@@ -4,5 +4,6 @@
   "main": "src/index.js",
   "assets": {
     "directory": "./dist"
-  }
+  },
+  "pages_build_output_dir": "./build"
 }
