@@ -1,9 +1,0 @@
-{
-  "name": "my-static-site-worker",
-  "compatibility_date": "2025-11-26",
-  "main": "src/index.js",
-  "assets": {
-    "directory": "./dist"
-  },
-  "pages_build_output_dir": "./build"
-}
