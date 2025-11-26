@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Villager Pack Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+    @font-face {
+        font-family: Minecraftia;
+        src: url('./fonts/Minecraftia-Regular.woff') format('woff');
+        font-style: normal;
+        font-weight: normal;
+    }
+
+    @font-face {
+        font-family: 'MCTenAlt';
+        src: url('./fonts/MCTenLowercaseAlt.eot');
+        src: url('./fonts/MCTenLowercaseAlt.eot?#iefix') format('embedded-opentype'),
+             url('./fonts/MCTenLowercaseAlt.woff2') format('woff2'),
+             url('./fonts/MCTenLowercaseAlt.woff') format('woff'),
+             url('./fonts/MCTenLowercaseAlt.ttf') format('truetype'),
+             url('./fonts/MCTenLowercaseAlt.svg#MCTenLowercaseAlt') format('svg');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+    }
+
+    @font-face {
+        font-family: MinecraftSeven2;
+        src: url('./fonts/MinecraftSeven2.eot');
+        src: url('./fonts/MinecraftSeven2.eot') format('embedded-opentype'),
+             url('./fonts/MinecraftSeven2.woff') format('woff'),
+             url('./fonts/MinecraftSeven2.ttf') format('truetype'),
+             url('./fonts/MinecraftSeven2.svg') format('svg');
+        font-style: normal;
+        font-weight: normal;
+    }
+
+    html {
+        font-size: 14px;
+        background-image: url("./img/copper_age.webp");
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
+        background-size: cover;
+    }
+
+    body {
+        font-family: MinecraftSeven2, sans-serif;
+        background-color: #f0f0f0;
+        padding: 20px;
+        font-synthesis-weight: none;
+        transform: translateX(-50%) scale(0.6);
+        transform-origin: top center;
+        position: absolute;
+        left: 50%;
+        width: 100%;
+        margin-top: 0px;
+        padding-top: 0px;
+    }
+
+    .nav-bar {
+        background-color: #4CAF50;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .nav-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0;
+    }
+
+    .nav-link {
+        font-family: MCTenAlt, sans-serif;
+        font-size: 55px;
+        color: white;
+        text-decoration: none;
+        padding: 20px 40px;
+        display: block;
+        text-align: center;
+        border-right: 2px solid #45a049;
+        transition: background-color 0.2s;
+        text-transform: uppercase;
+    }
+
+    .nav-link:last-child {
+        border-right: none;
+    }
+
+    .nav-link:hover {
+        background-color: #45a049;
+    }
+
+    .nav-link.active {
+        background-color: #388E3C;
+        font-weight: bold;
+    }
+
+    .pack-icon-upload {
+        height: 100%;
+    }
+    
+    h1 {
+        font-family: MCTenAlt, sans-serif;
+        font-size: 90px;
+        text-align: center;
+        color: #444;
+        width: 100%;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+    }
+
+    h2 {
+        font-family: MCTenAlt, sans-serif;
+        font-size: 60px;
+        text-align: center;
+        color: #666;
+        margin-top: 30px;
+        padding: 10px;
+        background-color: #ddd;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+    }
+
+    h3 {
+        font-family: MCTenAlt, sans-serif;
+        font-size: 50px;
+        text-align: center;
+        color: #555;
+        margin-top: 30px;
+        padding: 10px;
+        background-color: #e8e8e8;
+        border-radius: 5px;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+    }
+
+    h4 {
+        font-family: MinecraftSeven2, sans-serif;
+        font-size: 28px;
+        color: #4CAF50;
+        margin-bottom: 15px;
+    }
+
+    .container {
+        background-color: white;
+        padding: 30px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+
+    .section {
+        margin-bottom: 30px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 15px;
+        font-size: 20px;
+        color: #333;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+        width: 100%;
+        padding: 12px;
+        font-size: 18px;
+        font-family: MinecraftSeven2, monospace;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        background-color: white;
+        margin-top: 5px;
+        box-sizing: border-box;
+    }
+
+    input[type="file"] {
+        margin-top: 5px;
+        font-size: 18px;
+        padding: 12px;
+        font-family: MinecraftSeven2, sans-serif;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        background-color: white;
+        cursor: pointer;
+        box-sizing: border-box;
+    }
+
+    input[type="file"]::-webkit-file-upload-button {
+        font-family: MinecraftSeven2, sans-serif;
+        padding: 8px 16px;
+        font-size: 18px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        margin-right: 10px;
+    }
+
+    input[type="file"]::-webkit-file-upload-button:hover {
+        background-color: #45a049;
+    }
+
+    /* Firefox */
+    input[type="file"]::file-selector-button {
+        font-family: MinecraftSeven2, sans-serif;
+        padding: 8px 16px;
+        font-size: 18px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        margin-right: 10px;
+    }
+
+    input[type="file"]::file-selector-button:hover {
+        background-color: #45a049;
+    }
+
+    textarea {
+        min-height: 150px;
+        font-size: 16px;
+        resize: vertical;
+    }
+
+    button {
+        font-family: MinecraftSeven2, sans-serif;
+        padding: 12px 20px;
+        font-size: 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-right: 10px;
+        margin-top: 10px;
+    }
+
+    button:hover {
+        background-color: #45a049;
+    }
+
+    .remove-btn {
+        background-color: #f44336;
+    }
+
+    .remove-btn:hover {
+        background-color: #da190b;
+    }
+
+    .validate-btn {
+        background-color: #2196F3;
+    }
+
+    .validate-btn:hover {
+        background-color: #0b7dda;
+    }
+
+    .component-item {
+        background-color: #f0f0f0;
+        padding: 20px;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .component-list {
+        margin-top: 20px;
+    }
+
+    .add-button {
+        background-color: #8BC34A;
+        margin-bottom: 20px;
+    }
+
+    .add-button:hover {
+        background-color: #7CB342;
+    }
+
+    .generate-button {
+        background-color: #FF9800;
+        font-size: 30px;
+        padding: 15px 40px;
+        display: block;
+        margin: 40px auto;
+    }
+
+    .generate-button:hover {
+        background-color: #F57C00;
+    }
+
+    .validation-result {
+        margin-top: 10px;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .pack-icon-preview {
+        width: auto;
+        height: 128px;
+        margin-top: 15px;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        display: block;
+        image-rendering: pixelated;
+    }
+
+    .info-box {
+        background-color: #e3f2fd;
+        border: 2px solid #2196F3;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 5px;
+    }
+
+    .warning-box {
+        background-color: #fff3e0;
+        border: 2px solid #FF9800;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 5px;
+    }
+
+    .grid-2 {
+        display: flex;
+        gap: 20px;
+    }
+
+    .grid-2 > div {
+        flex: 1;
+    }
+
+    .intro {
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 19px;
+        color: #000;
+        background-color: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    ul {
+        font-size: 18px;
+    }
+
+    ul li {
+        margin-bottom: 10px;
+    }
+</style>
+</head>
+<body>
+    <h1>Villager Pack Generator</h1>
+
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <a href="https://morevillagers.neoterra.online" class="nav-link">Trades List</a>
+            <a href="https://morevillagers.neoterra.online/villager-pack-gen" class="nav-link">Villager Pack Generator</a>
+        </div>
+    </nav>
+    
+    <div class="intro">
+        Create custom villager professions, types, and trades for Minecraft without writing any code!
+    </div>
+
+    <div class="container">
+        <h2>Pack Metadata</h2>
+        
+        <div class="info-box">
+            <strong>Pack Format:</strong> 48 (Minecraft 1.21.1)<br>
+            <strong>Namespace:</strong> Use lowercase letters, numbers, and underscores only
+        </div>
+
+        <label>
+            Pack Namespace:
+            <input type="text" id="pack-namespace" placeholder="morevillagers" value="morevillagers">
+        </label>
+
+        <label>
+            Pack Description:
+            <textarea id="pack-description" rows="3" placeholder="§6Custom Villagers§r\n§7Adds new professions and types"></textarea>
+        </label>
+
+        <label>
+            Pack Icon (pack.png):
+            <input type="file" id="pack-icon-upload" accept="image/png">
+        </label>
+        <img id="pack-icon-preview" class="pack-icon-preview" style="display: none;">
+    </div>
+
+    <div class="container">
+        <h2>POI Types</h2>
+        
+        <div class="info-box">
+            POI (Point of Interest) types define which block a villager uses as their workstation.
+        </div>
+
+        <button id="add-poi" class="add-button">+ Add POI Type</button>
+        <div id="poi-list" class="component-list"></div>
+    </div>
+
+    <div class="container">
+        <h2>Villager Types</h2>
+        
+        <div class="info-box">
+            Villager types control the appearance based on biome. Upload a texture for each type.
+        </div>
+
+        <button id="add-type" class="add-button">+ Add Villager Type</button>
+        <div id="type-list" class="component-list"></div>
+    </div>
+
+    <div class="container">
+        <h2>Professions</h2>
+        
+        <div class="info-box">
+            Professions define the villager's job, linking them to a POI type and work sound.
+        </div>
+
+        <button id="add-profession" class="add-button">+ Add Profession</button>
+        <div id="profession-list" class="component-list"></div>
+    </div>
+
+    <div class="container">
+        <h2>Trades</h2>
+        
+        <div class="warning-box">
+            <strong>Important:</strong> Trades must be valid JSON. Use the Validate button to check before generating.
+        </div>
+
+        <div class="info-box">
+            Define what items villagers buy and sell at each level (1-5).
+        </div>
+
+        <button id="add-trade" class="add-button">+ Add Trade Definition</button>
+        <div id="trade-list" class="component-list"></div>
+    </div>
+
+    <div class="container">
+        <h2>Biome-Specific Trades</h2>
+        
+        <div class="info-box">
+            Add extra/replaceable trades for villagers based on their biome/type. [Currently does not work, will be used in later versions]
+        </div>
+
+        <button id="add-biome-trade" class="add-button">+ Add Biome Trade</button>
+        <div id="biomeTrade-list" class="component-list"></div>
+    </div>
+
+    <div class="container">
+        <h2>Hero Gifts</h2>
+        
+        <div class="info-box">
+            Define what loot table is used when villagers throw gifts after winning a raid.
+        </div>
+
+        <button id="add-gift" class="add-button">+ Add Hero Gift</button>
+        <div id="gift-list" class="component-list"></div>
+    </div>
+
+    <div class="container">
+        <h2>Biome Mappings</h2>
+        
+        <div class="info-box">
+            Control which villager type appears in which biome.
+        </div>
+
+        <button id="add-biome-mapping" class="add-button">+ Add Biome Mapping</button>
+        <div id="biomeMapping-list" class="component-list"></div>
+    </div>
+
+    <div class="container">
+        <h2>Loot Tables</h2>
+        
+        <div class="info-box">
+            Create loot tables for hero gifts. These will be placed in data/[namespace]/loot_table/gameplay/hero_of_the_village/
+        </div>
+
+        <button id="add-loot-table" class="add-button">+ Add Loot Table</button>
+        <div id="lootTable-list" class="component-list"></div>
+    </div>
+
+    <button id="generate-pack" class="generate-button">Generate & Download Pack</button>
+
+    <div class="container">
+        <h3>Quick Reference</h3>
+        <div>
+            <div>
+                <text>Additional documentation:</text>
+                <h5><a href="https://github.com/frikinjay/morevillagers/blob/1.21.1/DOCUMENTATION.md">github.com/frikinjay/morevillagers/blob/1.21.1/DOCUMENTATION.md</a></h5>
+            </div>
+        </div>
+    </div>
+
+    <script src="./js/villager-pack-generator.js"></script>
+</body>
+</html>

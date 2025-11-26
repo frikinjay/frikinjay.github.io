@@ -61,6 +61,47 @@
             margin-top: 0px;
             padding-top: 0px;
         }
+
+	.nav-bar {
+        background-color: #4CAF50;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .nav-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0;
+    }
+
+    .nav-link {
+        font-family: MCTenAlt, sans-serif;
+        font-size: 55px;
+        color: white;
+        text-decoration: none;
+        padding: 20px 40px;
+        display: block;
+        text-align: center;
+        border-right: 2px solid #45a049;
+        transition: background-color 0.2s;
+        text-transform: uppercase;
+    }
+
+    .nav-link:last-child {
+        border-right: none;
+    }
+
+    .nav-link:hover {
+        background-color: #45a049;
+    }
+
+    .nav-link.active {
+        background-color: #388E3C;
+        font-weight: bold;
+    }
         
         h1 {
             font-family: MCTenAlt, sans-serif;
