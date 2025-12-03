@@ -121,46 +121,49 @@ class VillagerPackGenerator {
 
     createPOIForm(id) {
         return `
-            <h4>POI Type</h4>
-            <label>Name: <input type="text" data-field="name" placeholder="e.g., alchemist" /></label>
-            <label>Block: <input type="text" data-field="block" placeholder="minecraft:brewing_stand" /></label>
-            <label>Tickets: <input type="number" data-field="tickets" value="1" min="1" /></label>
-            <button onclick="villagerGen.removeComponent('${id}')">Remove</button>
-        `;
+        <h4>POI Type</h4>
+        <label>Name: <input type="text" data-field="name" placeholder="e.g., alchemist" /></label>
+        <label>Namespace: <input type="text" data-field="namespace" placeholder="villagerapi (default)" /></label>
+        <label>Block: <input type="text" data-field="block" placeholder="minecraft:brewing_stand" /></label>
+        <label>Tickets: <input type="number" data-field="tickets" value="1" min="1" /></label>
+        <button onclick="villagerGen.removeComponent('${id}')">Remove</button>
+    `;
     }
 
     createTypeForm(id) {
         return `
-            <h4>Villager Type</h4>
-            <label>Name: <input type="text" data-field="name" placeholder="e.g., jungle_dweller" /></label>
-            <label>Texture: <input type="file" data-field="texture" accept="image/png" /></label>
-            <button onclick="villagerGen.removeComponent('${id}')">Remove</button>
-        `;
+        <h4>Villager Type</h4>
+        <label>Name: <input type="text" data-field="name" placeholder="e.g., jungle_dweller" /></label>
+        <label>Namespace: <input type="text" data-field="namespace" placeholder="villagerapi (default)" /></label>
+        <label>Texture: <input type="file" data-field="texture" accept="image/png" /></label>
+        <button onclick="villagerGen.removeComponent('${id}')">Remove</button>
+    `;
     }
 
     createProfessionForm(id) {
         return `
-            <h4>Profession</h4>
-            <label>Name: <input type="text" data-field="name" placeholder="e.g., alchemist" /></label>
-            <label>POI Type: <input type="text" data-field="poiType" placeholder="alchemist" /></label>
-            <label>Work Sound: <select data-field="workSound">
-                <option value="minecraft:entity.villager.work_armorer">Armorer</option>
-                <option value="minecraft:entity.villager.work_butcher">Butcher</option>
-                <option value="minecraft:entity.villager.work_cartographer">Cartographer</option>
-                <option value="minecraft:entity.villager.work_cleric">Cleric</option>
-                <option value="minecraft:entity.villager.work_farmer">Farmer</option>
-                <option value="minecraft:entity.villager.work_fisherman">Fisherman</option>
-                <option value="minecraft:entity.villager.work_fletcher">Fletcher</option>
-                <option value="minecraft:entity.villager.work_leatherworker">Leatherworker</option>
-                <option value="minecraft:entity.villager.work_librarian">Librarian</option>
-                <option value="minecraft:entity.villager.work_mason">Mason</option>
-                <option value="minecraft:entity.villager.work_shepherd">Shepherd</option>
-                <option value="minecraft:entity.villager.work_toolsmith">Toolsmith</option>
-                <option value="minecraft:entity.villager.work_weaponsmith">Weaponsmith</option>
-            </select></label>
-            <label>Texture: <input type="file" data-field="texture" accept="image/png" /></label>
-            <button onclick="villagerGen.removeComponent('${id}')">Remove</button>
-        `;
+        <h4>Profession</h4>
+        <label>Name: <input type="text" data-field="name" placeholder="e.g., alchemist" /></label>
+        <label>Namespace: <input type="text" data-field="namespace" placeholder="villagerapi (default)" /></label>
+        <label>POI Type: <input type="text" data-field="poiType" placeholder="alchemist" /></label>
+        <label>Work Sound: <select data-field="workSound">
+            <option value="minecraft:entity.villager.work_armorer">Armorer</option>
+            <option value="minecraft:entity.villager.work_butcher">Butcher</option>
+            <option value="minecraft:entity.villager.work_cartographer">Cartographer</option>
+            <option value="minecraft:entity.villager.work_cleric">Cleric</option>
+            <option value="minecraft:entity.villager.work_farmer">Farmer</option>
+            <option value="minecraft:entity.villager.work_fisherman">Fisherman</option>
+            <option value="minecraft:entity.villager.work_fletcher">Fletcher</option>
+            <option value="minecraft:entity.villager.work_leatherworker">Leatherworker</option>
+            <option value="minecraft:entity.villager.work_librarian">Librarian</option>
+            <option value="minecraft:entity.villager.work_mason">Mason</option>
+            <option value="minecraft:entity.villager.work_shepherd">Shepherd</option>
+            <option value="minecraft:entity.villager.work_toolsmith">Toolsmith</option>
+            <option value="minecraft:entity.villager.work_weaponsmith">Weaponsmith</option>
+        </select></label>
+        <label>Texture: <input type="file" data-field="texture" accept="image/png" /></label>
+        <button onclick="villagerGen.removeComponent('${id}')">Remove</button>
+    `;
     }
 
     createTradeForm(id) {
@@ -340,9 +343,11 @@ class VillagerPackGenerator {
             // Generate POI types
             poiTypes.forEach(poi => {
                 if (poi.name) {
+                    const poiNamespace = poi.namespace || 'villagerapi';
                     const poiData = {
                         block: poi.block || 'minecraft:barrel',
-                        tickets: poi.tickets || 1
+                        tickets: poi.tickets || 1,
+                        namespace: poiNamespace
                     };
                     zip.file(`villagers/poi_types/${poi.name}.json`, JSON.stringify(poiData, null, 2));
                 }
@@ -351,14 +356,18 @@ class VillagerPackGenerator {
             // Generate villager types
             types.forEach(type => {
                 if (type.name) {
-                    const typeData = { name: type.name };
+                    const typeNamespace = type.namespace || 'villagerapi';
+                    const typeData = {
+                        name: type.name,
+                        namespace: typeNamespace
+                    };
                     zip.file(`villagers/types/${type.name}.json`, JSON.stringify(typeData, null, 2));
-                    
+
                     // Add type texture if available
                     if (this.packData.textures.types[type.name]) {
                         const base64Data = this.packData.textures.types[type.name].split(',')[1];
-                        zip.file(`assets/${namespace}/textures/entity/villager/type/${type.name}.png`, base64Data, { base64: true });
-                        zip.file(`assets/${namespace}/textures/entity/zombie_villager/type/${type.name}.png`, base64Data, { base64: true });
+                        zip.file(`assets/${typeNamespace}/textures/entity/villager/type/${type.name}.png`, base64Data, { base64: true });
+                        zip.file(`assets/${typeNamespace}/textures/entity/zombie_villager/type/${type.name}.png`, base64Data, { base64: true });
                     }
                 }
             });
@@ -366,17 +375,19 @@ class VillagerPackGenerator {
             // Generate professions
             professions.forEach(prof => {
                 if (prof.name) {
+                    const profNamespace = prof.namespace || 'villagerapi';
                     const profData = {
                         poi_type: prof.poiType || prof.name,
-                        work_sound: prof.workSound || 'minecraft:entity.villager.work_armorer'
+                        work_sound: prof.workSound || 'minecraft:entity.villager.work_armorer',
+                        namespace: profNamespace
                     };
                     zip.file(`villagers/professions/${prof.name}.json`, JSON.stringify(profData, null, 2));
-                    
+
                     // Add profession texture if available
                     if (this.packData.textures.professions[prof.name]) {
                         const base64Data = this.packData.textures.professions[prof.name].split(',')[1];
-                        zip.file(`assets/${namespace}/textures/entity/villager/profession/${prof.name}.png`, base64Data, { base64: true });
-                        zip.file(`assets/${namespace}/textures/entity/zombie_villager/profession/${prof.name}.png`, base64Data, { base64: true });
+                        zip.file(`assets/${profNamespace}/textures/entity/villager/profession/${prof.name}.png`, base64Data, { base64: true });
+                        zip.file(`assets/${profNamespace}/textures/entity/zombie_villager/profession/${prof.name}.png`, base64Data, { base64: true });
                     }
                 }
             });
@@ -432,13 +443,15 @@ class VillagerPackGenerator {
             const langData = {};
             professions.forEach(prof => {
                 if (prof.name) {
-                    langData[`entity.minecraft.villager.${namespace}.${prof.name}`] = this.toTitleCase(prof.name);
+                    const profNamespace = prof.namespace || 'villagerapi';
+                    langData[`entity.minecraft.villager.${profNamespace}.${prof.name}`] = this.toTitleCase(prof.name);
                     langData[`entity.minecraft.villager.${prof.name}`] = this.toTitleCase(prof.name);
                 }
             });
             types.forEach(type => {
                 if (type.name) {
-                    langData[`entity.minecraft.villager.${namespace}.${type.name}`] = this.toTitleCase(type.name);
+                    const typeNamespace = type.namespace || 'villagerapi';
+                    langData[`entity.minecraft.villager.${typeNamespace}.${type.name}`] = this.toTitleCase(type.name);
                     langData[`entity.minecraft.villager.${type.name}`] = this.toTitleCase(type.name);
                 }
             });
@@ -450,7 +463,10 @@ class VillagerPackGenerator {
             if (professions.length > 0) {
                 const jobSiteTag = {
                     replace: false,
-                    values: professions.map(p => `${namespace}:${p.name}`)
+                    values: professions.map(p => {
+                        const profNamespace = p.namespace || 'villagerapi';
+                        return `${profNamespace}:${p.name}`;
+                    })
                 };
                 zip.file('data/minecraft/tags/point_of_interest_type/acquirable_job_site.json', JSON.stringify(jobSiteTag, null, 2));
             }

@@ -381,7 +381,8 @@
         
         <div class="info-box">
             <strong>Pack Format:</strong> 48 (Minecraft 1.21.1)<br>
-            <strong>Namespace:</strong> Use lowercase letters, numbers, and underscores only
+            <strong>Namespace:</strong> Use lowercase letters, numbers, and underscores only<br>
+            <strong>Note:</strong> Individual components default to "villagerapi" namespace if not specified
         </div>
 
         <label>
@@ -405,7 +406,8 @@
         <h2>POI Types</h2>
         
         <div class="info-box">
-            POI (Point of Interest) types define which block a villager uses as their workstation.
+            POI (Point of Interest) types define which block a villager uses as their workstation. Leave namespace empty to use
+            "villagerapi" namespace.
         </div>
 
         <button id="add-poi" class="add-button">+ Add POI Type</button>
@@ -416,7 +418,8 @@
         <h2>Villager Types</h2>
         
         <div class="info-box">
-            Villager types control the appearance based on biome. Upload a texture for each type.
+            Villager types control the appearance based on biome. Upload a texture for each type. Leave namespace empty to use
+            "villagerapi" namespace.
         </div>
 
         <button id="add-type" class="add-button">+ Add Villager Type</button>
@@ -427,7 +430,8 @@
         <h2>Professions</h2>
         
         <div class="info-box">
-            Professions define the villager's job, linking them to a POI type and work sound.
+            Professions define the villager's job, linking them to a POI type and work sound. Leave namespace empty to use
+            "villagerapi" namespace.
         </div>
 
         <button id="add-profession" class="add-button">+ Add Profession</button>
