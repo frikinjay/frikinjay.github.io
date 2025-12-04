@@ -9,7 +9,7 @@ class VillagerPackGenerator {
                 description: ''
             },
             packIcon: null,
-            namespace: 'morevillagers',
+            namespace: 'villagerapi',
             poiTypes: [],
             villagerTypes: [],
             professions: [],
