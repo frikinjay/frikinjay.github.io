@@ -147,6 +147,12 @@
         margin-bottom: 15px;
     }
 
+    h5 {
+        font-family: MinecraftSeven2, sans-serif;
+        font-size: 20px;
+        margin: 10px 0;
+    }
+
     .container {
         background-color: white;
         padding: 30px;
@@ -210,7 +216,6 @@
         background-color: #45a049;
     }
 
-    /* Firefox */
     input[type="file"]::file-selector-button {
         font-family: MinecraftSeven2, sans-serif;
         padding: 8px 16px;
@@ -317,6 +322,29 @@
         image-rendering: pixelated;
     }
 
+    .texture-preview {
+        width: auto;
+        height: 64px;
+        margin-top: 10px;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        image-rendering: pixelated;
+    }
+
+    .texture-upload-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin: 20px 0;
+    }
+
+    .texture-upload-item {
+        background-color: white;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
     .info-box {
         background-color: #e3f2fd;
         border: 2px solid #2196F3;
@@ -359,6 +387,15 @@
 
     ul li {
         margin-bottom: 10px;
+    }
+
+    a {
+        color: #2196F3;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
     }
 </style>
 </head>
@@ -403,11 +440,21 @@
     </div>
 
     <div class="container">
+        <h2>Workstation Blocks</h2>
+        
+        <div class="info-box">
+            Create custom workstation blocks for your villager professions. Upload textures for each face of the block (front, back, left, right, top, bottom). Leave namespace empty to use "villagerapi" namespace.
+        </div>
+
+        <button id="add-workstation" class="add-button">+ Add Workstation Block</button>
+        <div id="workstation-list" class="component-list"></div>
+    </div>
+
+    <div class="container">
         <h2>POI Types</h2>
         
         <div class="info-box">
-            POI (Point of Interest) types define which block a villager uses as their workstation. Leave namespace empty to use
-            "villagerapi" namespace.
+            POI (Point of Interest) types define which block a villager uses as their workstation. Reference your custom workstation blocks using the format "namespace:block_name" (e.g., "morevillagers:purpur_altar"). Leave namespace empty to use "villagerapi" namespace.
         </div>
 
         <button id="add-poi" class="add-button">+ Add POI Type</button>
@@ -418,8 +465,7 @@
         <h2>Villager Types</h2>
         
         <div class="info-box">
-            Villager types control the appearance based on biome. Upload a texture for each type. Leave namespace empty to use
-            "villagerapi" namespace.
+            Villager types control the appearance based on biome. Upload a texture for each type. Leave namespace empty to use "villagerapi" namespace.
         </div>
 
         <button id="add-type" class="add-button">+ Add Villager Type</button>
@@ -430,12 +476,22 @@
         <h2>Professions</h2>
         
         <div class="info-box">
-            Professions define the villager's job, linking them to a POI type and work sound. Leave namespace empty to use
-            "villagerapi" namespace.
+            Professions define the villager's job, linking them to a POI type and work sound. Leave namespace empty to use "villagerapi" namespace.
         </div>
 
         <button id="add-profession" class="add-button">+ Add Profession</button>
         <div id="profession-list" class="component-list"></div>
+    </div>
+
+    <div class="container">
+        <h2>Structure Tags & Map Decorations</h2>
+        
+        <div class="info-box">
+            Create structure tags for treasure maps and define custom map decoration icons. Upload a texture for the map decoration icon and choose the color for the map marker. Leave namespace empty to use "villagerapi" namespace.
+        </div>
+
+        <button id="add-structure-tag" class="add-button">+ Add Structure Tag</button>
+        <div id="structureTag-list" class="component-list"></div>
     </div>
 
     <div class="container">
@@ -446,7 +502,7 @@
         </div>
 
         <div class="info-box">
-            Define what items villagers buy and sell at each level (1-5).
+            Define what items villagers buy and sell at each level (1-5). You can reference custom structure tags in treasure map trades using the format "namespace:tag_name".
         </div>
 
         <button id="add-trade" class="add-button">+ Add Trade Definition</button>
@@ -502,10 +558,8 @@
     <div class="container">
         <h3>Quick Reference</h3>
         <div>
-            <div>
-                <text>Additional documentation:</text>
-                <h5><a href="https://github.com/frikinjay/morevillagers/blob/1.21.1/DOCUMENTATION.md">github.com/frikinjay/morevillagers/blob/1.21.1/DOCUMENTATION.md</a></h5>
-            </div>
+            <h5>Additional documentation:</h5>
+            <a href="https://github.com/frikinjay/morevillagers/blob/1.21.1/DOCUMENTATION.md">github.com/frikinjay/morevillagers/blob/1.21.1/DOCUMENTATION.md</a>
         </div>
     </div>
 
