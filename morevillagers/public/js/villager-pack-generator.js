@@ -133,7 +133,7 @@ class VillagerPackGenerator {
         <h4>POI Type</h4>
         <label>Name: <input type="text" data-field="name" placeholder="e.g., alchemist" /></label>
         <label>Namespace: <input type="text" data-field="namespace" placeholder="villagerapi (default)" /></label>
-        <label>Block: <input type="text" data-field="block" placeholder="minecraft:brewing_stand or morevillagers:custom_block" /></label>
+        <label>Block: <input type="text" data-field="block" placeholder="minecraft:brewing_stand or villagerapi:custom_block" /></label>
         <label>Tickets: <input type="number" data-field="tickets" value="1" min="1" /></label>
         <button onclick="villagerGen.removeComponent('${id}')">Remove</button>
     `;
@@ -201,7 +201,7 @@ class VillagerPackGenerator {
         return `
             <h4>Hero Gift</h4>
             <label>Profession: <input type="text" data-field="profession" placeholder="alchemist" /></label>
-            <label>Loot Table: <input type="text" data-field="lootTable" placeholder="morevillagers:gameplay/hero_of_the_village/alchemist_gift" /></label>
+            <label>Loot Table: <input type="text" data-field="lootTable" placeholder="villagerapi:gameplay/hero_of_the_village/alchemist_gift" /></label>
             <button onclick="villagerGen.removeComponent('${id}')">Remove</button>
         `;
     }
