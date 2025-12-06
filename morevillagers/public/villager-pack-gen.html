@@ -361,6 +361,14 @@
         border-radius: 5px;
     }
 
+    .critical-box {
+        background-color: #ffebee;
+        border: 2px solid #f44336;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 5px;
+    }
+
     .grid-2 {
         display: flex;
         gap: 20px;
@@ -414,22 +422,48 @@
     </div>
 
     <div class="container">
-        <h2>Pack Metadata</h2>
+        <h2>Pack Configuration</h2>
         
+        <div class="critical-box">
+            <strong>REQUIRED:</strong> All villagerpacks must have proper configuration. The namespace field is especially important as it determines your pack's identity.
+        </div>
+
         <div class="info-box">
             <strong>Pack Format:</strong> 48 (Minecraft 1.21.1)<br>
-            <strong>Namespace:</strong> Use lowercase letters, numbers, and underscores only<br>
-            <strong>Note:</strong> Individual components default to "villagerapi" namespace if not specified
+            <strong>Namespace:</strong> Use lowercase letters, numbers, and underscores only (required)<br>
+            <strong>Creative Tab:</strong> All your workstations will appear in a creative tab with your chosen icon<br>
+            <strong>Note:</strong> Individual components can override the namespace if needed
         </div>
 
         <label>
-            Pack Namespace:
-            <input type="text" id="pack-namespace" placeholder="villagerapi" value="villagerapi">
+            Pack Namespace (required):
+            <input type="text" id="pack-namespace" placeholder="morevillagers" value="morevillagers">
         </label>
 
         <label>
-            Pack Description:
-            <textarea id="pack-description" rows="3" placeholder="§6Custom Villagers§r\n§7Adds new professions and types"></textarea>
+            Display Name:
+            <input type="text" id="pack-display-name" placeholder="More Villagers" value="">
+        </label>
+
+        <label>
+            Description:
+            <textarea id="pack-description" rows="3" placeholder="Adds new villager professions and trades"></textarea>
+        </label>
+
+        <label>
+            Version:
+            <input type="text" id="pack-version" placeholder="1.0.0" value="1.0.0">
+        </label>
+
+        <label>
+            Author:
+            <input type="text" id="pack-author" placeholder="Your Name" value="">
+        </label>
+
+        <label>
+            Creative Tab Icon:
+            <input type="text" id="pack-creative-icon" placeholder="minecraft:emerald" value="minecraft:emerald">
+            <small style="display: block; margin-top: 5px; color: #666;">Format: namespace:item_id (e.g., minecraft:emerald, minecraft:diamond, yourmod:custom_item)</small>
         </label>
 
         <label>
@@ -443,7 +477,7 @@
         <h2>Workstation Blocks</h2>
         
         <div class="info-box">
-            Create custom workstation blocks for your villager professions. Upload textures for each face of the block (front, back, left, right, top, bottom). Leave namespace empty to use "villagerapi" namespace.
+            Create custom workstation blocks for your villager professions. Upload textures for each face of the block (front, back, left, right, top, bottom). Leave namespace empty to use pack namespace. All workstations will automatically appear in your pack's creative tab.
         </div>
 
         <button id="add-workstation" class="add-button">+ Add Workstation Block</button>
@@ -454,7 +488,7 @@
         <h2>POI Types</h2>
         
         <div class="info-box">
-            POI (Point of Interest) types define which block a villager uses as their workstation. Reference your custom workstation blocks using the format "namespace:block_name" (e.g., "villagerapi:purpur_altar"). Leave namespace empty to use "villagerapi" namespace.
+            POI (Point of Interest) types define which block a villager uses as their workstation. Reference your custom workstation blocks using the format "namespace:block_name" (e.g., "morevillagers:purpur_altar"). Leave namespace empty to use pack namespace.
         </div>
 
         <button id="add-poi" class="add-button">+ Add POI Type</button>
@@ -465,7 +499,7 @@
         <h2>Villager Types</h2>
         
         <div class="info-box">
-            Villager types control the appearance based on biome. Upload a texture for each type. Leave namespace empty to use "villagerapi" namespace.
+            Villager types control the appearance based on biome. Upload a texture for each type. Leave namespace empty to use pack namespace.
         </div>
 
         <button id="add-type" class="add-button">+ Add Villager Type</button>
@@ -476,7 +510,7 @@
         <h2>Professions</h2>
         
         <div class="info-box">
-            Professions define the villager's job, linking them to a POI type and work sound. Leave namespace empty to use "villagerapi" namespace.
+            Professions define the villager's job, linking them to a POI type and work sound. Leave namespace empty to use pack namespace.
         </div>
 
         <button id="add-profession" class="add-button">+ Add Profession</button>
@@ -487,7 +521,7 @@
         <h2>Structure Tags & Map Decorations</h2>
         
         <div class="info-box">
-            Create structure tags for treasure maps and define custom map decoration icons. Upload a texture for the map decoration icon and choose the color for the map marker. Leave namespace empty to use "villagerapi" namespace.
+            Create structure tags for treasure maps and define custom map decoration icons. Upload a texture for the map decoration icon and choose the color for the map marker. Leave namespace empty to use pack namespace.
         </div>
 
         <button id="add-structure-tag" class="add-button">+ Add Structure Tag</button>
@@ -557,6 +591,11 @@
 
     <div class="container">
         <h3>Quick Reference</h3>
+        <div class="info-box">
+            <strong>villagerapi_config.json:</strong> Every pack must have this file in the root with at minimum a namespace field.<br>
+            <strong>Creative Tabs:</strong> Workstations automatically appear in a creative tab named after your pack.<br>
+            <strong>Translation Key:</strong> itemGroup.{namespace}.villagerpack_tab
+        </div>
         <div>
             <h5>Additional documentation:</h5>
             <a href="https://github.com/frikinjay/morevillagers/blob/1.21.1/DOCUMENTATION.md">github.com/frikinjay/morevillagers/blob/1.21.1/DOCUMENTATION.md</a>

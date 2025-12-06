@@ -6,10 +6,14 @@ class VillagerPackGenerator {
         this.packData = {
             metadata: {
                 packFormat: 48,
-                description: ''
+                namespace: 'morevillagers',
+                displayName: '',
+                description: '',
+                version: '1.0.0',
+                author: '',
+                creativeTabIcon: 'minecraft:emerald'
             },
             packIcon: null,
-            namespace: 'villagerapi',
             poiTypes: [],
             villagerTypes: [],
             professions: [],
@@ -40,11 +44,23 @@ class VillagerPackGenerator {
 
     setupEventListeners() {
         document.getElementById('pack-namespace')?.addEventListener('input', (e) => {
-            this.packData.namespace = e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
-            e.target.value = this.packData.namespace;
+            this.packData.metadata.namespace = e.target.value.toLowerCase().replace(/[^a-z0-9_.-]/g, '');
+            e.target.value = this.packData.metadata.namespace;
+        });
+        document.getElementById('pack-display-name')?.addEventListener('input', (e) => {
+            this.packData.metadata.displayName = e.target.value;
         });
         document.getElementById('pack-description')?.addEventListener('input', (e) => {
             this.packData.metadata.description = e.target.value;
+        });
+        document.getElementById('pack-version')?.addEventListener('input', (e) => {
+            this.packData.metadata.version = e.target.value || '1.0.0';
+        });
+        document.getElementById('pack-author')?.addEventListener('input', (e) => {
+            this.packData.metadata.author = e.target.value;
+        });
+        document.getElementById('pack-creative-icon')?.addEventListener('input', (e) => {
+            this.packData.metadata.creativeTabIcon = e.target.value || 'minecraft:emerald';
         });
         document.getElementById('pack-icon-upload')?.addEventListener('change', (e) => {
             this.handlePackIconUpload(e);
@@ -132,8 +148,8 @@ class VillagerPackGenerator {
         return `
         <h4>POI Type</h4>
         <label>Name: <input type="text" data-field="name" placeholder="e.g., alchemist" /></label>
-        <label>Namespace: <input type="text" data-field="namespace" placeholder="villagerapi (default)" /></label>
-        <label>Block: <input type="text" data-field="block" placeholder="minecraft:brewing_stand or villagerapi:custom_block" /></label>
+        <label>Namespace (optional): <input type="text" data-field="namespace" placeholder="Leave empty to use pack namespace" /></label>
+        <label>Block: <input type="text" data-field="block" placeholder="minecraft:brewing_stand or morevillagers:custom_block" /></label>
         <label>Tickets: <input type="number" data-field="tickets" value="1" min="1" /></label>
         <button onclick="villagerGen.removeComponent('${id}')">Remove</button>
     `;
@@ -143,7 +159,7 @@ class VillagerPackGenerator {
         return `
         <h4>Villager Type</h4>
         <label>Name: <input type="text" data-field="name" placeholder="e.g., jungle_dweller" /></label>
-        <label>Namespace: <input type="text" data-field="namespace" placeholder="villagerapi (default)" /></label>
+        <label>Namespace (optional): <input type="text" data-field="namespace" placeholder="Leave empty to use pack namespace" /></label>
         <label>Texture: <input type="file" data-field="texture" accept="image/png" /></label>
         <button onclick="villagerGen.removeComponent('${id}')">Remove</button>
     `;
@@ -153,7 +169,7 @@ class VillagerPackGenerator {
         return `
         <h4>Profession</h4>
         <label>Name: <input type="text" data-field="name" placeholder="e.g., alchemist" /></label>
-        <label>Namespace: <input type="text" data-field="namespace" placeholder="villagerapi (default)" /></label>
+        <label>Namespace (optional): <input type="text" data-field="namespace" placeholder="Leave empty to use pack namespace" /></label>
         <label>POI Type: <input type="text" data-field="poiType" placeholder="alchemist" /></label>
         <label>Work Sound: <select data-field="workSound">
             <option value="minecraft:entity.villager.work_armorer">Armorer</option>
@@ -201,7 +217,7 @@ class VillagerPackGenerator {
         return `
             <h4>Hero Gift</h4>
             <label>Profession: <input type="text" data-field="profession" placeholder="alchemist" /></label>
-            <label>Loot Table: <input type="text" data-field="lootTable" placeholder="villagerapi:gameplay/hero_of_the_village/alchemist_gift" /></label>
+            <label>Loot Table: <input type="text" data-field="lootTable" placeholder="morevillagers:gameplay/hero_of_the_village/alchemist_gift" /></label>
             <button onclick="villagerGen.removeComponent('${id}')">Remove</button>
         `;
     }
@@ -232,7 +248,7 @@ class VillagerPackGenerator {
         return `
             <h4>Workstation Block</h4>
             <label>Name: <input type="text" data-field="name" placeholder="e.g., purpur_altar" /></label>
-            <label>Namespace: <input type="text" data-field="namespace" placeholder="villagerapi (default)" /></label>
+            <label>Namespace (optional): <input type="text" data-field="namespace" placeholder="Leave empty to use pack namespace" /></label>
             
             <div class="texture-upload-grid">
                 <div class="texture-upload-item">
@@ -269,7 +285,7 @@ class VillagerPackGenerator {
         return `
             <h4>Structure Tag & Map Decoration</h4>
             <label>Tag Name: <input type="text" data-field="tag" placeholder="e.g., on_end_city_explorer_maps" /></label>
-            <label>Namespace: <input type="text" data-field="namespace" placeholder="villagerapi (default)" /></label>
+            <label>Namespace (optional): <input type="text" data-field="namespace" placeholder="Leave empty to use pack namespace" /></label>
             <label>Map Decoration Name: <input type="text" data-field="mapDecoration" placeholder="e.g., end_city_decoration" /></label>
             
             <div style="margin: 15px 0;">
@@ -417,14 +433,31 @@ class VillagerPackGenerator {
 
     async generatePack() {
         const zip = new JSZip();
-        const namespace = this.packData.namespace;
+        const namespace = this.packData.metadata.namespace;
+
+        if (!namespace) {
+            alert('Pack namespace is required!');
+            return;
+        }
 
         try {
+            // Generate villagerapi_config.json
+            const villagerApiConfig = {
+                namespace: namespace,
+                display_name: this.packData.metadata.displayName || this.toTitleCase(namespace),
+                description: this.packData.metadata.description || '',
+                version: this.packData.metadata.version || '1.0.0',
+                author: this.packData.metadata.author || 'Unknown',
+                creative_tab_icon: this.packData.metadata.creativeTabIcon || 'minecraft:emerald'
+            };
+            zip.file('villagerapi_config.json', JSON.stringify(villagerApiConfig, null, 2));
+
+            // Generate pack.mcmeta
             const packMcmeta = {
                 pack: {
                     pack_format: this.packData.metadata.packFormat,
                     supported_formats: { min_inclusive: 42, max_inclusive: 1000 },
-                    description: this.packData.metadata.description
+                    description: this.packData.metadata.description || 'A custom villager pack'
                 }
             };
             zip.file('pack.mcmeta', JSON.stringify(packMcmeta, null, 2));
@@ -448,7 +481,7 @@ class VillagerPackGenerator {
             // Generate POI types
             poiTypes.forEach(poi => {
                 if (poi.name) {
-                    const poiNamespace = poi.namespace || 'villagerapi';
+                    const poiNamespace = poi.namespace || namespace;
                     const poiData = {
                         block: poi.block || 'minecraft:barrel',
                         namespace: poiNamespace
@@ -460,7 +493,7 @@ class VillagerPackGenerator {
             // Generate villager types
             types.forEach(type => {
                 if (type.name) {
-                    const typeNamespace = type.namespace || 'villagerapi';
+                    const typeNamespace = type.namespace || namespace;
                     const typeData = {
                         name: type.name,
                         namespace: typeNamespace
@@ -482,7 +515,7 @@ class VillagerPackGenerator {
             // Generate professions
             professions.forEach(prof => {
                 if (prof.name) {
-                    const profNamespace = prof.namespace || 'villagerapi';
+                    const profNamespace = prof.namespace || namespace;
                     const profData = {
                         poi_type: prof.poiType || prof.name,
                         work_sound: prof.workSound || 'minecraft:entity.villager.work_armorer',
@@ -505,7 +538,7 @@ class VillagerPackGenerator {
             // Generate workstations
             workstations.forEach(ws => {
                 if (ws.name) {
-                    const wsNamespace = ws.namespace || 'villagerapi';
+                    const wsNamespace = ws.namespace || namespace;
                     const wsData = {
                         name: ws.name,
                         namespace: wsNamespace
@@ -591,7 +624,7 @@ class VillagerPackGenerator {
             // Generate structure tags and map decorations
             structureTags.forEach(tag => {
                 if (tag.tag) {
-                    const tagNamespace = tag.namespace || 'villagerapi';
+                    const tagNamespace = tag.namespace || namespace;
                     
                     // Structure tag data
                     const structureTagData = {
@@ -667,21 +700,21 @@ class VillagerPackGenerator {
             const langData = {};
             professions.forEach(prof => {
                 if (prof.name) {
-                    const profNamespace = prof.namespace || 'villagerapi';
+                    const profNamespace = prof.namespace || namespace;
                     langData[`entity.minecraft.villager.${profNamespace}.${prof.name}`] = this.toTitleCase(prof.name);
                     langData[`entity.minecraft.villager.${prof.name}`] = this.toTitleCase(prof.name);
                 }
             });
             types.forEach(type => {
                 if (type.name) {
-                    const typeNamespace = type.namespace || 'villagerapi';
+                    const typeNamespace = type.namespace || namespace;
                     langData[`entity.minecraft.villager.${typeNamespace}.${type.name}`] = this.toTitleCase(type.name);
                     langData[`entity.minecraft.villager.${type.name}`] = this.toTitleCase(type.name);
                 }
             });
             workstations.forEach(ws => {
                 if (ws.name) {
-                    const wsNamespace = ws.namespace || 'villagerapi';
+                    const wsNamespace = ws.namespace || namespace;
                     langData[`block.${wsNamespace}.${ws.name}`] = this.toTitleCase(ws.name);
                 }
             });
@@ -691,6 +724,9 @@ class VillagerPackGenerator {
                     langData[`filled_map.${decorationName.replace('_decoration', '')}`] = this.toTitleCase(decorationName.replace('_decoration', '')) + ' Explorer Map';
                 }
             });
+            // Add creative tab translation
+            langData[`itemGroup.${namespace}.villagerpack_tab`] = this.packData.metadata.displayName || this.toTitleCase(namespace);
+            
             if (Object.keys(langData).length > 0) {
                 zip.file(`assets/${namespace}/lang/en_us.json`, JSON.stringify(langData, null, 2));
             }
@@ -700,7 +736,7 @@ class VillagerPackGenerator {
                 const jobSiteTag = {
                     replace: false,
                     values: professions.map(p => {
-                        const profNamespace = p.namespace || 'villagerapi';
+                        const profNamespace = p.namespace || namespace;
                         return `${profNamespace}:${p.name}`;
                     })
                 };
