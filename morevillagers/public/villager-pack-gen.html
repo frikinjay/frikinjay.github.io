@@ -3,9 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Villager Pack Generator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    
+    <!-- Primary Meta Tags -->
+    <title>Villager Pack Generator - Create Custom Minecraft Villagers | More Villagers Mod</title>
+    <meta name="title" content="Villager Pack Generator - Create Custom Minecraft Villagers | More Villagers Mod">
+    <meta name="description" content="Online tool to create custom villager professions, trades, and types for Minecraft 1.21.1. Generate villager packs without coding. Works with Fabric and NeoForge.">
+    <meta name="keywords" content="minecraft villager generator, custom villagers, minecraft mod, villager trades, minecraft professions, villager pack, minecraft 1.21.1, fabric mod, neoforge mod, villager api, custom trades, minecraft datapack, villager workstations, poi types, minecraft modding, villager types, biome villagers, treasure maps, hero gifts, minecraft texture packs, villager textures, minecraft json generator, datapack creator, resource pack generator, minecraft villager editor, custom minecraft professions">
+    <meta name="author" content="More Villagers">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://morevillagers.neoterra.online/villager-pack-gen">
+    <meta property="og:title" content="Villager Pack Generator - Create Custom Minecraft Villagers">
+    <meta property="og:description" content="Online tool to create custom villager professions, trades, and types for Minecraft. No coding required!">
+    <meta property="og:image" content="https://morevillagers.neoterra.online/img/og-image.png">
+    <meta property="og:site_name" content="More Villagers">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://morevillagers.neoterra.online/villager-pack-gen">
+    <meta property="twitter:title" content="Villager Pack Generator - Create Custom Minecraft Villagers">
+    <meta property="twitter:description" content="Online tool to create custom villager professions, trades, and types for Minecraft. No coding required!">
+    <meta property="twitter:image" content="https://morevillagers.neoterra.online/img/twitter-card.png">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://morevillagers.neoterra.online/villager-pack-gen">
+    
+    <!-- Language alternatives (add as needed) -->
+    <link rel="alternate" hreflang="en" href="https://morevillagers.neoterra.online/villager-pack-gen">
+    <link rel="alternate" hreflang="x-default" href="https://morevillagers.neoterra.online/villager-pack-gen">
+    
+    <!-- Performance hints -->
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+    
+    <!-- Preconnect to external resources -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Preload critical fonts -->
+    <link rel="preload" href="./fonts/MinecraftSeven2.woff" as="font" type="font/woff" crossorigin>
+    <link rel="preload" href="./fonts/MCTenLowercaseAlt.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="./fonts/Minecraftia-Regular.woff" as="font" type="font/woff" crossorigin>
+    
+    <!-- Preload critical scripts -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" as="script">
+    <link rel="preload" href="./js/villager-pack-generator.js" as="script">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="./img/favicon.png">
+    <link rel="apple-touch-icon" href="./img/apple-touch-icon.png">
+    
+    <!-- Sitemap -->
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Villager Pack Generator",
+      "url": "https://morevillagers.neoterra.online/villager-pack-gen",
+      "description": "Online tool to create custom villager professions, trades, and types for Minecraft 1.21.1 without coding",
+      "applicationCategory": "UtilityApplication",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "creator": {
+        "@type": "Organization",
+        "name": "More Villagers",
+        "url": "https://morevillagers.neoterra.online"
+      },
+      "featureList": [
+        "Custom villager professions",
+        "Villager trades editor",
+        "Workstation block creator",
+        "POI type generator",
+        "Villager type customization",
+        "Biome-specific trades",
+        "Structure tags for treasure maps",
+        "Hero gift configuration",
+        "Automatic creative tab generation",
+        "JSON validation",
+        "Texture upload support",
+        "Compatible with Fabric and NeoForge"
+      ],
+      "softwareVersion": "1.0",
+      "releaseNotes": "Supports Minecraft 1.21.1 with villagerapi_config.json format"
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [{
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://morevillagers.neoterra.online"
+      },{
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Villager Pack Generator",
+        "item": "https://morevillagers.neoterra.online/villager-pack-gen"
+      }]
+    }
+    </script>
+    
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [{
+        "@type": "Question",
+        "name": "What is a Villager Pack?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A Villager Pack is a data-driven configuration file system that allows you to create custom villager professions, trades, types, and workstations for Minecraft without writing any code. It works with the VillagerAPI mod."
+        }
+      },{
+        "@type": "Question",
+        "name": "Do I need programming knowledge to use this?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No! The Villager Pack Generator is designed to be user-friendly and requires no coding or programming knowledge. Simply fill in the forms and upload textures to create your custom villager pack."
+        }
+      },{
+        "@type": "Question",
+        "name": "Which Minecraft versions are supported?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Currently supports Minecraft Java Edition 1.21.1 with pack format 48. The generated packs work with both Fabric and NeoForge mod loaders."
+        }
+      },{
+        "@type": "Question",
+        "name": "What can I customize?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "You can create custom villager professions, workstation blocks, POI types, trades (including treasure maps), biome-specific appearances and trades, hero gifts, and more. All workstations automatically appear in a custom creative tab."
+        }
+      }]
+    }
+    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
     <style>
+    /* Critical CSS - Inlined for performance */
     @font-face {
         font-family: Minecraftia;
         src: url('./fonts/Minecraftia-Regular.woff') format('woff');
@@ -418,7 +567,9 @@
     </nav>
     
     <div class="intro">
-        Create custom villager professions, types, and trades for Minecraft without writing any code! You'll need the <a href="https://modrinth.com/mod/villagerapi">Villager API</a> mod for Villagerpacks to work.
+        <p><strong>Create custom villager professions, trades, and types for Minecraft 1.21.1 without writing any code!</strong></p>
+        <p>This Online Villager Pack Generator helps you create complete villager packs for the <a href="https://modrinth.com/mod/villagerapi">Villager API</a> mod (compatible with Fabric and NeoForge mod loaders).</p>
+        <p>Generate custom workstations, POI types, professions, trades, treasure maps, and more with an easy-to-use interface!</p>
     </div>
 
     <div class="container">
@@ -437,7 +588,7 @@
 
         <label>
             Pack Namespace (required):
-            <input type="text" id="pack-namespace" placeholder="morevillagers" value="morevillagers">
+            <input type="text" id="pack-namespace" placeholder="villagerapi" value="villagerapi">
         </label>
 
         <label>
@@ -590,18 +741,71 @@
     <button id="generate-pack" class="generate-button">Generate & Download Pack</button>
 
     <div class="container">
-        <h3>Quick Reference</h3>
+        <h3>Quick Reference & Documentation</h3>
         <div class="info-box">
             <strong>villagerapi_config.json:</strong> Every pack must have this file in the root with at minimum a namespace field.<br>
             <strong>Creative Tabs:</strong> Workstations automatically appear in a creative tab named after your pack.<br>
-            <strong>Translation Key:</strong> itemGroup.{namespace}.villagerpack_tab
+            <strong>Translation Key:</strong> itemGroup.{namespace}.villagerpack_tab<br>
+            <strong>Pack Format:</strong> 48 for Minecraft 1.21.1
         </div>
-        <div>
-            <h5>Additional documentation:</h5>
-            <a href="https://github.com/frikinjay/morevillagers/blob/1.21.1/DOCUMENTATION.md">github.com/frikinjay/morevillagers/blob/1.21.1/DOCUMENTATION.md</a>
+        <div style="margin-top: 20px;">
+            <h5>Need Help?</h5>
+            <p>- <a href="https://github.com/frikinjay/villagerapi/blob/main/DOCUMENTATION.md">Complete Documentation</a> - Full guide to creating villager packs</p>
+            <p>- <a href="https://discord.gg/aPPEPJWG39">Join our Discord</a> - Get help from the community</p>
+            <p>- <a href="https://github.com/frikinjay/villagerapi/issues">Report Issues</a> - Found a bug? Let us know!</p>
+            <p>- <a href="https://modrinth.com/mod/villagerapi">Download VillagerAPI Mod</a> - Required to use generated packs</p>
+        </div>
+        <div style="margin-top: 20px;">
+            <h5>Features:</h5>
+            <ol type="1">
+                <li>Custom villager professions with unique workstations</li>
+                <li>Custom trades for each profession level (Novice to Master)</li>
+                <li>Biome-specific villager appearances and trades</li>
+                <li>Treasure maps to custom structures</li>
+                <li>Hero of the Village gifts</li>
+                <li>Automatic creative tab for your workstations</li>
+            </ol>
         </div>
     </div>
 
-    <script src="./js/villager-pack-generator.js"></script>
+    <script defer src="./js/villager-pack-generator.js"></script>
+    
+    <!-- Additional SEO Content -->
+    <noscript>
+        <div style="padding: 20px; background: #ffebee; border: 2px solid #f44336; margin: 20px; border-radius: 5px;">
+            <strong>JavaScript Required:</strong> This Villager Pack Generator requires JavaScript to function. Please enable JavaScript in your browser settings.
+        </div>
+    </noscript>
+    
+    <!-- Hidden SEO content -->
+    <div style="display: none;">
+        <h2>Minecraft Custom Villager Creator</h2>
+        <p>Create custom villagers for Minecraft Java Edition 1.21.1. This Online generator helps you create villager packs for the VillagerAPI mod, compatible with both Fabric and NeoForge mod loaders.</p>
+        
+        <h3>Features</h3>
+        <ul>
+            <li>Custom villager professions generator</li>
+            <li>Villager trades editor</li>
+            <li>Workstation block creator with texture upload</li>
+            <li>POI (Point of Interest) type configuration</li>
+            <li>Villager type customization for biomes</li>
+            <li>Biome-specific trade editor</li>
+            <li>Structure tags for treasure maps</li>
+            <li>Map decoration creator</li>
+            <li>Hero of the village gift configuration</li>
+            <li>Automatic creative tab generation</li>
+            <li>JSON validation tools</li>
+            <li>No coding or programming required</li>
+        </ul>
+        
+        <h3>Supported Minecraft Versions</h3>
+        <p>Minecraft 1.21.1 (Java Edition)</p>
+        
+        <h3>Compatible Mod Loaders</h3>
+        <p>Fabric, NeoForge</p>
+        
+        <h3>Keywords</h3>
+        <p>minecraft villager creator, custom villager generator, minecraft modding tool, villager pack maker, datapack creator, minecraft json generator, villager trades editor, poi type generator, minecraft 1.21.1 mods, fabric mods, neoforge mods, villagerapi, custom minecraft professions, minecraft workstation creator, treasure map generator, minecraft biome villagers</p>
+    </div>
 </body>
 </html>
