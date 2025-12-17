@@ -1,4 +1,4 @@
-// Villager Pack Generator - Common/Shared Code
+// Villager Pack Generator - Shared Code
 // Base class with shared functionality across versions
 
 class VillagerPackGeneratorBase {
@@ -31,6 +31,7 @@ class VillagerPackGeneratorBase {
                 mapDecorations: {}
             }
         };
+        this.init();
     }
 
     init() {
