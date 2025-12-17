@@ -27,7 +27,7 @@ class VillagerPackGenerator_1_21_1 extends VillagerPackGeneratorBase {
             const packMcmeta = {
                 pack: {
                     pack_format: this.packData.metadata.packFormat,
-                    supported_formats: { min_inclusive: 42, max_inclusive: 1000 },
+                    supported_formats: { min_inclusive: 0, max_inclusive: 1000 },
                     description: this.packData.metadata.description || 'A custom villager pack'
                 }
             };

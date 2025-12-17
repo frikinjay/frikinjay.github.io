@@ -26,10 +26,10 @@ class VillagerPackGenerator_1_21_11 extends VillagerPackGeneratorBase {
             // Generate pack.mcmeta (1.21.11 format)
             const packMcmeta = {
                 pack: {
-                    pack_format: 48,
-                    min_format: 38,
+                    pack_format: 94,
+                    min_format: 48,
                     max_format: 1000,
-                    supported_formats: [38, 1000],
+                    supported_formats: [48, 1000],
                     description: this.packData.metadata.description || 'A custom villager pack'
                 }
             };
