@@ -51,6 +51,8 @@
     <!-- Preload critical scripts -->
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" as="script">
     <link rel="preload" href="./js/villager-pack-generator-common.js" as="script">
+    <link rel="preload" href="./js/villager-pack-generator-1.21.1.js" as="script">
+    <link rel="preload" href="./js/villager-pack-generator-1.21.11.js" as="script">
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="./favicon.png">
@@ -610,7 +612,7 @@
         
         <div class="info-box">
             <strong>Version Differences:</strong><br>
-            <strong>1.21.11:</strong> New item models structure as per Minecraft 1.21.11<br>
+            <strong>1.21.11:</strong> Updated item models structure as per Minecraft 1.21.11<br>
             <strong>1.21.1:</strong> Original format with legacy item model structure
         </div>
     </div>
@@ -817,8 +819,8 @@
     <script src="./js/villager-pack-generator-1.21.1.js"></script>
     <script src="./js/villager-pack-generator-1.21.11.js"></script>
     <script>
-        // Initialize the appropriate generator based on version selection
-        let villagerGen;
+        // Global variable to hold the generator instance
+        var villagerGen;
         
         function initializeGenerator() {
             const version = document.getElementById('minecraft-version').value;
@@ -832,25 +834,16 @@
             console.log(`Initialized generator for Minecraft ${version}`);
         }
         
-        // Initialize on page load
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                initializeGenerator();
-                
-                // Re-initialize when version changes
-                document.getElementById('minecraft-version').addEventListener('change', () => {
-                    initializeGenerator();
-                    alert('Generator switched to Minecraft ' + document.getElementById('minecraft-version').value);
-                });
-            });
-        } else {
+        // Wait for everything to load
+        window.addEventListener('load', function() {
             initializeGenerator();
             
-            document.getElementById('minecraft-version').addEventListener('change', () => {
+            // Re-initialize when version changes
+            document.getElementById('minecraft-version').addEventListener('change', function() {
                 initializeGenerator();
                 alert('Generator switched to Minecraft ' + document.getElementById('minecraft-version').value);
             });
-        }
+        });
     </script>
     
     <!-- Additional SEO Content -->

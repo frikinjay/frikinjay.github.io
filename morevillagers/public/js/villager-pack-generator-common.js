@@ -34,11 +34,8 @@ class VillagerPackGeneratorBase {
     }
 
     init() {
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.setupEventListeners());
-        } else {
-            this.setupEventListeners();
-        }
+        // Call setupEventListeners directly since this is called after window.load
+        this.setupEventListeners();
     }
 
     setupEventListeners() {
