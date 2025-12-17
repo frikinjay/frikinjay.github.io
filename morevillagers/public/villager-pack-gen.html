@@ -8,7 +8,7 @@
     <title>Villager Pack Generator - Create Custom Minecraft Villagers | VillagerAPI Mod</title>
     <meta name="title" content="Villager Pack Generator - Create Custom Minecraft Villagers | VillagerAPI Mod">
     <meta name="description" content="Online tool to create custom villager professions, trades, and types for Minecraft. Generate villager packs without coding. Works with Fabric and NeoForge.">
-    <meta name="keywords" content="minecraft villager generator, custom villagers, minecraft mod, villager trades, minecraft professions, villager pack, minecraft 1.21.1, fabric mod, neoforge mod, villager api, custom trades, minecraft datapack, villager workstations, poi types, minecraft modding, villager types, biome villagers, treasure maps, hero gifts, minecraft texture packs, villager textures, minecraft json generator, datapack creator, resource pack generator, minecraft villager editor, custom minecraft professions">
+    <meta name="keywords" content="minecraft villager generator, custom villagers, minecraft mod, villager trades, minecraft professions, villager pack, minecraft 1.21.1, minecraft 1.21.11, fabric mod, neoforge mod, villager api, custom trades, minecraft datapack, villager workstations, poi types, minecraft modding, villager types, biome villagers, treasure maps, hero gifts, minecraft texture packs, villager textures, minecraft json generator, datapack creator, resource pack generator, minecraft villager editor, custom minecraft professions">
     <meta name="author" content="More Villagers">
     <meta name="robots" content="index, follow">
     <meta name="language" content="English">
@@ -50,7 +50,7 @@
     
     <!-- Preload critical scripts -->
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" as="script">
-    <link rel="preload" href="./js/villager-pack-generator.js" as="script">
+    <link rel="preload" href="./js/villager-pack-generator-common.js" as="script">
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="./favicon.png">
@@ -66,7 +66,7 @@
       "@type": "WebApplication",
       "name": "Villager Pack Generator",
       "url": "https://morevillagers.neoterra.online/villager-pack-gen",
-      "description": "Online tool to create custom villager professions, trades, and types for Minecraft 1.21.1 without coding",
+      "description": "Online tool to create custom villager professions, trades, and types for Minecraft 1.21.1 and 1.21.11 without coding",
       "applicationCategory": "UtilityApplication",
       "operatingSystem": "Web Browser",
       "offers": {
@@ -91,10 +91,11 @@
         "Automatic creative tab generation",
         "JSON validation",
         "Texture upload support",
-        "Compatible with Fabric and NeoForge"
+        "Compatible with Fabric and NeoForge",
+        "Supports Minecraft 1.21.1 and 1.21.11"
       ],
-      "softwareVersion": "1.0",
-      "releaseNotes": "Supports Minecraft 1.21.1 with villagerapi_config.json format"
+      "softwareVersion": "2.0",
+      "releaseNotes": "Now supports both Minecraft 1.21.1 and 1.21.11 with version selector"
     }
     </script>
     
@@ -139,7 +140,7 @@
         "name": "Which Minecraft versions are supported?",
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Currently supports Minecraft Java Edition 1.21.1 with pack format 48. The generated packs work with both Fabric and NeoForge mod loaders."
+          "text": "Currently supports Minecraft Java Edition 1.21.1 and 1.21.11 with pack format 48. The generated packs work with both Fabric and NeoForge mod loaders."
         }
       },{
         "@type": "Question",
@@ -518,6 +519,32 @@
         border-radius: 5px;
     }
 
+    .version-selector {
+        background-color: #9C27B0;
+        border: 2px solid #7B1FA2;
+        padding: 15px;
+        margin: 20px 0;
+        border-radius: 5px;
+        text-align: center;
+    }
+
+    .version-selector label {
+        color: white;
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    .version-selector select {
+        font-size: 22px;
+        padding: 15px;
+        background-color: white;
+        border: 2px solid #7B1FA2;
+        border-radius: 5px;
+        cursor: pointer;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
     .grid-2 {
         display: flex;
         gap: 20px;
@@ -567,9 +594,25 @@
     </nav>
     
     <div class="intro">
-        <p><strong>Create custom villager professions, trades, and types for Minecraft 1.21.1 without writing any code!</strong></p>
+        <p><strong>Create custom villager professions, trades, and types for Minecraft without writing any code!</strong></p>
         <p>This Online Villager Pack Generator helps you create complete villager packs for the <a href="https://modrinth.com/mod/villagerapi">Villager API</a> mod (compatible with Fabric and NeoForge mod loaders).</p>
         <p>Generate custom workstations, POI types, professions, trades, treasure maps, and more with an easy-to-use interface!</p>
+    </div>
+
+    <div class="container">
+        <div class="version-selector">
+            <label for="minecraft-version">Select Minecraft Version:</label>
+            <select id="minecraft-version">
+                <option value="1.21.11" selected>Minecraft 1.21.11 (Latest)</option>
+                <option value="1.21.1">Minecraft 1.21.1</option>
+            </select>
+        </div>
+        
+        <div class="info-box">
+            <strong>Version Differences:</strong><br>
+            <strong>1.21.11:</strong> New item models structure as per Minecraft 1.21.11<br>
+            <strong>1.21.1:</strong> Original format with legacy item model structure
+        </div>
     </div>
 
     <div class="container">
@@ -580,7 +623,7 @@
         </div>
 
         <div class="info-box">
-            <strong>Pack Format:</strong> 48 (Minecraft 1.21.1)<br>
+            <strong>Pack Format:</strong> 48 (Minecraft 1.21.1 & 1.21.11)<br>
             <strong>Namespace:</strong> Use lowercase letters, numbers, and underscores only (required)<br>
             <strong>Creative Tab:</strong> All your workstations will appear in a creative tab with your chosen icon<br>
             <strong>Note:</strong> Individual components can override the namespace if needed
@@ -746,7 +789,7 @@
             <strong>villagerapi_config.json:</strong> Every pack must have this file in the root with at minimum a namespace field.<br>
             <strong>Creative Tabs:</strong> Workstations automatically appear in a creative tab named after your pack.<br>
             <strong>Translation Key:</strong> itemGroup.{namespace}.villagerpack_tab<br>
-            <strong>Pack Format:</strong> 48 for Minecraft 1.21.1
+            <strong>Pack Format:</strong> 48 for Minecraft 1.21.1 & 1.21.11
         </div>
         <div style="margin-top: 20px;">
             <h5>Need Help?</h5>
@@ -764,11 +807,51 @@
                 <li>Treasure maps to custom structures</li>
                 <li>Hero of the Village gifts</li>
                 <li>Automatic creative tab for your workstations</li>
+                <li>Support for both Minecraft 1.21.1 and 1.21.11</li>
             </ol>
         </div>
     </div>
 
-    <script defer src="./js/villager-pack-generator.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="./js/villager-pack-generator-common.js"></script>
+    <script src="./js/villager-pack-generator-1.21.1.js"></script>
+    <script src="./js/villager-pack-generator-1.21.11.js"></script>
+    <script>
+        // Initialize the appropriate generator based on version selection
+        let villagerGen;
+        
+        function initializeGenerator() {
+            const version = document.getElementById('minecraft-version').value;
+            
+            if (version === '1.21.11') {
+                villagerGen = new VillagerPackGenerator_1_21_11();
+            } else {
+                villagerGen = new VillagerPackGenerator_1_21_1();
+            }
+            
+            console.log(`Initialized generator for Minecraft ${version}`);
+        }
+        
+        // Initialize on page load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                initializeGenerator();
+                
+                // Re-initialize when version changes
+                document.getElementById('minecraft-version').addEventListener('change', () => {
+                    initializeGenerator();
+                    alert('Generator switched to Minecraft ' + document.getElementById('minecraft-version').value);
+                });
+            });
+        } else {
+            initializeGenerator();
+            
+            document.getElementById('minecraft-version').addEventListener('change', () => {
+                initializeGenerator();
+                alert('Generator switched to Minecraft ' + document.getElementById('minecraft-version').value);
+            });
+        }
+    </script>
     
     <!-- Additional SEO Content -->
     <noscript>
@@ -780,7 +863,7 @@
     <!-- Hidden SEO content -->
     <div style="display: none;">
         <h2>Minecraft Custom Villager Creator</h2>
-        <p>Create custom villagers for Minecraft Java Edition 1.21.1. This Online generator helps you create villager packs for the VillagerAPI mod, compatible with both Fabric and NeoForge mod loaders.</p>
+        <p>Create custom villagers for Minecraft Java Edition 1.21.1 and 1.21.11. This online generator helps you create villager packs for the VillagerAPI mod, compatible with both Fabric and NeoForge mod loaders.</p>
         
         <h3>Features</h3>
         <ul>
@@ -796,16 +879,17 @@
             <li>Automatic creative tab generation</li>
             <li>JSON validation tools</li>
             <li>No coding or programming required</li>
+            <li>Support for Minecraft 1.21.1 and 1.21.11</li>
         </ul>
         
         <h3>Supported Minecraft Versions</h3>
-        <p>Minecraft 1.21.1 (Java Edition)</p>
+        <p>Minecraft 1.21.1 and 1.21.11 (Java Edition)</p>
         
         <h3>Compatible Mod Loaders</h3>
         <p>Fabric, NeoForge</p>
         
         <h3>Keywords</h3>
-        <p>minecraft villager creator, custom villager generator, minecraft modding tool, villager pack maker, datapack creator, minecraft json generator, villager trades editor, poi type generator, minecraft 1.21.1 mods, fabric mods, neoforge mods, villagerapi, custom minecraft professions, minecraft workstation creator, treasure map generator, minecraft biome villagers</p>
+        <p>minecraft villager creator, custom villager generator, minecraft modding tool, villager pack maker, datapack creator, minecraft json generator, villager trades editor, poi type generator, minecraft 1.21.1 mods, minecraft 1.21.11 mods, fabric mods, neoforge mods, villagerapi, custom minecraft professions, minecraft workstation creator, treasure map generator, minecraft biome villagers</p>
     </div>
 </body>
 </html>
