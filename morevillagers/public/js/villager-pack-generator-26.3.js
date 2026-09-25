@@ -1,16 +1,16 @@
-VillagerPackGeneratorBase.registerVersion('1.21.11', {
-    label: 'Minecraft 1.21.11',
+VillagerPackGeneratorBase.registerVersion('26.3', {
+    label: 'Minecraft 26.3',
     packMcmeta: (description) => ({
         pack: {
-            pack_format: 94,
-            min_format: 48,
+            pack_format: 48,
+            min_format: 38,
             max_format: 1000,
-            supported_formats: [48, 1000],
+            supported_formats: [38, 1000],
             description
         }
     }),
     itemDefinitions: true,
-    babyTextures: false,
+    babyTextures: true,
     lootRandomSequence: true,
     neoforgeBiomeDataMap: true,
     legacyLangKeys: false

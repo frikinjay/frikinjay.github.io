@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,7 +7,7 @@
     <title>Villager Pack Generator - Create Custom Minecraft Villagers | VillagerAPI Mod</title>
     <meta name="title" content="Villager Pack Generator - Create Custom Minecraft Villagers | VillagerAPI Mod">
     <meta name="description" content="Online tool to create custom villager professions, trades, and types for Minecraft. Generate villager packs without coding. Works with Fabric and NeoForge.">
-    <meta name="keywords" content="minecraft villager generator, custom villagers, minecraft mod, villager trades, minecraft professions, villager pack, minecraft 1.21.1, minecraft 1.21.11, fabric mod, neoforge mod, villager api, custom trades, minecraft datapack, villager workstations, poi types, minecraft modding, villager types, biome villagers, treasure maps, hero gifts, minecraft texture packs, villager textures, minecraft json generator, datapack creator, resource pack generator, minecraft villager editor, custom minecraft professions">
+    <meta name="keywords" content="minecraft villager generator, custom villagers, minecraft mod, villager trades, minecraft professions, villager pack, minecraft 26.3, minecraft 1.21.1, minecraft 1.21.11, fabric mod, neoforge mod, villager api, custom trades, minecraft datapack, villager workstations, poi types, minecraft modding, villager types, biome villagers, treasure maps, hero gifts, minecraft texture packs, villager textures, minecraft json generator, datapack creator, resource pack generator, minecraft villager editor, custom minecraft professions">
     <meta name="author" content="More Villagers">
     <meta name="robots" content="index, follow">
     <meta name="language" content="English">
@@ -53,6 +52,7 @@
     <link rel="preload" href="./js/villager-pack-generator-common.js" as="script">
     <link rel="preload" href="./js/villager-pack-generator-1.21.1.js" as="script">
     <link rel="preload" href="./js/villager-pack-generator-1.21.11.js" as="script">
+    <link rel="preload" href="./js/villager-pack-generator-26.3.js" as="script">
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="./favicon.png">
@@ -155,7 +155,6 @@
     }
     </script>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
     <style>
     /* Critical CSS - Inlined for performance */
     @font-face {
@@ -605,15 +604,18 @@
         <div class="version-selector">
             <label for="minecraft-version">Select Minecraft Version:</label>
             <select id="minecraft-version">
-                <option value="1.21.11" selected>Minecraft 1.21.11 (Latest)</option>
+                <option value="26.3" selected>Minecraft 26.3 (Latest)</option>
+                <option value="1.21.11">Minecraft 1.21.11</option>
                 <option value="1.21.1">Minecraft 1.21.1</option>
             </select>
         </div>
         
         <div class="info-box">
             <strong>Version Differences:</strong><br>
+            <strong>26.3:</strong> Adds baby villager textures for villager types and uses the new trade format (wants/gives), with support for changing vanilla and other mods' trades<br>
             <strong>1.21.11:</strong> Updated item models structure as per Minecraft 1.21.11<br>
-            <strong>1.21.1:</strong> Original format with legacy item model structure
+            <strong>1.21.1:</strong> Original format with legacy item model structure<br>
+            You can switch versions at any time. Nothing you've entered is lost, the version is only used when the pack is generated.
         </div>
     </div>
 
@@ -625,7 +627,7 @@
         </div>
 
         <div class="info-box">
-            <strong>Pack Format:</strong> 48 (Minecraft 1.21.1) & 94 (Minecraft 1.21.11)<br>
+            <strong>Pack Format:</strong> Set automatically for the version you pick<br>
             <strong>Namespace:</strong> Use lowercase letters, numbers, and underscores only (required)<br>
             <strong>Creative Tab:</strong> All your workstations will appear in a creative tab with your chosen icon<br>
             <strong>Note:</strong> Individual components can override the namespace if needed
@@ -633,7 +635,7 @@
 
         <label>
             Pack Namespace (required):
-            <input type="text" id="pack-namespace" placeholder="villagerapi" value="villagerapi">
+            <input type="text" id="pack-namespace" placeholder="my_villagers" value="">
         </label>
 
         <label>
@@ -695,7 +697,8 @@
         <h2>Villager Types</h2>
         
         <div class="info-box">
-            Villager types control the appearance based on biome. Upload a texture for each type. Leave namespace empty to use pack namespace.
+            Villager types control the appearance based on biome. Upload a texture for each type. Leave namespace empty to use pack namespace.<br>
+            <strong>26.1 and newer:</strong> Baby villagers have their own textures, so also upload a baby villager texture for each type. The zombie textures are optional and fall back to the normal ones.
         </div>
 
         <button id="add-type" class="add-button">+ Add Villager Type</button>
@@ -732,7 +735,8 @@
         </div>
 
         <div class="info-box">
-            Define what items villagers buy and sell at each level (1-5). You can reference custom structure tags in treasure map trades using the format "namespace:tag_name".
+            Define what items villagers buy and sell at each level (1-5). You can reference custom structure tags in treasure map trades using the format "namespace:tag_name".<br>
+            <strong>26.3:</strong> Trades use the new format with "wants", "additional_wants" and "gives". Levels can be objects with "trades", "replace", "trade_list_amount" and "trade_list_max", and each trade can have a "trade_list_weight". Enter a full profession ID like "minecraft:farmer" to add to or replace another villager's trades. See the <a href="https://github.com/frikinjay/villagerapi/blob/main/DOCUMENTATION.md">documentation</a> for details.
         </div>
 
         <button id="add-trade" class="add-button">+ Add Trade Definition</button>
@@ -743,7 +747,7 @@
         <h2>Biome-Specific Trades</h2>
         
         <div class="info-box">
-            Add extra/replaceable trades for villagers based on their biome/type.
+            Add extra/replaceable trades for villagers based on their biome/type. The keys in "biome_overrides" are villager type IDs, not biome IDs.
         </div>
 
         <button id="add-biome-trade" class="add-button">+ Add Biome Trade</button>
@@ -765,7 +769,7 @@
         <h2>Biome Mappings</h2>
         
         <div class="info-box">
-            Control which villager type appears in which biome.
+            Control which villager type appears in which biome. Villager types without a namespace are given your pack's namespace.
         </div>
 
         <button id="add-biome-mapping" class="add-button">+ Add Biome Mapping</button>
@@ -791,11 +795,11 @@
             <strong>villagerapi_config.json:</strong> Every pack must have this file in the root with at minimum a namespace field.<br>
             <strong>Creative Tabs:</strong> Workstations automatically appear in a creative tab named after your pack.<br>
             <strong>Translation Key:</strong> itemGroup.{namespace}.villagerpack_tab<br>
-            <strong>Pack Format:</strong> 48 for Minecraft 1.21.1 & 1.21.11
+            <strong>Pack Format:</strong> Set automatically for the selected Minecraft version
         </div>
         <div style="margin-top: 20px;">
             <h5>Need Help?</h5>
-            <p>- <a href="https://github.com/frikinjay/villagerapi/blob/main/DOCUMENTATION.md">Complete Documentation</a> - Full guide to creating villager packs</p>
+            <p>- <a href="https://github.com/frikinjay/villagerapi/blob/main/DOCUMENTATION_26_1.md">Complete Documentation</a> - Full guide to creating villager packs</p>
             <p>- <a href="https://discord.gg/aPPEPJWG39">Join our Discord</a> - Get help from the community</p>
             <p>- <a href="https://github.com/frikinjay/villagerapi/issues">Report Issues</a> - Found a bug? Let us know!</p>
             <p>- <a href="https://modrinth.com/mod/villagerapi">Download VillagerAPI Mod</a> - Required to use generated packs</p>
@@ -809,7 +813,7 @@
                 <li>Treasure maps to custom structures</li>
                 <li>Hero of the Village gifts</li>
                 <li>Automatic creative tab for your workstations</li>
-                <li>Support for both Minecraft 1.21.1 and 1.21.11</li>
+                <li>Support for Minecraft 1.21.1, 1.21.11 and 26.3</li>
             </ol>
         </div>
     </div>
@@ -818,31 +822,12 @@
     <script src="./js/villager-pack-generator-common.js"></script>
     <script src="./js/villager-pack-generator-1.21.1.js"></script>
     <script src="./js/villager-pack-generator-1.21.11.js"></script>
+    <script src="./js/villager-pack-generator-26.3.js"></script>
     <script>
-        // Global variable to hold the generator instance
         var villagerGen;
-        
-        function initializeGenerator() {
-            const version = document.getElementById('minecraft-version').value;
-            
-            if (version === '1.21.11') {
-                villagerGen = new VillagerPackGenerator_1_21_11();
-            } else {
-                villagerGen = new VillagerPackGenerator_1_21_1();
-            }
-            
-            console.log(`Initialized generator for Minecraft ${version}`);
-        }
-        
-        // Wait for everything to load
+
         window.addEventListener('load', function() {
-            initializeGenerator();
-            
-            // Re-initialize when version changes
-            document.getElementById('minecraft-version').addEventListener('change', function() {
-                initializeGenerator();
-                alert('Generator switched to Minecraft ' + document.getElementById('minecraft-version').value);
-            });
+            villagerGen = new VillagerPackGeneratorBase();
         });
     </script>
     
@@ -856,7 +841,7 @@
     <!-- Hidden SEO content -->
     <div style="display: none;">
         <h2>Minecraft Custom Villager Creator</h2>
-        <p>Create custom villagers for Minecraft Java Edition 1.21.1 and 1.21.11. This online generator helps you create villager packs for the VillagerAPI mod, compatible with both Fabric and NeoForge mod loaders.</p>
+        <p>Create custom villagers for Minecraft Java Edition 1.21.1, 1.21.11 and 26.3. This online generator helps you create villager packs for the VillagerAPI mod, compatible with both Fabric and NeoForge mod loaders.</p>
         
         <h3>Features</h3>
         <ul>
@@ -875,13 +860,13 @@
         </ul>
         
         <h3>Supported Minecraft Versions</h3>
-        <p>Minecraft 1.21.1 and 1.21.11 (Java Edition)</p>
+        <p>Minecraft 1.21.1, 1.21.11 and 26.3 (Java Edition)</p>
         
         <h3>Compatible Mod Loaders</h3>
         <p>Fabric, NeoForge</p>
         
         <h3>Keywords</h3>
-        <p>minecraft villager creator, custom villagers, custom minecraft villagers, custom minecraft villager, custom villager generator, minecraft modding tool, villager pack maker, datapack creator, minecraft json generator, villager trades editor, poi type generator, minecraft 1.21.1 mods, minecraft 1.21.11 mods, fabric mods, neoforge mods, villagerapi, custom minecraft professions, minecraft workstation creator, treasure map generator, minecraft biome villagers</p>
+        <p>minecraft villager creator, custom villagers, custom minecraft villagers, custom minecraft villager, custom villager generator, minecraft modding tool, villager pack maker, datapack creator, minecraft json generator, villager trades editor, poi type generator, minecraft 1.21.1 mods, minecraft 1.21.11 mods, minecraft 26.3 mods, fabric mods, neoforge mods, villagerapi, custom minecraft professions, minecraft workstation creator, treasure map generator, minecraft biome villagers</p>
     </div>
 </body>
 </html>
