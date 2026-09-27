@@ -1,0 +1,36 @@
+{
+  "namespace": "morevillagers",
+  "village_type": "minecraft:village_taiga",
+  "houses": {
+    "taiga_woodworker": {
+      "location": "morevillagers:village/taiga/taiga_woodworker",
+      "weight": 10,
+      "element_type": "single",
+      "processors": "minecraft:empty"
+    },
+    "taiga_oceanographer": {
+      "location": "morevillagers:village/taiga/taiga_oceanographer",
+      "weight": 10,
+      "element_type": "single",
+      "processors": "minecraft:empty"
+    },
+    "taiga_florist": {
+      "location": "morevillagers:village/taiga/taiga_florist",
+      "weight": 10,
+      "element_type": "single",
+      "processors": "minecraft:empty"
+    },
+    "taiga_hunter": {
+      "location": "morevillagers:village/taiga/taiga_hunter",
+      "weight": 10,
+      "element_type": "single",
+      "processors": "minecraft:empty"
+    },
+    "taiga_engineer": {
+      "location": "morevillagers:village/taiga/taiga_engineer",
+      "weight": 10,
+      "element_type": "single",
+      "processors": "minecraft:empty"
+    }
+  }
+}

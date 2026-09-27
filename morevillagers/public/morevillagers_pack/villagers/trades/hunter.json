@@ -1,0 +1,163 @@
+{
+  "profession": "morevillagers:hunter",
+  "levels": {
+    "1": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:bone",
+            "count": 32.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 2.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 5.0
+          },
+          "gives": {
+            "id": "minecraft:slime_ball",
+            "count": 2.0
+          },
+          "max_uses": 16.0,
+          "xp": 1.0
+        }
+      ]
+    },
+    "2": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:spider_eye",
+            "count": 24.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 10.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 5.0
+          },
+          "gives": {
+            "id": "minecraft:fermented_spider_eye"
+          },
+          "max_uses": 16.0,
+          "xp": 5.0
+        }
+      ]
+    },
+    "3": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:gunpowder",
+            "count": 20.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 20.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 5.0
+          },
+          "gives": {
+            "id": "minecraft:magma_cream"
+          },
+          "max_uses": 12.0,
+          "xp": 10.0
+        }
+      ]
+    },
+    "4": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 5.0
+          },
+          "gives": {
+            "id": "minecraft:blaze_rod"
+          },
+          "max_uses": 12.0,
+          "xp": 15.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 13.0
+          },
+          "gives": {
+            "id": "minecraft:map"
+          },
+          "given_item_modifiers": [
+            {
+              "decoration": "morevillagers:pillager_outpost_decoration",
+              "destination": "morevillagers:on_pillager_outpost_explorer_maps",
+              "function": "minecraft:exploration_map",
+              "search_radius": 100
+            },
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "translate": "filled_map.pillager_outpost"
+              },
+              "target": "item_name"
+            },
+            {
+              "function": "minecraft:filtered",
+              "item_filter": {
+                "items": "minecraft:filled_map",
+                "predicates": {
+                  "minecraft:map_id": {}
+                }
+              },
+              "on_fail": {
+                "function": "minecraft:discard"
+              }
+            }
+          ],
+          "max_uses": 12.0,
+          "xp": 15.0
+        }
+      ]
+    },
+    "5": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 8.0
+          },
+          "gives": {
+            "id": "minecraft:ghast_tear"
+          },
+          "max_uses": 12.0,
+          "xp": 30.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 8.0
+          },
+          "gives": {
+            "id": "minecraft:rabbit_foot"
+          },
+          "max_uses": 12.0,
+          "xp": 30.0
+        }
+      ]
+    }
+  }
+}

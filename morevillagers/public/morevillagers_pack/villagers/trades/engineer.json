@@ -1,0 +1,160 @@
+{
+  "profession": "morevillagers:engineer",
+  "levels": {
+    "1": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:redstone",
+            "count": 20.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 2.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 4.0
+          },
+          "gives": {
+            "id": "minecraft:repeater",
+            "count": 3.0
+          },
+          "max_uses": 16.0,
+          "xp": 1.0
+        }
+      ]
+    },
+    "2": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:redstone_torch",
+            "count": 12.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 10.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 3.0
+          },
+          "gives": {
+            "id": "minecraft:dropper",
+            "count": 3.0
+          },
+          "max_uses": 16.0,
+          "xp": 5.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 4.0
+          },
+          "gives": {
+            "id": "minecraft:dispenser"
+          },
+          "max_uses": 16.0,
+          "xp": 5.0
+        }
+      ]
+    },
+    "3": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:redstone_lamp",
+            "count": 4.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 20.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 4.0
+          },
+          "gives": {
+            "id": "minecraft:observer"
+          },
+          "max_uses": 16.0,
+          "xp": 10.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 5.0
+          },
+          "gives": {
+            "id": "minecraft:comparator"
+          },
+          "max_uses": 16.0,
+          "xp": 10.0
+        }
+      ]
+    },
+    "4": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 5.0
+          },
+          "gives": {
+            "id": "minecraft:piston"
+          },
+          "max_uses": 16.0,
+          "xp": 15.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 6.0
+          },
+          "gives": {
+            "id": "minecraft:sticky_piston"
+          },
+          "max_uses": 16.0,
+          "xp": 15.0
+        }
+      ]
+    },
+    "5": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 5.0
+          },
+          "gives": {
+            "id": "minecraft:daylight_detector",
+            "count": 2.0
+          },
+          "max_uses": 16.0,
+          "xp": 30.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 7.0
+          },
+          "gives": {
+            "id": "minecraft:hopper"
+          },
+          "max_uses": 16.0,
+          "xp": 30.0
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:gift",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:end_rod"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:popped_chorus_fruit"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:phantom_membrane"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "morevillagers:gameplay/hero_of_the_village/enderian_gift"
+}

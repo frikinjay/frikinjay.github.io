@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "@@",
+    "##",
+    "$$"
+  ],
+  "key": {
+    "#": "minecraft:warped_planks",
+    "$": "minecraft:crimson_planks",
+    "@": "minecraft:nether_bricks"
+  },
+  "result": {
+    "id": "morevillagers:decayed_workbench",
+    "count": 1
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "poi_type": "oceanographer",
+  "work_sound": "minecraft:entity.villager.work_cartographer",
+  "namespace": "morevillagers"
+}

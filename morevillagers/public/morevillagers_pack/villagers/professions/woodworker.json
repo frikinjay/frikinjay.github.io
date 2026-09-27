@@ -1,0 +1,5 @@
+{
+  "poi_type": "woodworker",
+  "work_sound": "minecraft:entity.villager.work_leatherworker",
+  "namespace": "morevillagers"
+}

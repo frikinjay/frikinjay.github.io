@@ -1,0 +1,44 @@
+{
+  "type": "minecraft:gift",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:oak_log"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:birch_log"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:spruce_log"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:dark_oak_log"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:acacia_log"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:jungle_log"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:warped_stem"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:crimson_stem"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "morevillagers:gameplay/hero_of_the_village/woodworker_gift"
+}

@@ -1,0 +1,60 @@
+{
+  "parent": "morevillagers:end_trade",
+  "display": {
+    "icon": {
+      "id": "minecraft:purpur_block"
+    },
+    "title": {
+      "translate": "advancements.map_endcity.title"
+    },
+    "description": {
+      "translate": "advancements.map_endcity.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_map": {
+      "trigger": "minecraft:villager_trade",
+      "conditions": {
+        "villager": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:entity_type": "minecraft:villager",
+            "minecraft:nbt": "{VillagerData:{profession:\"morevillagers:enderian\"}}"
+          }
+        },
+        "item": {
+          "items": "minecraft:filled_map"
+        }
+      }
+    },
+    "end_city": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:location": {
+              "structures": "minecraft:end_city"
+            },
+            "minecraft:type_specific/player": {
+              "advancements": {
+                "morevillagers:map_endcity": {
+                  "has_map": true
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "rewards": {
+    "experience": 200
+  }
+}

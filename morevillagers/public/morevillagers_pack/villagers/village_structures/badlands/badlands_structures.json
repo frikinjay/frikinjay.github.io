@@ -1,0 +1,11 @@
+{
+  "namespace": "morevillagers",
+  "village_type": "morevillagers:village_badlands",
+  "houses": {
+    "engineer": { "weight": 10 },
+    "florist": { "weight": 10 },
+    "hunter": { "weight": 10 },
+    "oceanographer": { "weight": 10 },
+    "woodworker": { "weight": 10 }
+  }
+}

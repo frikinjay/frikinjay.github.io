@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "rewards": {
+    "recipes": [
+      "morevillagers:chiller"
+    ]
+  },
+  "criteria": {
+    "has_spruce": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:spruce_log"
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipes": "morevillagers:chiller"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_spruce",
+      "has_the_recipe"
+    ]
+  ]
+}

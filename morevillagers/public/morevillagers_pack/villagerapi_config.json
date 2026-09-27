@@ -1,0 +1,8 @@
+{
+  "namespace": "morevillagers",
+  "display_name": "More Villagers",
+  "description": "Adds new villager professions, types, workstations and trades",
+  "version": "1.26.9.4",
+  "author": "frikinjay",
+  "creative_tab_icon": "minecraft:emerald"
+}

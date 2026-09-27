@@ -1,0 +1,191 @@
+{
+  "profession": "morevillagers:miner",
+  "levels": {
+    "1": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:deepslate",
+            "count": 20.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 2.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald"
+          },
+          "gives": {
+            "id": "minecraft:calcite",
+            "count": 5.0
+          },
+          "max_uses": 16.0,
+          "xp": 1.0
+        }
+      ]
+    },
+    "2": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:raw_copper",
+            "count": 15.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 10.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:raw_iron",
+            "count": 12.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 10.0
+        }
+      ]
+    },
+    "3": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:raw_gold",
+            "count": 10.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 20.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald"
+          },
+          "gives": {
+            "id": "minecraft:amethyst_shard",
+            "count": 2.0
+          },
+          "max_uses": 12.0,
+          "xp": 10.0
+        }
+      ]
+    },
+    "4": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:torch",
+            "count": 50.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 12.0,
+          "xp": 30.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 13.0
+          },
+          "gives": {
+            "id": "minecraft:map"
+          },
+          "given_item_modifiers": [
+            {
+              "decoration": "morevillagers:mineshaft_decoration",
+              "destination": "morevillagers:on_mineshaft_explorer_maps",
+              "function": "minecraft:exploration_map",
+              "search_radius": 100
+            },
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "translate": "filled_map.mineshaft"
+              },
+              "target": "item_name"
+            },
+            {
+              "function": "minecraft:filtered",
+              "item_filter": {
+                "items": "minecraft:filled_map",
+                "predicates": {
+                  "minecraft:map_id": {}
+                }
+              },
+              "on_fail": {
+                "function": "minecraft:discard"
+              }
+            }
+          ],
+          "max_uses": 12.0,
+          "xp": 15.0
+        }
+      ]
+    },
+    "5": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 12.0
+          },
+          "gives": {
+            "id": "minecraft:diamond_pickaxe",
+            "count": 1.0
+          },
+          "max_uses": 15.0,
+          "xp": 30.0,
+          "reputation_discount": 0.2
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 15.0
+          },
+          "gives": {
+            "id": "minecraft:map"
+          },
+          "given_item_modifiers": [
+            {
+              "decoration": "morevillagers:ancient_city_decoration",
+              "destination": "morevillagers:on_ancient_city_explorer_maps",
+              "function": "minecraft:exploration_map",
+              "search_radius": 100
+            },
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "translate": "filled_map.ancient_city"
+              },
+              "target": "item_name"
+            },
+            {
+              "function": "minecraft:filtered",
+              "item_filter": {
+                "items": "minecraft:filled_map",
+                "predicates": {
+                  "minecraft:map_id": {}
+                }
+              },
+              "on_fail": {
+                "function": "minecraft:discard"
+              }
+            }
+          ],
+          "max_uses": 12.0,
+          "xp": 15.0
+        }
+      ]
+    }
+  }
+}

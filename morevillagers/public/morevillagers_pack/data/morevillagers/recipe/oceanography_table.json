@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:paper",
+    "minecraft:string",
+    "minecraft:barrel"
+  ],
+  "result": {
+    "id": "morevillagers:oceanography_table",
+    "count": 1
+  }
+}

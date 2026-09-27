@@ -1,0 +1,33 @@
+{
+  "parent": "morevillagers:first_trade",
+  "display": {
+    "icon": {
+      "id": "morevillagers:xmas_chest"
+    },
+    "title": {
+      "translate": "advancements.buy_xmas_chest.title"
+    },
+    "description": {
+      "translate": "advancements.buy_xmas_chest.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "trade": {
+      "trigger": "minecraft:villager_trade",
+      "conditions": {
+        "item": {
+          "items": [
+            "morevillagers:xmas_chest"
+          ]
+        }
+      }
+    }
+  },
+  "rewards": {
+    "experience": 100
+  }
+}

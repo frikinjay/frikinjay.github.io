@@ -1,0 +1,26 @@
+{
+	"parent": "minecraft:block/cube",
+	"textures": {
+		"north": "morevillagers:block/mining_bench_front",
+		"south": "morevillagers:block/mining_bench_back",
+		"east": "morevillagers:block/mining_bench_right",
+		"west": "morevillagers:block/mining_bench_left",
+		"up": "morevillagers:block/mining_bench_top",
+		"particle": "morevillagers:block/mining_bench_bottom",
+		"down": "morevillagers:block/mining_bench_bottom"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [16, 16, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#east"},
+				"east": {"uv": [0, 0, 16, 16], "texture": "#south"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#west"},
+				"west": {"uv": [0, 0, 16, 16], "texture": "#north"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#up"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#down"}
+			}
+		}
+	]
+}

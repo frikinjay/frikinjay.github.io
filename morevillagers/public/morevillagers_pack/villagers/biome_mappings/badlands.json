@@ -1,0 +1,7 @@
+{
+  "biomes": [
+    { "biome": "minecraft:badlands", "villager_type": "morevillagers:badlands"},
+    { "biome": "minecraft:wooded_badlands", "villager_type": "morevillagers:badlands"},
+    { "biome": "minecraft:eroded_badlands", "villager_type": "morevillagers:badlands"}
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "namespace": "morevillagers",
+  "village_type": "minecraft:village_savanna",
+  "houses": {
+    "savanna_woodworker": {
+      "location": "morevillagers:village/savanna/savanna_woodworker",
+      "weight": 10,
+      "element_type": "single",
+      "processors": "minecraft:empty"
+    },
+    "savanna_oceanographer": {
+      "location": "morevillagers:village/savanna/savanna_oceanographer",
+      "weight": 10,
+      "element_type": "single",
+      "processors": "minecraft:empty"
+    },
+    "savanna_florist": {
+      "location": "morevillagers:village/savanna/savanna_florist",
+      "weight": 10,
+      "element_type": "single",
+      "processors": "minecraft:empty"
+    },
+    "savanna_hunter": {
+      "location": "morevillagers:village/savanna/savanna_hunter",
+      "weight": 10,
+      "element_type": "single",
+      "processors": "minecraft:empty"
+    },
+    "savanna_engineer": {
+      "location": "morevillagers:village/savanna/savanna_engineer",
+      "weight": 10,
+      "element_type": "single",
+      "processors": "minecraft:empty"
+    }
+  }
+}

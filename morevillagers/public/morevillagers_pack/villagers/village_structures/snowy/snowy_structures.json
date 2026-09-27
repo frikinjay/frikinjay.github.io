@@ -1,0 +1,36 @@
+{
+  "namespace": "morevillagers",
+  "village_type": "minecraft:village_snowy",
+  "houses": {
+    "snowy_woodworker": {
+      "location": "morevillagers:village/snowy/snowy_woodworker",
+      "weight": 10,
+      "element_type": "single",
+      "processors": "minecraft:empty"
+    },
+    "snowy_oceanographer": {
+      "location": "morevillagers:village/snowy/snowy_oceanographer",
+      "weight": 10,
+      "element_type": "single",
+      "processors": "minecraft:empty"
+    },
+    "snowy_florist": {
+      "location": "morevillagers:village/snowy/snowy_florist",
+      "weight": 10,
+      "element_type": "single",
+      "processors": "minecraft:empty"
+    },
+    "snowy_hunter": {
+      "location": "morevillagers:village/snowy/snowy_hunter",
+      "weight": 10,
+      "element_type": "single",
+      "processors": "minecraft:empty"
+    },
+    "snowy_engineer": {
+      "location": "morevillagers:village/snowy/snowy_engineer",
+      "weight": 10,
+      "element_type": "single",
+      "processors": "minecraft:empty"
+    }
+  }
+}

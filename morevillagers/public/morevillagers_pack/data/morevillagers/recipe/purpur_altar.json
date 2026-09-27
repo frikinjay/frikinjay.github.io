@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "@@",
+    "##",
+    "##"
+  ],
+  "key": {
+    "#": "minecraft:end_stone",
+    "@": "minecraft:purpur_block"
+  },
+  "result": {
+    "id": "morevillagers:purpur_altar",
+    "count": 1
+  }
+}

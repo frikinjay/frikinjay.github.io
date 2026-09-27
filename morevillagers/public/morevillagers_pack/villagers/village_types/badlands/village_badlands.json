@@ -1,0 +1,9 @@
+{
+  "namespace": "morevillagers",
+  "name": "village_badlands",
+  "copy_from": "minecraft:village_desert",
+  "biomes": [
+    "#minecraft:is_badlands"
+  ],
+  "weight": 1
+}

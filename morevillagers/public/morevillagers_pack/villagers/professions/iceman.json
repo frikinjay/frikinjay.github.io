@@ -1,0 +1,5 @@
+{
+  "poi_type": "iceman",
+  "work_sound": "minecraft:entity.villager.work_toolsmith",
+  "namespace": "morevillagers"
+}

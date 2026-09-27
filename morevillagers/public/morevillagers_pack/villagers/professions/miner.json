@@ -1,0 +1,5 @@
+{
+  "poi_type": "miner",
+  "work_sound": "minecraft:entity.villager.work_armorer",
+  "namespace": "morevillagers"
+}

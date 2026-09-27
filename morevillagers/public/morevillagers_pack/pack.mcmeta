@@ -1,0 +1,9 @@
+{
+  "pack": {
+    "pack_format": 48,
+    "min_format": 38,
+    "max_format": 1000,
+    "supported_formats": [38, 1000],
+    "description": "More Villagers Pack"
+  }
+}

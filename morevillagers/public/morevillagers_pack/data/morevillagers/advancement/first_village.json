@@ -1,0 +1,42 @@
+{
+  "parent": "morevillagers:root",
+  "display": {
+    "icon": {
+      "id": "minecraft:map"
+    },
+    "title": {
+      "translate": "advancements.first_village.title"
+    },
+    "description": {
+      "translate": "advancements.first_village.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "entered_village": {
+      "trigger": "minecraft:location",
+      "conditions": {
+        "player": {
+          "type": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "minecraft:location": {
+              "structures": "#minecraft:village"
+            }
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "entered_village"
+    ]
+  ],
+  "rewards": {
+    "experience": 25
+  }
+}

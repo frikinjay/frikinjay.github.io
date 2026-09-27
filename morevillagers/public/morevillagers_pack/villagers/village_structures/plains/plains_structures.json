@@ -1,0 +1,36 @@
+{
+  "namespace": "morevillagers",
+  "village_type": "minecraft:village_plains",
+  "houses": {
+    "plains_woodworker": {
+      "location": "morevillagers:village/plains/plains_woodworker",
+      "weight": 10,
+      "element_type": "single",
+      "processors": "minecraft:empty"
+    },
+    "plains_oceanographer": {
+      "location": "morevillagers:village/plains/plains_oceanographer",
+      "weight": 10,
+      "element_type": "single",
+      "processors": "minecraft:empty"
+    },
+    "plains_florist": {
+      "location": "morevillagers:village/plains/plains_florist",
+      "weight": 10,
+      "element_type": "single",
+      "processors": "minecraft:empty"
+    },
+    "plains_hunter": {
+      "location": "morevillagers:village/plains/plains_hunter",
+      "weight": 10,
+      "element_type": "single",
+      "processors": "minecraft:empty"
+    },
+    "plains_engineer": {
+      "location": "morevillagers:village/plains/plains_engineer",
+      "weight": 10,
+      "element_type": "single",
+      "processors": "minecraft:empty"
+    }
+  }
+}

@@ -1,0 +1,189 @@
+{
+  "profession": "morevillagers:florist",
+  "levels": {
+    "1": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:flower_pot",
+            "count": 3.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 2.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 3.0
+          },
+          "gives": {
+            "id": "minecraft:honeycomb"
+          },
+          "max_uses": 16.0,
+          "xp": 1.0
+        }
+      ]
+    },
+    "2": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:vine",
+            "count": 24.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 10.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald"
+          },
+          "gives": {
+            "id": "minecraft:glow_berries",
+            "count": 2.0
+          },
+          "max_uses": 16.0,
+          "xp": 5.0
+        }
+      ]
+    },
+    "3": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:emerald"
+          },
+          "gives": {
+            "id": "minecraft:small_dripleaf",
+            "count": 2.0
+          },
+          "max_uses": 16.0,
+          "xp": 10.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 6.0
+          },
+          "gives": {
+            "id": "minecraft:honey_bottle"
+          },
+          "max_uses": 16.0,
+          "xp": 10.0
+        }
+      ]
+    },
+    "4": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:moss_block",
+            "count": 32.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 30.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 13.0
+          },
+          "gives": {
+            "id": "minecraft:map"
+          },
+          "given_item_modifiers": [
+            {
+              "decoration": "minecraft:swamp_hut",
+              "destination": "morevillagers:on_swamp_hut_explorer_maps",
+              "function": "minecraft:exploration_map",
+              "search_radius": 100
+            },
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "translate": "filled_map.swamp_hut"
+              },
+              "target": "item_name"
+            },
+            {
+              "function": "minecraft:filtered",
+              "item_filter": {
+                "items": "minecraft:filled_map",
+                "predicates": {
+                  "minecraft:map_id": {}
+                }
+              },
+              "on_fail": {
+                "function": "minecraft:discard"
+              }
+            }
+          ],
+          "max_uses": 12.0,
+          "xp": 15.0
+        }
+      ]
+    },
+    "5": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 6.0
+          },
+          "gives": {
+            "id": "minecraft:bee_nest"
+          },
+          "max_uses": 12.0,
+          "xp": 30.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 15.0
+          },
+          "gives": {
+            "id": "minecraft:map"
+          },
+          "given_item_modifiers": [
+            {
+              "decoration": "minecraft:jungle_temple",
+              "destination": "morevillagers:on_jungle_temple_explorer_maps",
+              "function": "minecraft:exploration_map",
+              "search_radius": 100
+            },
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "translate": "filled_map.jungle_pyramid"
+              },
+              "target": "item_name"
+            },
+            {
+              "function": "minecraft:filtered",
+              "item_filter": {
+                "items": "minecraft:filled_map",
+                "predicates": {
+                  "minecraft:map_id": {}
+                }
+              },
+              "on_fail": {
+                "function": "minecraft:discard"
+              }
+            }
+          ],
+          "max_uses": 12.0,
+          "xp": 30.0
+        }
+      ]
+    }
+  }
+}

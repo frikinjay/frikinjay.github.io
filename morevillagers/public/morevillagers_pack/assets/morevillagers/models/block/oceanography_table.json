@@ -1,0 +1,26 @@
+{
+	"parent": "minecraft:block/cube",
+	"textures": {
+		"5": "morevillagers:block/oceanography_table_right",
+		"north": "morevillagers:block/oceanography_table_back",
+		"south": "morevillagers:block/oceanography_table_front",
+		"particle": "morevillagers:block/oceanography_table_left",
+		"west": "morevillagers:block/oceanography_table_left",
+		"up": "morevillagers:block/oceanography_table_top",
+		"down": "minecraft:block/barrel_bottom"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [16, 16, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#5"},
+				"east": {"uv": [0, 0, 16, 16], "texture": "#north"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#west"},
+				"west": {"uv": [0, 0, 16, 16], "texture": "#south"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#up"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#down"}
+			}
+		}
+	]
+}

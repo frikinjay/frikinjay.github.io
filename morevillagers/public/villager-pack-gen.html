@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="is-loading">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -21,8 +21,10 @@
   <script src="./js/versions.js" defer></script>
   <script src="./js/pack-builder.js" defer></script>
   <script src="./js/pack-generator.js" defer></script>
+  <style>#loader{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:#fbfbfd;color:#1d1d1f;font:20px/1 "Minecraft Seven",system-ui,sans-serif;letter-spacing:.12em}@media(prefers-color-scheme:dark){#loader{background:#000;color:#f5f5f7}}</style>
 </head>
 <body>
+  <div id="loader" role="status" aria-live="polite">LOADING...</div>
   <header class="nav">
     <div class="nav-inner">
       <a class="logo" href="./"><span class="logo-block" aria-hidden="true" style="background-image: url('./img/villagerapi_logo.png');"></span>VAPI</a>

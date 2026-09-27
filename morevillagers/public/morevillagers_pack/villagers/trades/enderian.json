@@ -1,0 +1,165 @@
+{
+  "profession": "morevillagers:enderian",
+  "levels": {
+    "1": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:end_stone",
+            "count": 24.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 2.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 4.0
+          },
+          "gives": {
+            "id": "minecraft:end_rod",
+            "count": 3.0
+          },
+          "max_uses": 16.0,
+          "xp": 1.0
+        }
+      ]
+    },
+    "2": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:popped_chorus_fruit",
+            "count": 20.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 10.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 5.0
+          },
+          "gives": {
+            "id": "minecraft:phantom_membrane"
+          },
+          "max_uses": 16.0,
+          "xp": 5.0
+        }
+      ]
+    },
+    "3": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:ender_pearl",
+            "count": 14.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 20.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 3.0
+          },
+          "gives": {
+            "id": "minecraft:firework_rocket",
+            "count": 8.0
+          },
+          "max_uses": 16.0,
+          "xp": 10.0
+        }
+      ]
+    },
+    "4": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 6.0
+          },
+          "gives": {
+            "id": "minecraft:dragon_breath",
+            "count": 2.0
+          },
+          "max_uses": 12.0,
+          "xp": 15.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 14.0
+          },
+          "gives": {
+            "id": "minecraft:map"
+          },
+          "given_item_modifiers": [
+            {
+              "decoration": "morevillagers:end_city_decoration",
+              "destination": "morevillagers:on_end_city_explorer_maps",
+              "function": "minecraft:exploration_map",
+              "search_radius": 100
+            },
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "translate": "filled_map.endcity"
+              },
+              "target": "item_name"
+            },
+            {
+              "function": "minecraft:filtered",
+              "item_filter": {
+                "items": "minecraft:filled_map",
+                "predicates": {
+                  "minecraft:map_id": {}
+                }
+              },
+              "on_fail": {
+                "function": "minecraft:discard"
+              }
+            }
+          ],
+          "max_uses": 12.0,
+          "xp": 15.0
+        }
+      ]
+    },
+    "5": {
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 12.0
+          },
+          "gives": {
+            "id": "minecraft:ender_pearl"
+          },
+          "max_uses": 8.0,
+          "xp": 30.0
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 64.0
+          },
+          "gives": {
+            "id": "minecraft:dragon_head"
+          },
+          "max_uses": 2.0,
+          "xp": 30.0
+        }
+      ]
+    }
+  }
+}

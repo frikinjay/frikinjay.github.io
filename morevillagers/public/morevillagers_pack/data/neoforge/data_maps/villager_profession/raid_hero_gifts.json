@@ -1,0 +1,34 @@
+{
+  "values": {
+    "morevillagers:oceanographer": {
+      "loot_table": "morevillagers:gameplay/hero_of_the_village/oceanographer_gift"
+    },
+    "morevillagers:netherian": {
+      "loot_table": "morevillagers:gameplay/hero_of_the_village/netherian_gift"
+    },
+    "morevillagers:woodworker": {
+      "loot_table": "morevillagers:gameplay/hero_of_the_village/woodworker_gift"
+    },
+    "morevillagers:enderian": {
+      "loot_table": "morevillagers:gameplay/hero_of_the_village/enderian_gift"
+    },
+    "morevillagers:engineer": {
+      "loot_table": "morevillagers:gameplay/hero_of_the_village/engineer_gift"
+    },
+    "morevillagers:florist": {
+      "loot_table": "morevillagers:gameplay/hero_of_the_village/florist_gift"
+    },
+    "morevillagers:hunter": {
+      "loot_table": "morevillagers:gameplay/hero_of_the_village/hunter_gift"
+    },
+    "morevillagers:miner": {
+      "loot_table": "morevillagers:gameplay/hero_of_the_village/miner_gift"
+    },
+    "morevillagers:iceman": {
+      "loot_table": "morevillagers:gameplay/hero_of_the_village/iceman_gift"
+    },
+    "morevillagers:explorer": {
+      "loot_table": "morevillagers:gameplay/hero_of_the_village/explorer_gift"
+    }
+  }
+}

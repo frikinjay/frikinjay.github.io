@@ -1,0 +1,24 @@
+{
+	"parent": "minecraft:block/cube",
+	"textures": {
+		"east": "morevillagers:block/blueprint_table_side",
+		"particle": "morevillagers:block/blueprint_table_front",
+		"west": "morevillagers:block/blueprint_table_front",
+		"up": "morevillagers:block/blueprint_table_top",
+		"down": "morevillagers:block/blueprint_table_bottom"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [16, 16, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#east"},
+				"east": {"uv": [0, 0, 16, 16], "texture": "#east"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#east"},
+				"west": {"uv": [0, 0, 16, 16], "texture": "#west"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#up"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#down"}
+			}
+		}
+	]
+}
