@@ -105,7 +105,6 @@ code { font-family: var(--mono); font-size: 0.85em; background: var(--fill); pad
 .logo:hover { text-decoration: none; }
 .logo-block {
     width: 18px; height: 18px;
-    background-image: url("../img/logo.png");
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
