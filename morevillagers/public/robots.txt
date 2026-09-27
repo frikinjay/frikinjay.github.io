@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://morevillagers.neoterra.online/sitemap.xml
