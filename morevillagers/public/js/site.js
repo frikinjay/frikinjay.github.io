@@ -127,8 +127,9 @@
             tipElement = document.createElement('div');
             tipElement.className = 'mc-tooltip';
             tipElement.setAttribute('aria-hidden', 'true');
-            document.body.appendChild(tipElement);
         }
+        var host = element.closest('dialog[open]') || document.body;
+        if (tipElement.parentNode !== host) host.appendChild(tipElement);
         if (tipOwner !== element) {
             tipElement.textContent = '';
             tipElement.appendChild(tipLine(data.name, data.color, 'mc-tooltip-line mc-tooltip-title'));

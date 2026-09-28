@@ -1,5 +1,5 @@
-import { fetchJson, splitId, assetUrl, renderEntity, villagerElements, composeTextures, registerCanvasTexture, iconElement, textureMeta } from './mc-assets.js';
-import { setupPack, loadNames, initTrades, describeStack, slot, watchIcons } from './trades.js';
+import { fetchJson, renderIcon, splitId, assetUrl, renderEntity, villagerElements, composeTextures, registerCanvasTexture, iconElement, textureMeta } from './mc-assets.js';
+import { setupPack, loadNames, initTrades, describeStack, slot, watchIcons, paint } from './trades.js';
 
 const MCMETA = 'https://raw.githubusercontent.com/misode/mcmeta/data/data';
 const VANILLA_TYPES = ['plains', 'desert', 'jungle', 'savanna', 'snow', 'swamp', 'taiga'];
@@ -116,63 +116,106 @@ async function renderProfessions() {
     draw();
 }
 
-async function resolveItems(ingredient) {
-    if (Array.isArray(ingredient)) return (await Promise.all(ingredient.map(resolveItems))).flat();
+const tagCache = new Map();
+
+function resolveItems(ingredient) {
+    if (Array.isArray(ingredient)) return Promise.all(ingredient.map(resolveItems)).then(lists => [...new Set(lists.flat())]);
     if (ingredient && typeof ingredient === 'object') return resolveItems(ingredient.item || (ingredient.tag ? '#' + ingredient.tag : null));
-    if (typeof ingredient !== 'string') return [];
-    if (!ingredient.startsWith('#')) return [ingredient];
-    const { ns, path } = splitId(ingredient.slice(1));
-    const tag = await fetchJson(ns === 'minecraft' ? `${MCMETA}/minecraft/tags/item/${path}.json` : `${pack.path}/data/${ns}/tags/item/${path}.json`);
-    const values = (tag && tag.values || []).map(value => (typeof value === 'object' ? value.id : value));
-    return (await Promise.all(values.slice(0, 12).map(resolveItems))).flat();
+    if (typeof ingredient !== 'string') return Promise.resolve([]);
+    if (!ingredient.startsWith('#')) return Promise.resolve([ingredient]);
+    if (!tagCache.has(ingredient)) {
+        const { ns, path } = splitId(ingredient.slice(1));
+        tagCache.set(ingredient, fetchJson(ns === 'minecraft' ? `${MCMETA}/minecraft/tags/item/${path}.json` : `${pack.path}/data/${ns}/tags/item/${path}.json`)
+            .then(tag => Promise.all((tag && tag.values || []).map(value => resolveItems(typeof value === 'object' ? value.id : value))))
+            .then(lists => [...new Set(lists.flat())].slice(0, 24)));
+    }
+    return tagCache.get(ingredient);
+}
+
+async function findRecipe(itemId) {
+    const { ns, path } = splitId(itemId);
+    const base = ns === pack.namespace ? `${pack.path}/data/${ns}/recipe/` : `${MCMETA}/${ns}/recipe/`;
+    const recipe = await fetchJson(`${base}${path}.json`);
+    if (recipe) return recipe;
+    return fetchJson(`${base}${path}_simple.json`);
+}
+
+function recipeCells(recipe) {
+    const cells = new Array(9).fill(null);
+    const type = String(recipe.type || '').replace('minecraft:', '');
+    if (type === 'crafting_decorated_pot') {
+        [['back', 1], ['left', 3], ['right', 5], ['front', 7]].forEach(([side, index]) => { cells[index] = recipe[side]; });
+    } else if (recipe.pattern) {
+        recipe.pattern.forEach((row, y) => [...row].forEach((key, x) => {
+            if (key !== ' ' && x < 3 && y < 3) cells[y * 3 + x] = recipe.key[key];
+        }));
+    } else if (recipe.ingredients) {
+        recipe.ingredients.slice(0, 9).forEach((ingredient, index) => { cells[index] = ingredient; });
+    }
+    return Promise.all(cells.map(cell => (cell ? resolveItems(cell) : null)));
 }
 
 let cycleTimer = 0;
+const readyIcons = new Set();
+
+function makeSlot(id) {
+    const holder = document.createElement('span');
+    holder.innerHTML = slot(describeStack({ id, count: 1 }, names));
+    return holder.firstElementChild;
+}
 
 async function openRecipe(itemId) {
-    const { ns, path } = splitId(itemId);
-    const recipe = await fetchJson(ns === pack.namespace ? `${pack.path}/data/${ns}/recipe/${path}.json` : `${MCMETA}/${ns}/recipe/${path}.json`);
     const dialog = document.getElementById('recipe-dialog');
     const grid = dialog.querySelector('.crafting-grid');
     const result = dialog.querySelector('.crafting-result');
     dialog.querySelector('h2').textContent = names.item(itemId);
+    grid.innerHTML = '<span class="cell"><span class="slot"></span></span>'.repeat(9);
+    result.innerHTML = '<span class="slot"></span>';
+    dialog.querySelector('.recipe-missing').hidden = true;
+    clearInterval(cycleTimer);
+    if (!dialog.open) dialog.showModal();
 
-    const cells = new Array(9).fill(null);
-    if (recipe && recipe.pattern) {
-        const rows = recipe.pattern;
-        const offsetY = rows.length < 3 ? 0 : 0;
-        for (let y = 0; y < rows.length; y++) {
-            for (let x = 0; x < rows[y].length; x++) {
-                const key = rows[y][x];
-                if (key !== ' ') cells[(y + offsetY) * 3 + x] = await resolveItems(recipe.key[key]);
-            }
-        }
-    } else if (recipe && recipe.ingredients) {
-        for (let i = 0; i < Math.min(9, recipe.ingredients.length); i++) cells[i] = await resolveItems(recipe.ingredients[i]);
+    const recipe = await findRecipe(itemId);
+    if (!recipe) {
+        dialog.querySelector('.recipe-missing').hidden = false;
+        result.replaceChildren(makeSlot(itemId));
+        paint(result.firstElementChild);
+        return;
     }
 
-    const stack = id => describeStack({ id, count: 1 }, names);
-    grid.innerHTML = cells.map((options, index) => (options && options.length
-        ? `<span class="cell" data-options="${escape(JSON.stringify(options))}" data-index="0">${slot(stack(options[0]))}</span>`
-        : '<span class="cell"><span class="slot"></span></span>')).join('');
-    const out = recipe && recipe.result ? recipe.result : { id: itemId, count: 1 };
-    result.innerHTML = slot({ ...stack(out.id || out.item || itemId), count: out.count || 1 });
-    dialog.querySelector('.recipe-missing').hidden = !!recipe;
-    watchIcons(dialog);
+    const cells = await recipeCells(recipe);
+    const out = recipe.result || { id: itemId };
+    const resultSlot = makeSlot(out.id || out.item || itemId);
+    const count = Number(out.count || 1);
+    if (count > 1) resultSlot.insertAdjacentHTML('beforeend', `<b>${count}</b>`);
+    result.replaceChildren(resultSlot);
+    paint(resultSlot);
 
-    clearInterval(cycleTimer);
+    const cellElements = [...grid.children];
+    const states = cells.map((options, index) => {
+        if (!options || !options.length) return null;
+        const first = makeSlot(options[0]);
+        cellElements[index].replaceChildren(first);
+        paint(first).then(() => readyIcons.add(options[0]));
+        return { options, index: 0, element: cellElements[index] };
+    });
+
+    const pending = [...new Set(cells.filter(Boolean).flatMap(options => options.slice(1)))].filter(id => !readyIcons.has(id));
+    pending.forEach(id => renderIcon(id).then(() => readyIcons.add(id)));
+
     cycleTimer = setInterval(() => {
-        dialog.querySelectorAll('.cell[data-options]').forEach(cell => {
-            const options = JSON.parse(cell.dataset.options);
-            if (options.length < 2) return;
-            const index = (Number(cell.dataset.index) + 1) % options.length;
-            cell.dataset.index = index;
-            cell.innerHTML = slot(stack(options[index]));
-            watchIcons(cell);
-        });
-    }, 1200);
-
-    dialog.showModal();
+        for (const state of states) {
+            if (!state || state.options.length < 2) continue;
+            for (let step = 1; step < state.options.length; step++) {
+                const next = (state.index + step) % state.options.length;
+                if (!readyIcons.has(state.options[next])) continue;
+                const element = makeSlot(state.options[next]);
+                state.index = next;
+                paint(element).then(() => { if (dialog.open) state.element.replaceChildren(element); });
+                break;
+            }
+        }
+    }, 1500);
 }
 
 function showTab(tab) {
@@ -206,6 +249,17 @@ async function init() {
     names = await loadNames();
 
     document.querySelectorAll('[data-tab]').forEach(button => button.addEventListener('click', () => showTab(button.dataset.tab)));
+    const prefetched = new Set();
+    const prefetch = event => {
+        const target = event.target.closest && event.target.closest('.workstation .slot[data-item]');
+        if (!target || prefetched.has(target.dataset.item)) return;
+        prefetched.add(target.dataset.item);
+        findRecipe(target.dataset.item).then(recipe => recipe && recipeCells(recipe)).then(cells => {
+            (cells || []).forEach(options => options && options[0] && renderIcon(options[0]));
+        });
+    };
+    document.addEventListener('pointerover', prefetch, { passive: true });
+    document.addEventListener('pointerdown', prefetch, { passive: true });
     document.addEventListener('click', event => {
         const target = event.target.closest('.workstation .slot[data-item]');
         if (target) openRecipe(target.dataset.item);

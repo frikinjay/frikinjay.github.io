@@ -359,7 +359,7 @@ const iconObserver = 'IntersectionObserver' in window
     }, { rootMargin: '300px 0px' })
     : null;
 
-function paint(element) {
+export function paint(element) {
     if (element.dataset.painted) return element._painting || Promise.resolve();
     element.dataset.painted = '1';
     const icon = element.dataset.map
