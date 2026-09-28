@@ -69,13 +69,6 @@ body {
     font-size: 15px;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-main {
-    flex: 1;
 }
 
 h1, h2, h3 { font-family: var(--display); font-weight: 400; margin: 0; line-height: 1.1; letter-spacing: 0; }
@@ -623,3 +616,8 @@ html.is-loading { overflow: hidden; }
 .crafting .slot .anim-icon { width: 32px; height: 32px; }
 .villager-render .anim-icon { width: 96px; height: 96px; }
 @media (max-width: 640px) { .villager-render .anim-icon { width: 76px; height: 76px; } }
+
+/* Keep the footer at the bottom of short pages */
+body { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
+body > main, body > .app { flex: 1 0 auto; }
+body > .footer { margin-top: auto; }

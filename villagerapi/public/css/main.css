@@ -608,3 +608,8 @@ html.is-loading { overflow: hidden; }
     .crafting .slot img { width: 32px; height: 32px; }
     .crafting-result .slot { width: 52px; height: 52px; }
 }
+
+/* Keep the footer at the bottom of short pages */
+body { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
+body > main, body > .app { flex: 1 0 auto; }
+body > .footer { margin-top: auto; }

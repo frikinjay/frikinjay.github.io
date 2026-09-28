@@ -2,7 +2,7 @@ const REPOSITORY = 'https://raw.githubusercontent.com/InventivetalentDev/minecra
 const ICON_SIZE = 96;
 const FACE_SHADE = { up: 1, down: 0.5, north: 0.8, south: 0.8, east: 0.6, west: 0.6 };
 const DEFAULT_TINT = 0x48b518;
-const CACHE_PREFIX = 'mcicon:v9:';
+const CACHE_PREFIX = 'mcicon:v10:';
 const MAX_ANIMATION_STATES = 64;
 const MAX_ANIMATION_TICKS = 2400;
 const canvasTextures = new Map();
@@ -542,21 +542,25 @@ function specialElements(description) {
                     }
                 ]
             };
-        case 'chest':
+        case 'chest': {
+            const box = (x, y, z, w, h, d, u, v) => ({
+                from: [x, y, z],
+                to: [x + w, y + h, z + d],
+                faces: {
+                    down: { uv: [u + d, v, u + d + w, v + d], texture: '#t' },
+                    up: { uv: [u + d + w, v + d, u + d + w + w, v], texture: '#t' },
+                    west: { uv: [u, v + d, u + d, v + d + h], texture: '#t' },
+                    north: { uv: [u + d, v + d, u + d + w, v + d + h], texture: '#t' },
+                    east: { uv: [u + d + w, v + d, u + d + w + d, v + d + h], texture: '#t' },
+                    south: { uv: [u + d + w + d, v + d, u + d + w + d + w, v + d + h], texture: '#t' }
+                }
+            });
             return {
                 textures: { t: 'minecraft:entity/chest/' + splitId(description.data.texture || 'minecraft:normal').path },
                 uvScale: [4, 4],
-                elements: [
-                    { from: [1, 0, 1], to: [15, 10, 15], faces: {
-                        north: { uv: [14, 33, 28, 43], texture: '#t' }, south: { uv: [42, 33, 56, 43], texture: '#t' },
-                        east: { uv: [0, 33, 14, 43], texture: '#t' }, west: { uv: [28, 33, 42, 43], texture: '#t' },
-                        down: { uv: [28, 19, 42, 33], texture: '#t' } } },
-                    { from: [1, 9, 1], to: [15, 14, 15], faces: {
-                        north: { uv: [14, 14, 28, 19], texture: '#t' }, south: { uv: [42, 14, 56, 19], texture: '#t' },
-                        east: { uv: [0, 14, 14, 19], texture: '#t' }, west: { uv: [28, 14, 42, 19], texture: '#t' },
-                        up: { uv: [14, 0, 28, 14], texture: '#t' } } }
-                ]
+                elements: [box(1, 0, 1, 14, 10, 14, 0, 19), box(1, 9, 1, 14, 5, 14, 0, 0), box(7, 7, 15, 2, 4, 1, 0, 0)]
             };
+        }
         case 'head': {
             const kind = String(description.data.kind || 'skeleton');
             const heads = {
@@ -578,7 +582,7 @@ function specialElements(description) {
                 }), 0.6), -4);
             }
             if (kind === 'dragon') {
-                return fitElements(turnAround({
+                return Object.assign(fitElements(turnAround({
                     textures: { t: 'minecraft:entity/enderdragon/dragon' },
                     uvScale: [16, 16],
                     elements: [
@@ -590,7 +594,7 @@ function specialElements(description) {
                         entityBox(3, -3, -22, 2, 2, 4, 112, 0),
                         entityBox(-6, 4, -24, 12, 4, 16, 176, 65)
                     ]
-                }));
+                })), { gui: { rotation: [30, 45, 0], translation: [0, 0, 0], scale: [0.72, 0.72, 0.72] } });
             }
             const [texture, scale] = heads[kind] || heads.skeleton;
             return shiftElements(fitElements(turnAround({ textures: { t: texture }, uvScale: scale, elements: [entityBox(-4, -8, -4, 8, 8, 8, 0, 0)] }), 0.5), -4);
@@ -780,7 +784,7 @@ async function renderBlock(description) {
         const special = specialElements(description);
         if (!special) return null;
         group = await buildElements(special.elements, special.textures, [], special.uvScale);
-        gui = description.display && description.display.gui;
+        gui = special.gui || (description.display && description.display.gui);
     } else {
         group = await buildElements(description.model.elements, description.model.textures, description.tints);
         gui = description.model.display && description.model.display.gui;
