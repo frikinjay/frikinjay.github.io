@@ -2,8 +2,8 @@ import { configure, fetchJson, renderIcon, renderMapIcon, glintUrl, splitId, ass
 
 const LEVEL_NAMES = { 1: 'Novice', 2: 'Apprentice', 3: 'Journeyman', 4: 'Expert', 5: 'Master' };
 const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
-const LANG_CACHE = 'mclang:v2:';
-const LANG_PREFIXES = ['item.minecraft.', 'block.minecraft.', 'enchantment.minecraft.', 'enchantment.level.', 'effect.minecraft.', 'instrument.minecraft.', 'trim_pattern.minecraft.'];
+const LANG_CACHE = 'mclang:v3:';
+const LANG_PREFIXES = ['item.minecraft.', 'block.minecraft.', 'enchantment.minecraft.', 'enchantment.level.', 'effect.minecraft.', 'instrument.minecraft.', 'trim_pattern.minecraft.', 'jukebox_song.minecraft.'];
 
 const RARITY = {
     uncommon: ['enchanted_book', 'dragon_breath', 'experience_bottle', 'heart_of_the_sea', 'totem_of_undying', 'nether_star', 'creeper_head',
@@ -185,6 +185,12 @@ export function describeStack(stack, names) {
     if (instrument) {
         const instrumentId = splitId(typeof instrument === 'string' ? instrument : 'minecraft:ponder_goat_horn');
         tooltip.lines.push({ text: names.text(`instrument.${instrumentId.ns}.${instrumentId.path}`, titleCase(instrumentId.path)), color: 'gray' });
+    }
+
+    const disc = path.match(/^music_disc_(.+)$/);
+    if (disc) {
+        const song = components['minecraft:jukebox_playable'] ? splitId(components['minecraft:jukebox_playable'].song || components['minecraft:jukebox_playable']).path : disc[1];
+        tooltip.lines.push({ text: names.text(`jukebox_song.minecraft.${song}`, titleCase(song)), color: 'gray' });
     }
 
     const trim = path.match(/^(.+)_armor_trim_smithing_template$/);
@@ -486,7 +492,7 @@ function setupInteraction(tabs, panels) {
 async function init() {
     if (document.body.dataset.tradesReady) return;
     document.body.dataset.tradesReady = '1';
-    const tabHost = document.querySelector('[role="tablist"]');
+    const tabHost = document.querySelector('.trades-bar [role="tablist"]');
     const list = document.getElementById('professions');
 
     const names = await loadNames();

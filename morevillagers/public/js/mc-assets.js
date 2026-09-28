@@ -2,7 +2,7 @@ const REPOSITORY = 'https://raw.githubusercontent.com/InventivetalentDev/minecra
 const ICON_SIZE = 96;
 const FACE_SHADE = { up: 1, down: 0.5, north: 0.8, south: 0.8, east: 0.6, west: 0.6 };
 const DEFAULT_TINT = 0x48b518;
-const CACHE_PREFIX = 'mcicon:v8:';
+const CACHE_PREFIX = 'mcicon:v9:';
 const MAX_ANIMATION_STATES = 64;
 const MAX_ANIMATION_TICKS = 2400;
 const canvasTextures = new Map();
@@ -572,7 +572,9 @@ function specialElements(description) {
                     textures: { t: 'minecraft:entity/piglin/piglin' },
                     uvScale: [4, 4],
                     elements: [entityBox(-5, -8, -4, 10, 8, 8, 0, 0), entityBox(-2, -4, -5, 4, 4, 1, 31, 1),
-                        entityBox(2, -2, -5, 1, 2, 1, 2, 4), entityBox(-3, -2, -5, 1, 2, 1, 2, 0)]
+                        entityBox(2, -2, -5, 1, 2, 1, 2, 4), entityBox(-3, -2, -5, 1, 2, 1, 2, 0),
+                        withPivot(entityBox(4.5, -6, -2, 1, 5, 4, 51, 6), [4.5, -6, 0], 'z', -Math.PI / 6),
+                        withPivot(entityBox(-5.5, -6, -2, 1, 5, 4, 39, 6), [-4.5, -6, 0], 'z', Math.PI / 6)]
                 }), 0.6), -4);
             }
             if (kind === 'dragon') {
@@ -721,7 +723,13 @@ export async function composeTextures(ids, clear = {}) {
 }
 
 function shiftElements(model, dy) {
-    model.elements = model.elements.map(element => ({ ...element, from: [element.from[0], element.from[1] + dy, element.from[2]], to: [element.to[0], element.to[1] + dy, element.to[2]] }));
+    const move = point => [point[0], point[1] + dy, point[2]];
+    model.elements = model.elements.map(element => ({
+        ...element,
+        from: move(element.from),
+        to: move(element.to),
+        rotation: element.rotation ? { ...element.rotation, origin: move(element.rotation.origin) } : undefined
+    }));
     return model;
 }
 
@@ -730,7 +738,12 @@ function turnAround(model) {
     model.elements = model.elements.map(element => {
         const faces = {};
         for (const [face, value] of Object.entries(element.faces)) faces[swap[face]] = value;
-        return { ...element, faces, from: [-element.to[0], element.from[1], -element.to[2]], to: [-element.from[0], element.to[1], -element.from[2]] };
+        const rotation = element.rotation && {
+            ...element.rotation,
+            origin: [-element.rotation.origin[0], element.rotation.origin[1], -element.rotation.origin[2]],
+            angle: element.rotation.axis === 'y' ? element.rotation.angle : -element.rotation.angle
+        };
+        return { ...element, faces, rotation, from: [-element.to[0], element.from[1], -element.to[2]], to: [-element.from[0], element.to[1], -element.from[2]] };
     });
     return model;
 }
