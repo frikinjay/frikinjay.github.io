@@ -1,0 +1,468 @@
+{
+  "profession": "morevillagers:oceanographer",
+  "levels": {
+    "1": {
+      "trade_list_amount": 2,
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:prismarine",
+            "count": 14.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 2.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 6.0
+          },
+          "gives": {
+            "id": "minecraft:sea_lantern"
+          },
+          "max_uses": 16.0,
+          "xp": 2.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:kelp",
+            "count": 32.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 2.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:seagrass",
+            "count": 24.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 2.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:fishing_rod"
+          },
+          "max_uses": 12.0,
+          "xp": 1.0,
+          "reputation_discount": 0.2,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:dried_kelp",
+            "count": 12.0
+          },
+          "max_uses": 16.0,
+          "xp": 1.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        }
+      ]
+    },
+    "2": {
+      "trade_list_amount": 2,
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:prismarine_bricks",
+            "count": 14.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 10.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 20.0
+          },
+          "gives": {
+            "id": "minecraft:sponge"
+          },
+          "max_uses": 16.0,
+          "xp": 7.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:cod",
+            "count": 15.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 10.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:salmon",
+            "count": 13.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 10.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:prismarine_shard",
+            "count": 4.0
+          },
+          "max_uses": 12.0,
+          "xp": 5.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 3.0
+          },
+          "gives": {
+            "id": "minecraft:tropical_fish_bucket"
+          },
+          "max_uses": 8.0,
+          "xp": 5.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        }
+      ]
+    },
+    "3": {
+      "trade_list_amount": 2,
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:dark_prismarine",
+            "count": 12.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 20.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 13.0
+          },
+          "gives": {
+            "id": "minecraft:map"
+          },
+          "given_item_modifiers": [
+            {
+              "decoration": "morevillagers:red_x_decoration",
+              "destination": "morevillagers:on_shipwreck_maps",
+              "function": "minecraft:exploration_map",
+              "search_radius": 100
+            },
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "translate": "filled_map.shipwreck"
+              },
+              "target": "item_name"
+            },
+            {
+              "function": "minecraft:filtered",
+              "item_filter": {
+                "items": "minecraft:filled_map",
+                "predicates": {
+                  "minecraft:map_id": {}
+                }
+              },
+              "on_fail": {
+                "function": "minecraft:discard"
+              }
+            }
+          ],
+          "max_uses": 12.0,
+          "xp": 10.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:tropical_fish",
+            "count": 6.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 12.0,
+          "xp": 20.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:pufferfish",
+            "count": 4.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 12.0,
+          "xp": 20.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 5.0
+          },
+          "gives": {
+            "id": "minecraft:potion",
+            "components": {
+              "minecraft:potion_contents": {
+                "potion": "minecraft:water_breathing"
+              }
+            }
+          },
+          "max_uses": 12.0,
+          "xp": 10.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 2.0
+          },
+          "gives": {
+            "id": "minecraft:prismarine_crystals",
+            "count": 3.0
+          },
+          "max_uses": 12.0,
+          "xp": 10.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        }
+      ]
+    },
+    "4": {
+      "trade_list_amount": 2,
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 3.0
+          },
+          "gives": {
+            "id": "minecraft:nautilus_shell"
+          },
+          "max_uses": 12.0,
+          "xp": 15.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 32.0
+          },
+          "gives": {
+            "id": "minecraft:heart_of_the_sea"
+          },
+          "max_uses": 12.0,
+          "xp": 15.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 14.0
+          },
+          "gives": {
+            "id": "minecraft:map"
+          },
+          "given_item_modifiers": [
+            {
+              "decoration": "morevillagers:ocean_monument_decoration",
+              "destination": "morevillagers:on_ocean_monument_maps",
+              "function": "minecraft:exploration_map",
+              "search_radius": 100
+            },
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "translate": "filled_map.ocean_monument"
+              },
+              "target": "item_name"
+            },
+            {
+              "function": "minecraft:filtered",
+              "item_filter": {
+                "items": "minecraft:filled_map",
+                "predicates": {
+                  "minecraft:map_id": {}
+                }
+              },
+              "on_fail": {
+                "function": "minecraft:discard"
+              }
+            }
+          ],
+          "max_uses": 12.0,
+          "xp": 15.0,
+          "reputation_discount": 0.2,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:nautilus_shell",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 12.0,
+          "xp": 30.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 3.0
+          },
+          "gives": {
+            "id": "minecraft:turtle_scute"
+          },
+          "max_uses": 8.0,
+          "xp": 15.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        }
+      ]
+    },
+    "5": {
+      "trade_list_amount": 2,
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 64.0
+          },
+          "gives": {
+            "id": "minecraft:trident"
+          },
+          "max_uses": 2.0,
+          "xp": 30.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 18.0
+          },
+          "gives": {
+            "id": "minecraft:enchanted_book",
+            "components": {
+              "minecraft:stored_enchantments": {
+                "minecraft:respiration": 3
+              }
+            }
+          },
+          "max_uses": 4.0,
+          "xp": 30.0,
+          "reputation_discount": 0.2,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 22.0
+          },
+          "gives": {
+            "id": "minecraft:enchanted_book",
+            "components": {
+              "minecraft:stored_enchantments": {
+                "minecraft:depth_strider": 3
+              }
+            }
+          },
+          "max_uses": 4.0,
+          "xp": 30.0,
+          "reputation_discount": 0.2,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 20.0
+          },
+          "additional_wants": {
+            "id": "minecraft:trident",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:trident",
+            "components": {
+              "minecraft:enchantments": {
+                "minecraft:loyalty": 3,
+                "minecraft:unbreaking": 3
+              }
+            }
+          },
+          "max_uses": 3.0,
+          "xp": 30.0,
+          "reputation_discount": 0.2,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:trident",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:emerald",
+            "count": 48.0
+          },
+          "max_uses": 4.0,
+          "xp": 30.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        }
+      ]
+    }
+  }
+}

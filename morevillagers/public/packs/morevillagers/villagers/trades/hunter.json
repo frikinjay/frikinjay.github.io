@@ -1,0 +1,403 @@
+{
+  "profession": "morevillagers:hunter",
+  "levels": {
+    "1": {
+      "trade_list_amount": 2,
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:bone",
+            "count": 32.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 2.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 5.0
+          },
+          "gives": {
+            "id": "minecraft:slime_ball",
+            "count": 2.0
+          },
+          "max_uses": 16.0,
+          "xp": 1.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:rotten_flesh",
+            "count": 32.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 2.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:string",
+            "count": 18.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 2.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:arrow",
+            "count": 16.0
+          },
+          "max_uses": 12.0,
+          "xp": 1.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        }
+      ]
+    },
+    "2": {
+      "trade_list_amount": 2,
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:spider_eye",
+            "count": 24.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 10.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 5.0
+          },
+          "gives": {
+            "id": "minecraft:fermented_spider_eye"
+          },
+          "max_uses": 16.0,
+          "xp": 5.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:feather",
+            "count": 24.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 10.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 3.0
+          },
+          "gives": {
+            "id": "minecraft:crossbow"
+          },
+          "max_uses": 12.0,
+          "xp": 5.0,
+          "reputation_discount": 0.2,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 2.0
+          },
+          "gives": {
+            "id": "minecraft:spectral_arrow",
+            "count": 4.0
+          },
+          "max_uses": 12.0,
+          "xp": 5.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        }
+      ]
+    },
+    "3": {
+      "trade_list_amount": 2,
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:gunpowder",
+            "count": 20.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 20.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 5.0
+          },
+          "gives": {
+            "id": "minecraft:magma_cream"
+          },
+          "max_uses": 12.0,
+          "xp": 10.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:rabbit_foot",
+            "count": 2.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 12.0,
+          "xp": 20.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 2.0
+          },
+          "gives": {
+            "id": "minecraft:lead"
+          },
+          "max_uses": 12.0,
+          "xp": 10.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 8.0
+          },
+          "gives": {
+            "id": "minecraft:bow",
+            "components": {
+              "minecraft:enchantments": {
+                "minecraft:power": 3
+              }
+            }
+          },
+          "max_uses": 3.0,
+          "xp": 10.0,
+          "reputation_discount": 0.2,
+          "trade_list_weight": 10
+        }
+      ]
+    },
+    "4": {
+      "trade_list_amount": 2,
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 5.0
+          },
+          "gives": {
+            "id": "minecraft:blaze_rod"
+          },
+          "max_uses": 12.0,
+          "xp": 15.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 13.0
+          },
+          "gives": {
+            "id": "minecraft:map"
+          },
+          "given_item_modifiers": [
+            {
+              "decoration": "morevillagers:pillager_outpost_decoration",
+              "destination": "morevillagers:on_pillager_outpost_explorer_maps",
+              "function": "minecraft:exploration_map",
+              "search_radius": 100
+            },
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "translate": "filled_map.pillager_outpost"
+              },
+              "target": "item_name"
+            },
+            {
+              "function": "minecraft:filtered",
+              "item_filter": {
+                "items": "minecraft:filled_map",
+                "predicates": {
+                  "minecraft:map_id": {}
+                }
+              },
+              "on_fail": {
+                "function": "minecraft:discard"
+              }
+            }
+          ],
+          "max_uses": 12.0,
+          "xp": 15.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:ghast_tear",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:emerald",
+            "count": 2.0
+          },
+          "max_uses": 12.0,
+          "xp": 30.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 2.0
+          },
+          "additional_wants": {
+            "id": "minecraft:arrow",
+            "count": 8.0
+          },
+          "gives": {
+            "id": "minecraft:tipped_arrow",
+            "count": 8.0,
+            "components": {
+              "minecraft:potion_contents": {
+                "potion": "minecraft:poison"
+              }
+            }
+          },
+          "max_uses": 12.0,
+          "xp": 15.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 2.0
+          },
+          "additional_wants": {
+            "id": "minecraft:arrow",
+            "count": 8.0
+          },
+          "gives": {
+            "id": "minecraft:tipped_arrow",
+            "count": 8.0,
+            "components": {
+              "minecraft:potion_contents": {
+                "potion": "minecraft:slowness"
+              }
+            }
+          },
+          "max_uses": 12.0,
+          "xp": 15.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        }
+      ]
+    },
+    "5": {
+      "trade_list_amount": 2,
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 8.0
+          },
+          "gives": {
+            "id": "minecraft:ghast_tear"
+          },
+          "max_uses": 12.0,
+          "xp": 30.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 8.0
+          },
+          "gives": {
+            "id": "minecraft:rabbit_foot"
+          },
+          "max_uses": 12.0,
+          "xp": 30.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 24.0
+          },
+          "additional_wants": {
+            "id": "minecraft:diamond_sword",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:diamond_sword",
+            "components": {
+              "minecraft:enchantments": {
+                "minecraft:sharpness": 4,
+                "minecraft:looting": 2
+              }
+            }
+          },
+          "max_uses": 3.0,
+          "xp": 30.0,
+          "reputation_discount": 0.2,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 20.0
+          },
+          "gives": {
+            "id": "minecraft:enchanted_book",
+            "components": {
+              "minecraft:stored_enchantments": {
+                "minecraft:looting": 3
+              }
+            }
+          },
+          "max_uses": 4.0,
+          "xp": 30.0,
+          "reputation_discount": 0.2,
+          "trade_list_weight": 10
+        }
+      ]
+    }
+  }
+}

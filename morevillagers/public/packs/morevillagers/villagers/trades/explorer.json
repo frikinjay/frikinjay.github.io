@@ -1,0 +1,505 @@
+{
+  "profession": "morevillagers:explorer",
+  "levels": {
+    "1": {
+      "trade_list_amount": 2,
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:map",
+            "count": 6.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 2.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 24.0
+          },
+          "additional_wants": {
+            "id": "minecraft:map",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:map"
+          },
+          "given_item_modifiers": [
+            {
+              "decoration": "morevillagers:trail_ruins_decoration",
+              "destination": "morevillagers:on_trail_ruins_maps",
+              "function": "minecraft:exploration_map",
+              "search_radius": 100
+            },
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "translate": "filled_map.trail_ruins"
+              },
+              "target": "item_name"
+            },
+            {
+              "function": "minecraft:filtered",
+              "item_filter": {
+                "items": "minecraft:filled_map",
+                "predicates": {
+                  "minecraft:map_id": {}
+                }
+              },
+              "on_fail": {
+                "function": "minecraft:discard"
+              }
+            }
+          ],
+          "max_uses": 2.0,
+          "xp": 5.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:compass",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 12.0,
+          "xp": 2.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:bread",
+            "count": 6.0
+          },
+          "max_uses": 16.0,
+          "xp": 1.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        }
+      ]
+    },
+    "2": {
+      "trade_list_amount": 2,
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:paper",
+            "count": 24.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 12.0,
+          "xp": 5.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 8.0
+          },
+          "additional_wants": {
+            "id": "minecraft:compass",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:recovery_compass"
+          },
+          "max_uses": 1.0,
+          "xp": 10.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:leather",
+            "count": 6.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 10.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 4.0
+          },
+          "gives": {
+            "id": "minecraft:clock"
+          },
+          "max_uses": 12.0,
+          "xp": 5.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 6.0
+          },
+          "gives": {
+            "id": "minecraft:saddle"
+          },
+          "max_uses": 12.0,
+          "xp": 5.0,
+          "reputation_discount": 0.2,
+          "trade_list_weight": 10
+        }
+      ]
+    },
+    "3": {
+      "trade_list_amount": 2,
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 18.0
+          },
+          "gives": {
+            "id": "minecraft:spyglass"
+          },
+          "max_uses": 2.0,
+          "xp": 15.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 28.0
+          },
+          "gives": {
+            "id": "minecraft:diamond_boots",
+            "components": {
+              "minecraft:enchantments": {
+                "minecraft:feather_falling": 4,
+                "minecraft:depth_strider": 3
+              }
+            }
+          },
+          "max_uses": 2.0,
+          "xp": 20.0,
+          "reputation_discount": 0.2,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 12.0
+          },
+          "additional_wants": {
+            "id": "minecraft:map",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:map"
+          },
+          "given_item_modifiers": [
+            {
+              "decoration": "morevillagers:desert_pyramid_decoration",
+              "destination": "morevillagers:on_desert_pyramid_maps",
+              "function": "minecraft:exploration_map",
+              "search_radius": 100
+            },
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "translate": "filled_map.desert_pyramid"
+              },
+              "target": "item_name"
+            },
+            {
+              "function": "minecraft:filtered",
+              "item_filter": {
+                "items": "minecraft:filled_map",
+                "predicates": {
+                  "minecraft:map_id": {}
+                }
+              },
+              "on_fail": {
+                "function": "minecraft:discard"
+              }
+            }
+          ],
+          "max_uses": 2.0,
+          "xp": 10.0,
+          "reputation_discount": 0.2,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 4.0
+          },
+          "gives": {
+            "id": "minecraft:potion",
+            "components": {
+              "minecraft:potion_contents": {
+                "potion": "minecraft:swiftness"
+              }
+            }
+          },
+          "max_uses": 12.0,
+          "xp": 10.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        }
+      ]
+    },
+    "4": {
+      "trade_list_amount": 2,
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 38.0
+          },
+          "additional_wants": {
+            "id": "minecraft:map",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:map"
+          },
+          "given_item_modifiers": [
+            {
+              "decoration": "morevillagers:trial_chambers_decoration",
+              "destination": "morevillagers:on_trial_chambers_maps",
+              "function": "minecraft:exploration_map",
+              "search_radius": 100
+            },
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "translate": "filled_map.trial_chambers_map"
+              },
+              "target": "item_name"
+            },
+            {
+              "function": "minecraft:filtered",
+              "item_filter": {
+                "items": "minecraft:filled_map",
+                "predicates": {
+                  "minecraft:map_id": {}
+                }
+              },
+              "on_fail": {
+                "function": "minecraft:discard"
+              }
+            }
+          ],
+          "max_uses": 1.0,
+          "xp": 20.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:trial_key",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:emerald",
+            "count": 12.0
+          },
+          "max_uses": 12.0,
+          "xp": 30.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 4.0
+          },
+          "gives": {
+            "id": "minecraft:wind_charge",
+            "count": 8.0
+          },
+          "max_uses": 12.0,
+          "xp": 15.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 16.0
+          },
+          "additional_wants": {
+            "id": "minecraft:map",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:map"
+          },
+          "given_item_modifiers": [
+            {
+              "decoration": "morevillagers:woodland_mansion_decoration",
+              "destination": "morevillagers:on_woodland_mansion_maps",
+              "function": "minecraft:exploration_map",
+              "search_radius": 100
+            },
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "translate": "filled_map.woodland_mansion"
+              },
+              "target": "item_name"
+            },
+            {
+              "function": "minecraft:filtered",
+              "item_filter": {
+                "items": "minecraft:filled_map",
+                "predicates": {
+                  "minecraft:map_id": {}
+                }
+              },
+              "on_fail": {
+                "function": "minecraft:discard"
+              }
+            }
+          ],
+          "max_uses": 2.0,
+          "xp": 15.0,
+          "reputation_discount": 0.2,
+          "trade_list_weight": 10
+        }
+      ]
+    },
+    "5": {
+      "trade_list_amount": 2,
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 48.0
+          },
+          "additional_wants": {
+            "id": "minecraft:ender_pearl",
+            "count": 2.0
+          },
+          "gives": {
+            "id": "minecraft:shulker_box"
+          },
+          "max_uses": 8.0,
+          "xp": 30.0,
+          "reputation_discount": 0.5,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 48.0
+          },
+          "additional_wants": {
+            "id": "minecraft:map",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:map"
+          },
+          "given_item_modifiers": [
+            {
+              "decoration": "morevillagers:ancient_city_decoration",
+              "destination": "morevillagers:on_ancient_city_explorer_maps",
+              "function": "minecraft:exploration_map",
+              "search_radius": 100
+            },
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "translate": "filled_map.ancient_city"
+              },
+              "target": "item_name"
+            },
+            {
+              "function": "minecraft:filtered",
+              "item_filter": {
+                "items": "minecraft:filled_map",
+                "predicates": {
+                  "minecraft:map_id": {}
+                }
+              },
+              "on_fail": {
+                "function": "minecraft:discard"
+              }
+            }
+          ],
+          "max_uses": 1.0,
+          "xp": 20.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 20.0
+          },
+          "additional_wants": {
+            "id": "minecraft:map",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:map"
+          },
+          "given_item_modifiers": [
+            {
+              "decoration": "morevillagers:red_x_decoration",
+              "destination": "morevillagers:on_buried_treasure_maps",
+              "function": "minecraft:exploration_map",
+              "search_radius": 100
+            },
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "translate": "filled_map.buried_treasure"
+              },
+              "target": "item_name"
+            },
+            {
+              "function": "minecraft:filtered",
+              "item_filter": {
+                "items": "minecraft:filled_map",
+                "predicates": {
+                  "minecraft:map_id": {}
+                }
+              },
+              "on_fail": {
+                "function": "minecraft:discard"
+              }
+            }
+          ],
+          "max_uses": 2.0,
+          "xp": 30.0,
+          "reputation_discount": 0.2,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:ominous_trial_key",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:emerald",
+            "count": 32.0
+          },
+          "max_uses": 8.0,
+          "xp": 30.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        }
+      ]
+    }
+  }
+}

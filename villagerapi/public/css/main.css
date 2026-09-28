@@ -608,10 +608,3 @@ html.is-loading { overflow: hidden; }
     .crafting .slot img { width: 32px; height: 32px; }
     .crafting-result .slot { width: 52px; height: 52px; }
 }
-
-/* Animated textures */
-.anim-icon { position: relative; display: block; width: 38px; height: 38px; animation: icon-in 0.25s var(--ease); }
-.anim-icon i { position: absolute; inset: 0; background: var(--strip) 0 0 / 100% calc(var(--frames) * 100%) no-repeat; image-rendering: pixelated; }
-.crafting .slot .anim-icon { width: 32px; height: 32px; }
-.villager-render .anim-icon { width: 120px; height: 120px; }
-@media (max-width: 640px) { .villager-render .anim-icon { width: 96px; height: 96px; } }

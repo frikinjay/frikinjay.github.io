@@ -1,0 +1,430 @@
+{
+  "profession": "morevillagers:miner",
+  "levels": {
+    "1": {
+      "trade_list_amount": 2,
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:deepslate",
+            "count": 20.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 2.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald"
+          },
+          "gives": {
+            "id": "minecraft:calcite",
+            "count": 5.0
+          },
+          "max_uses": 16.0,
+          "xp": 1.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:cobblestone",
+            "count": 32.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 2.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:tuff",
+            "count": 24.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 2.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:torch",
+            "count": 16.0
+          },
+          "max_uses": 16.0,
+          "xp": 1.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        }
+      ]
+    },
+    "2": {
+      "trade_list_amount": 2,
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:raw_copper",
+            "count": 15.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 10.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:raw_iron",
+            "count": 12.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 10.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:coal",
+            "count": 15.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 10.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:flint",
+            "count": 26.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 12.0,
+          "xp": 10.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 2.0
+          },
+          "gives": {
+            "id": "minecraft:iron_pickaxe"
+          },
+          "max_uses": 12.0,
+          "xp": 5.0,
+          "reputation_discount": 0.2,
+          "trade_list_weight": 10
+        }
+      ]
+    },
+    "3": {
+      "trade_list_amount": 2,
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:raw_gold",
+            "count": 10.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 16.0,
+          "xp": 20.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald"
+          },
+          "gives": {
+            "id": "minecraft:amethyst_shard",
+            "count": 2.0
+          },
+          "max_uses": 12.0,
+          "xp": 10.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:lapis_lazuli",
+            "count": 12.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 12.0,
+          "xp": 20.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 3.0
+          },
+          "gives": {
+            "id": "minecraft:rail",
+            "count": 16.0
+          },
+          "max_uses": 12.0,
+          "xp": 10.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 2.0
+          },
+          "gives": {
+            "id": "minecraft:minecart"
+          },
+          "max_uses": 12.0,
+          "xp": 10.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        }
+      ]
+    },
+    "4": {
+      "trade_list_amount": 2,
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:torch",
+            "count": 50.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 12.0,
+          "xp": 30.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 13.0
+          },
+          "gives": {
+            "id": "minecraft:map"
+          },
+          "given_item_modifiers": [
+            {
+              "decoration": "morevillagers:mineshaft_decoration",
+              "destination": "morevillagers:on_mineshaft_explorer_maps",
+              "function": "minecraft:exploration_map",
+              "search_radius": 100
+            },
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "translate": "filled_map.mineshaft"
+              },
+              "target": "item_name"
+            },
+            {
+              "function": "minecraft:filtered",
+              "item_filter": {
+                "items": "minecraft:filled_map",
+                "predicates": {
+                  "minecraft:map_id": {}
+                }
+              },
+              "on_fail": {
+                "function": "minecraft:discard"
+              }
+            }
+          ],
+          "max_uses": 12.0,
+          "xp": 15.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:diamond",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:emerald"
+          },
+          "max_uses": 12.0,
+          "xp": 30.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 4.0
+          },
+          "gives": {
+            "id": "minecraft:potion",
+            "components": {
+              "minecraft:potion_contents": {
+                "potion": "minecraft:night_vision"
+              }
+            }
+          },
+          "max_uses": 12.0,
+          "xp": 15.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 4.0
+          },
+          "gives": {
+            "id": "minecraft:powered_rail",
+            "count": 6.0
+          },
+          "max_uses": 12.0,
+          "xp": 15.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        }
+      ]
+    },
+    "5": {
+      "trade_list_amount": 2,
+      "trades": [
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 12.0
+          },
+          "gives": {
+            "id": "minecraft:diamond_pickaxe"
+          },
+          "max_uses": 15.0,
+          "xp": 30.0,
+          "reputation_discount": 0.2,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 15.0
+          },
+          "gives": {
+            "id": "minecraft:map"
+          },
+          "given_item_modifiers": [
+            {
+              "decoration": "morevillagers:ancient_city_decoration",
+              "destination": "morevillagers:on_ancient_city_explorer_maps",
+              "function": "minecraft:exploration_map",
+              "search_radius": 100
+            },
+            {
+              "function": "minecraft:set_name",
+              "name": {
+                "translate": "filled_map.ancient_city"
+              },
+              "target": "item_name"
+            },
+            {
+              "function": "minecraft:filtered",
+              "item_filter": {
+                "items": "minecraft:filled_map",
+                "predicates": {
+                  "minecraft:map_id": {}
+                }
+              },
+              "on_fail": {
+                "function": "minecraft:discard"
+              }
+            }
+          ],
+          "max_uses": 12.0,
+          "xp": 15.0,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 24.0
+          },
+          "additional_wants": {
+            "id": "minecraft:diamond_pickaxe",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:diamond_pickaxe",
+            "components": {
+              "minecraft:enchantments": {
+                "minecraft:efficiency": 4,
+                "minecraft:fortune": 2,
+                "minecraft:unbreaking": 3
+              }
+            }
+          },
+          "max_uses": 3.0,
+          "xp": 30.0,
+          "reputation_discount": 0.2,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:emerald",
+            "count": 20.0
+          },
+          "additional_wants": {
+            "id": "minecraft:diamond_pickaxe",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:diamond_pickaxe",
+            "components": {
+              "minecraft:enchantments": {
+                "minecraft:silk_touch": 1,
+                "minecraft:efficiency": 3
+              }
+            }
+          },
+          "max_uses": 3.0,
+          "xp": 30.0,
+          "reputation_discount": 0.2,
+          "trade_list_weight": 10
+        },
+        {
+          "wants": {
+            "id": "minecraft:echo_shard",
+            "count": 1.0
+          },
+          "gives": {
+            "id": "minecraft:diamond",
+            "count": 12.0
+          },
+          "max_uses": 4.0,
+          "xp": 30.0,
+          "reputation_discount": 0.05,
+          "trade_list_weight": 10
+        }
+      ]
+    }
+  }
+}

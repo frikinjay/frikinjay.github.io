@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" class="is-loading">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Villager Pack</title>
+  <meta name="description" content="Villager types, professions and trades of a VillagerAPI villager pack.">
+  <link rel="canonical" href="https://morevillagers.neoterra.online/pack">
+  <meta property="og:title" content="Villager Pack">
+  <meta property="og:description" content="Villager types, professions and trades of a VillagerAPI villager pack.">
+  <meta property="og:url" content="https://morevillagers.neoterra.online/pack">
+  <meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/png" href="./favicon.png">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+  <link rel="preload" href="./fonts/MCTenLowercaseAlt.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./fonts/MinecraftSeven2.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="./css/main.css">
+  <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
+  <link rel="modulepreload" href="./js/mc-assets.js">
+  <script src="./js/site.js" defer></script>
+  <link rel="modulepreload" href="./js/mc-assets.js">
+  <script src="./js/pack.js" type="module"></script>
+  <style>#loader{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:#fbfbfd;color:#1d1d1f;font:20px/1 "Minecraft Seven",system-ui,sans-serif;letter-spacing:.12em}@media(prefers-color-scheme:dark){#loader{background:#000;color:#f5f5f7}}</style>
+</head>
+<body>
+  <div id="loader" role="status" aria-live="polite">LOADING...</div>
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="logo" href="./"><span class="logo-block" aria-hidden="true" style="background-image: url('./img/more_villagers_re_logo.png');"></span>MV:Re</a>
+      <nav class="nav-links" aria-label="Main">
+        <a href="./">Villager Packs</a>
+        <a href="https://villagerapi.neoterra.online/">Generator</a>
+        <a href="https://github.com/frikinjay/villagerapi/blob/main/DOCUMENTATION_26_1.md">Docs</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <div class="pack-header" id="pack-header"></div>
+      <div class="tabs pack-tabs" role="tablist" aria-label="Pack sections">
+        <button class="tab" role="tab" data-tab="types" aria-selected="true">Villager Types</button>
+        <button class="tab" role="tab" data-tab="professions" aria-selected="false">Villager Professions</button>
+        <button class="tab" role="tab" data-tab="trades" aria-selected="false">Villager Trades</button>
+      </div>
+
+      <section data-panel="types">
+        <div class="villager-grid" id="types-list"></div>
+      </section>
+
+      <section data-panel="professions" hidden>
+        <label class="type-picker"><span>Villager type</span><select id="type-select"></select></label>
+        <div class="villager-grid" id="professions-list"></div>
+      </section>
+
+      <section data-panel="trades" hidden>
+        <div class="trades-bar">
+          <div class="tabs" role="tablist" aria-label="Professions"></div>
+          <label class="search">
+            <span class="sr-only">Search trades</span>
+            <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            <input type="search" id="search" placeholder="Search" autocomplete="off">
+          </label>
+        </div>
+        <div id="professions">
+          <p class="no-results" id="no-results" hidden>No results</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <dialog class="recipe-dialog" id="recipe-dialog" aria-labelledby="recipe-title">
+    <div class="recipe-panel">
+      <div class="recipe-head"><h2 id="recipe-title">Recipe</h2><button type="button" class="dialog-close" aria-label="Close">&times;</button></div>
+      <div class="crafting">
+        <div class="crafting-grid"></div>
+        <span class="crafting-arrow" aria-hidden="true"></span>
+        <div class="crafting-result"></div>
+      </div>
+      <p class="recipe-missing" hidden>No crafting recipe found.</p>
+    </div>
+  </dialog>
+
+  <footer class="footer">
+    <div class="wrap">
+      <span>Not affiliated with Mojang Studios or Microsoft.</span>
+      <nav aria-label="Footer">
+        <a href="https://modrinth.com/mod/villagerapi">Modrinth</a>
+        <a href="https://github.com/frikinjay/villagerapi">GitHub</a>
+        <a href="https://discord.gg/aPPEPJWG39">Discord</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

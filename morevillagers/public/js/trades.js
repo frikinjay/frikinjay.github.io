@@ -1,17 +1,58 @@
-import { configure, fetchJson, renderIcon, renderMapIcon, glintUrl, splitId, assetUrl } from './mc-assets.js';
+import { configure, fetchJson, renderIcon, renderMapIcon, glintUrl, splitId, assetUrl, iconElement, iconFirstFrame } from './mc-assets.js';
 
 const LEVEL_NAMES = { 1: 'Novice', 2: 'Apprentice', 3: 'Journeyman', 4: 'Expert', 5: 'Master' };
 const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
-const LANG_CACHE = 'mclang:v1:';
+const LANG_CACHE = 'mclang:v2:';
+const LANG_PREFIXES = ['item.minecraft.', 'block.minecraft.', 'enchantment.minecraft.', 'enchantment.level.', 'effect.minecraft.', 'instrument.minecraft.', 'trim_pattern.minecraft.'];
 
-const root = document.querySelector('[data-pack]');
-const packPath = root.dataset.pack.replace(/\/$/, '');
-const version = root.dataset.version || '26.3';
-const professions = root.dataset.professions.split(',').map(value => value.trim()).filter(Boolean);
-const packNamespace = root.dataset.namespace || 'morevillagers';
+const RARITY = {
+    uncommon: ['enchanted_book', 'dragon_breath', 'experience_bottle', 'heart_of_the_sea', 'totem_of_undying', 'nether_star', 'creeper_head',
+        'zombie_head', 'skeleton_skull', 'wither_skeleton_skull', 'player_head', 'piglin_head', 'sniffer_egg', 'ominous_trial_key',
+        'spire_armor_trim_smithing_template', 'netherite_upgrade_smithing_template', 'goat_horn'],
+    rare: ['conduit', 'beacon', 'golden_apple', 'end_crystal'],
+    epic: ['dragon_head', 'dragon_egg', 'enchanted_golden_apple', 'elytra', 'heavy_core', 'mace', 'trident']
+};
+const RARITY_COLOR = { common: 'white', uncommon: 'yellow', rare: 'aqua', epic: 'light_purple' };
 
-configure({ version, local: { [packNamespace]: `${packPath}/assets`, villagerapi: `${packPath}/assets` } });
-document.documentElement.style.setProperty('--glint', `url("${glintUrl()}")`);
+const POTIONS = {
+    water_breathing: ['water_breathing', 180, 0, 0x98dac0], long_water_breathing: ['water_breathing', 480, 0, 0x98dac0],
+    fire_resistance: ['fire_resistance', 180, 0, 0xff9900], long_fire_resistance: ['fire_resistance', 480, 0, 0xff9900],
+    night_vision: ['night_vision', 180, 0, 0xc2ff66], long_night_vision: ['night_vision', 480, 0, 0xc2ff66],
+    swiftness: ['speed', 180, 0, 0x33ebff], long_swiftness: ['speed', 480, 0, 0x33ebff], strong_swiftness: ['speed', 90, 1, 0x33ebff],
+    slow_falling: ['slow_falling', 90, 0, 0xf3cfb9], long_slow_falling: ['slow_falling', 240, 0, 0xf3cfb9],
+    invisibility: ['invisibility', 180, 0, 0xf6f6f6], long_invisibility: ['invisibility', 480, 0, 0xf6f6f6],
+    strength: ['strength', 180, 0, 0xffc700], long_strength: ['strength', 480, 0, 0xffc700], strong_strength: ['strength', 90, 1, 0xffc700],
+    poison: ['poison', 45, 0, 0x87a363], long_poison: ['poison', 90, 0, 0x87a363], strong_poison: ['poison', 21, 1, 0x87a363],
+    slowness: ['slowness', 90, 0, 0x8bafe0], long_slowness: ['slowness', 240, 0, 0x8bafe0], strong_slowness: ['slowness', 20, 3, 0x8bafe0],
+    weakness: ['weakness', 90, 0, 0x484d48], long_weakness: ['weakness', 240, 0, 0x484d48],
+    leaping: ['jump_boost', 180, 0, 0xfdff84], long_leaping: ['jump_boost', 480, 0, 0xfdff84], strong_leaping: ['jump_boost', 90, 1, 0xfdff84],
+    regeneration: ['regeneration', 45, 0, 0xcd5cab], long_regeneration: ['regeneration', 90, 0, 0xcd5cab], strong_regeneration: ['regeneration', 22, 1, 0xcd5cab],
+    healing: ['instant_health', 0, 0, 0xf82423], strong_healing: ['instant_health', 0, 1, 0xf82423],
+    harming: ['instant_damage', 0, 0, 0xa9656a], strong_harming: ['instant_damage', 0, 1, 0xa9656a]
+};
+const POTION_ITEMS = ['potion', 'splash_potion', 'lingering_potion', 'tipped_arrow'];
+
+let packPath = '';
+let version = '26.3';
+let professions = [];
+let packNamespace = 'morevillagers';
+
+export function setupPack(options) {
+    packPath = String(options.packPath).replace(/\/$/, '');
+    version = options.version || '26.3';
+    packNamespace = options.namespace || 'morevillagers';
+    professions = options.professions || [];
+    configure({ version, local: { [packNamespace]: `${packPath}/assets`, villagerapi: `${packPath}/assets` } });
+    document.documentElement.style.setProperty('--glint', `url("${glintUrl()}")`);
+}
+
+export async function loadNames() {
+    const [vanillaLang, packLang] = await Promise.all([
+        loadVanillaLang(),
+        fetchJson(`${packPath}/assets/${packNamespace}/lang/en_us.json`)
+    ]);
+    return createNamer({ ...vanillaLang, ...(packLang || {}) });
+}
 
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const titleCase = value => value.split(/[_/]/).map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
@@ -26,7 +67,7 @@ async function loadVanillaLang() {
     const full = await fetchJson(assetUrl('minecraft', 'lang/en_us.json')) || {};
     const trimmed = {};
     for (const [name, value] of Object.entries(full)) {
-        if (name.startsWith('item.minecraft.') || name.startsWith('block.minecraft.') || name.startsWith('enchantment.minecraft.')) {
+        if (LANG_PREFIXES.some(prefix => name.startsWith(prefix))) {
             trimmed[name] = value;
         }
     }
@@ -52,7 +93,10 @@ function createNamer(lang) {
         enchantment(id, level) {
             const { ns, path } = splitId(id);
             const name = lang[`enchantment.${ns}.${path}`] || titleCase(path);
-            return level > 1 ? `${name} ${ROMAN[level] || level}` : name;
+            return level > 1 ? `${name} ${lang['enchantment.level.' + level] || ROMAN[level] || level}` : name;
+        },
+        level(value) {
+            return lang['enchantment.level.' + value] || ROMAN[value] || String(value);
         },
         text(key, fallback) {
             return lang[key] || fallback;
@@ -87,14 +131,81 @@ async function mapSpec(modifier) {
     };
 }
 
+function formatDuration(seconds) {
+    const total = Math.max(0, Math.floor(seconds));
+    return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
+}
+
+function rarityOf(id) {
+    const path = splitId(id).path;
+    if (/^music_disc_/.test(path)) return 'rare';
+    for (const [rarity, items] of Object.entries(RARITY)) {
+        if (items.includes(path)) return rarity;
+    }
+    return 'common';
+}
+
+export function describeStack(stack, names) {
+    const { ns, path } = splitId(stack.id);
+    const components = stack.components || {};
+    const tooltip = { name: names.item(stack.id), color: 'white', lines: [] };
+    let rarity = rarityOf(stack.id);
+
+    const potion = components['minecraft:potion_contents'];
+    if (potion && POTION_ITEMS.includes(path)) {
+        const potionId = splitId(potion.potion || 'minecraft:water').path;
+        const base = potionId.replace(/^(long|strong)_/, '');
+        tooltip.name = names.text(`item.${ns}.${path}.effect.${base}`, tooltip.name);
+        const info = POTIONS[potionId];
+        if (info) {
+            const [effect, seconds, amplifier, color] = info;
+            let line = names.text(`effect.minecraft.${effect}`, titleCase(effect));
+            if (amplifier > 0) line += ' ' + names.level(amplifier + 1);
+            const duration = path === 'tipped_arrow' ? seconds / 8 : path === 'lingering_potion' ? seconds / 4 : seconds;
+            if (seconds > 0) line += ` (${formatDuration(duration)})`;
+            tooltip.lines.push({ text: line, color: 'blue' });
+            stack.tint = color;
+        }
+    }
+
+    const enchantments = components['minecraft:enchantments'];
+    const stored = components['minecraft:stored_enchantments'];
+    for (const source of [enchantments, stored]) {
+        if (!source) continue;
+        const levels = source.levels || source;
+        for (const [id, level] of Object.entries(levels)) {
+            tooltip.lines.push({ text: names.enchantment(id, number(level)), color: 'gray' });
+        }
+    }
+    if (enchantments && Object.keys(enchantments.levels || enchantments).length) {
+        rarity = rarity === 'rare' || rarity === 'epic' ? 'epic' : 'rare';
+    }
+
+    const instrument = components['minecraft:instrument'];
+    if (instrument) {
+        const instrumentId = splitId(typeof instrument === 'string' ? instrument : 'minecraft:ponder_goat_horn');
+        tooltip.lines.push({ text: names.text(`instrument.${instrumentId.ns}.${instrumentId.path}`, titleCase(instrumentId.path)), color: 'gray' });
+    }
+
+    const trim = path.match(/^(.+)_armor_trim_smithing_template$/);
+    if (trim) {
+        tooltip.lines.push({ text: names.text(`trim_pattern.minecraft.${trim[1]}`, titleCase(trim[1]) + ' Armor Trim'), color: 'gray' });
+    }
+
+    tooltip.color = RARITY_COLOR[rarity];
+    stack.name = tooltip.name;
+    stack.tooltip = tooltip;
+    return stack;
+}
+
 async function describeTrade(trade, names) {
-    const cost = [trade.wants, trade.additional_wants].filter(Boolean).map(stack => ({
-        id: stack.id, count: number(stack.count), name: names.item(stack.id)
-    }));
+    const cost = [trade.wants, trade.additional_wants].filter(Boolean).map(stack => describeStack({
+        id: stack.id, count: number(stack.count), components: stack.components
+    }, names));
 
     const gives = trade.gives || {};
     const components = gives.components || {};
-    const result = { id: gives.id, count: number(gives.count), name: names.item(gives.id), enchanted: false };
+    const result = describeStack({ id: gives.id, count: number(gives.count), components, enchanted: false }, names);
     const modifiers = trade.given_item_modifiers || trade.given_item_modifier || [];
     const list = Array.isArray(modifiers) ? modifiers : [modifiers];
 
@@ -104,6 +215,7 @@ async function describeTrade(trade, names) {
         const naming = list.find(modifier => modifierType(modifier) === 'set_name');
         const key = naming && naming.name && naming.name.translate;
         result.name = key ? names.text(key, 'Explorer Map') : 'Explorer Map';
+        result.tooltip = { name: result.name, color: 'white', lines: [] };
         result.map = await mapSpec(exploration);
     }
 
@@ -111,6 +223,8 @@ async function describeTrade(trade, names) {
     if (enchantments) {
         const levels = enchantments.levels || enchantments;
         result.detail = Object.entries(levels).map(([id, level]) => names.enchantment(id, number(level))).join(', ');
+    } else if (result.tooltip && result.tooltip.lines.length && !result.map) {
+        result.detail = result.tooltip.lines.map(line => line.text).join(', ');
     }
     result.enchanted = components['minecraft:enchantment_glint_override'] !== undefined
         ? !!components['minecraft:enchantment_glint_override']
@@ -170,10 +284,13 @@ function levelOffer(levelValue, trades) {
     return { trades: offered, picks, total: offered.length };
 }
 
-function slot(stack, extraClass = '') {
+export function slot(stack, extraClass = '') {
     const count = stack.count > 1 ? `<b>${stack.count}</b>` : '';
     const map = stack.map ? ` data-map="${escape(JSON.stringify(stack.map))}"` : '';
-    return `<span class="slot${stack.enchanted ? ' enchanted' : ''}${extraClass}" data-item="${escape(stack.id)}"${map} title="${escape(stack.name)}" role="img" aria-label="${escape(stack.name)}">${count}</span>`;
+    const tint = typeof stack.tint === 'number' ? ` data-tint="${stack.tint}"` : '';
+    const tooltip = stack.tooltip || { name: stack.name, color: 'white', lines: [] };
+    const label = [tooltip.name, ...tooltip.lines.map(line => line.text)].join(', ');
+    return `<span class="slot${stack.enchanted ? ' enchanted' : ''}${extraClass}" data-item="${escape(stack.id)}"${map}${tint} data-tip="${escape(JSON.stringify(tooltip))}" role="img" aria-label="${escape(label)}">${count}</span>`;
 }
 
 function percent(chance) {
@@ -247,19 +364,16 @@ function paint(element) {
     element.dataset.painted = '1';
     const icon = element.dataset.map
         ? renderMapIcon(JSON.parse(element.dataset.map).key, JSON.parse(element.dataset.map)).then(url => url || renderIcon(element.dataset.item))
-        : renderIcon(element.dataset.item);
+        : renderIcon(element.dataset.item, element.dataset.tint ? { tint: Number(element.dataset.tint) } : {});
     element._painting = icon.then(url => {
         if (url) {
-            const image = new Image();
-            image.alt = '';
-            image.decoding = 'async';
-            image.src = url;
+            const image = iconElement(url);
             element.prepend(image);
             if (element.classList.contains('enchanted')) {
                 const glint = document.createElement('span');
                 glint.className = 'glint';
                 glint.setAttribute('aria-hidden', 'true');
-                glint.style.setProperty('--icon', `url("${url}")`);
+                glint.style.setProperty('--icon', `url("${iconFirstFrame(url)}")`);
                 image.after(glint);
             }
         } else {
@@ -270,7 +384,7 @@ function paint(element) {
     return element._painting;
 }
 
-function watchIcons(scope) {
+export function watchIcons(scope) {
     scope.querySelectorAll('.slot[data-item]:not([data-painted])').forEach(element => {
         if (iconObserver) iconObserver.observe(element);
         else paint(element);
@@ -370,14 +484,12 @@ function setupInteraction(tabs, panels) {
 }
 
 async function init() {
+    if (document.body.dataset.tradesReady) return;
+    document.body.dataset.tradesReady = '1';
     const tabHost = document.querySelector('[role="tablist"]');
     const list = document.getElementById('professions');
 
-    const [vanillaLang, packLang] = await Promise.all([
-        loadVanillaLang(),
-        fetchJson(`${packPath}/assets/${packNamespace}/lang/en_us.json`)
-    ]);
-    const names = createNamer({ ...vanillaLang, ...(packLang || {}) });
+    const names = await loadNames();
 
     const loaded = (await Promise.all(professions.map(id => loadProfession(id, names).catch(() => null)))).filter(Boolean);
     if (!loaded.length) {
@@ -400,4 +512,4 @@ async function init() {
     await Promise.all(first.slice(0, 40).map(paint));
 }
 
-window.Site.ready(init());
+export const initTrades = init;
