@@ -69,6 +69,13 @@ body {
     font-size: 15px;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
 }
 
 h1, h2, h3 { font-family: var(--display); font-weight: 400; margin: 0; line-height: 1.1; letter-spacing: 0; }
