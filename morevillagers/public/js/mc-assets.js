@@ -2,7 +2,7 @@ const REPOSITORY = 'https://raw.githubusercontent.com/InventivetalentDev/minecra
 const ICON_SIZE = 96;
 const FACE_SHADE = { up: 1, down: 0.5, north: 0.8, south: 0.8, east: 0.6, west: 0.6 };
 const DEFAULT_TINT = 0x48b518;
-const CACHE_PREFIX = 'mcicon:v10:';
+const CACHE_PREFIX = 'mcicon:v11:';
 const MAX_ANIMATION_STATES = 64;
 const MAX_ANIMATION_TICKS = 2400;
 const canvasTextures = new Map();
@@ -519,29 +519,25 @@ function specialElements(description) {
                 elements: [box(0, 0, [0, 4, 0], [16, 16, 16], 16, 12, 16), box(0, 28, [0, 0, 0], [16, 8, 16], 16, 8, 16)]
             };
         }
-        case 'decorated_pot':
+        case 'decorated_pot': {
+            const side = { uv: [2, 0, 30, 32], texture: '#side' };
+            const base = uv => ({ uv, texture: '#base' });
             return {
                 textures: { side: 'minecraft:entity/decorated_pot/decorated_pot_side', base: 'minecraft:entity/decorated_pot/decorated_pot_base' },
-                uvScale: [1, 1],
+                uvScale: [2, 2],
                 elements: [
-                    {
-                        from: [1, 0, 1], to: [15, 16, 15],
-                        faces: {
-                            north: { uv: [1, 0, 15, 16], texture: '#side' }, south: { uv: [1, 0, 15, 16], texture: '#side' },
-                            east: { uv: [1, 0, 15, 16], texture: '#side' }, west: { uv: [1, 0, 15, 16], texture: '#side' },
-                            up: { uv: [0, 6.5, 7, 13.5], texture: '#base' }, down: { uv: [7, 6.5, 14, 13.5], texture: '#base' }
-                        }
-                    },
-                    {
-                        from: [4, 16, 4], to: [12, 20, 12],
-                        faces: {
-                            north: { uv: [0, 0, 4, 2], texture: '#base' }, south: { uv: [0, 0, 4, 2], texture: '#base' },
-                            east: { uv: [0, 0, 4, 2], texture: '#base' }, west: { uv: [0, 0, 4, 2], texture: '#base' },
-                            up: { uv: [4, 0, 8, 4], texture: '#base' }
-                        }
-                    }
+                    { from: [1, 0, 1], to: [15, 16, 15], faces: {
+                        north: side, south: side, east: side, west: side,
+                        up: base([14, 27, 28, 13]), down: base([0, 13, 14, 27]) } },
+                    { from: [4.8, 15.8, 4.8], to: [11.2, 17.2, 11.2], faces: {
+                        up: base([6, 5, 12, 11]), north: base([18, 12, 24, 11]), south: base([6, 12, 12, 11]),
+                        west: base([0, 12, 6, 11]), east: base([12, 12, 18, 11]) } },
+                    { from: [4.1, 17.1, 4.1], to: [11.9, 19.9, 11.9], faces: {
+                        up: base([8, 0, 16, 8]), down: base([16, 8, 24, 0]), north: base([24, 11, 32, 8]), south: base([8, 11, 16, 8]),
+                        west: base([0, 11, 8, 8]), east: base([16, 11, 24, 8]) } }
                 ]
             };
+        }
         case 'chest': {
             const box = (x, y, z, w, h, d, u, v) => ({
                 from: [x, y, z],
