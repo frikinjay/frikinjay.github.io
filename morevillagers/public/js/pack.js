@@ -1,4 +1,4 @@
-import { fetchJson, splitId, assetUrl, renderEntity, villagerElements, composeTextures, registerCanvasTexture, iconElement } from './mc-assets.js';
+import { fetchJson, splitId, assetUrl, renderEntity, villagerElements, composeTextures, registerCanvasTexture, iconElement, textureMeta } from './mc-assets.js';
 import { setupPack, loadNames, initTrades, describeStack, slot, watchIcons } from './trades.js';
 
 const MCMETA = 'https://raw.githubusercontent.com/misode/mcmeta/data/data';
@@ -17,8 +17,21 @@ function villagerTexture(type, profession) {
     return layers;
 }
 
+const HAT_AREAS = [[32, 0, 32, 18], [30, 47, 34, 17]];
+
+async function hatOf(id) {
+    const meta = await textureMeta(id);
+    return (meta && meta.villager && meta.villager.hat) || 'none';
+}
+
 async function villagerImage(key, layers) {
-    const canvas = await composeTextures(layers);
+    const clear = {};
+    if (layers.length > 2) {
+        const [typeHat, professionHat] = await Promise.all([hatOf(layers[1]), hatOf(layers[2])]);
+        const typeHatVisible = professionHat === 'none' || (professionHat === 'partial' && typeHat !== 'full');
+        if (!typeHatVisible) clear[1] = HAT_AREAS;
+    }
+    const canvas = await composeTextures(layers, clear);
     if (!canvas) return null;
     registerCanvasTexture('canvas:' + key, canvas);
     return renderEntity(key, { elements: villagerElements(), textures: { t: 'canvas:' + key } });

@@ -682,7 +682,12 @@ export async function renderEntity(key, model, options = {}) {
     return run;
 }
 
-export async function composeTextures(ids) {
+export function textureMeta(id) {
+    const url = textureUrl(id);
+    return url ? fetchJson(url + '.mcmeta') : Promise.resolve(null);
+}
+
+export async function composeTextures(ids, clear = {}) {
     const layers = (await Promise.all(ids.map(textureSource))).filter(layer => layer.image).map(layer => ({ ...layer, position: 0 }));
     if (!layers.length) return null;
     const size = layers[0].info ? layers[0].info.width : layers[0].image.width;
@@ -695,7 +700,19 @@ export async function composeTextures(ids) {
         context.clearRect(0, 0, size, size);
         for (const layer of layers) {
             const frame = frameOf(layer.image, layer.info, layer.position);
-            context.drawImage(frame, 0, 0, frame.width, Math.min(frame.height, frame.width), 0, 0, size, size);
+            const rects = clear[layers.indexOf(layer)];
+            if (rects) {
+                const scale = frame.width / 64;
+                const copy = document.createElement('canvas');
+                copy.width = frame.width;
+                copy.height = frame.height;
+                const copyContext = copy.getContext('2d');
+                copyContext.drawImage(frame, 0, 0);
+                for (const [x, y, w, h] of rects) copyContext.clearRect(x * scale, y * scale, w * scale, h * scale);
+                context.drawImage(copy, 0, 0, copy.width, Math.min(copy.height, copy.width), 0, 0, size, size);
+            } else {
+                context.drawImage(frame, 0, 0, frame.width, Math.min(frame.height, frame.width), 0, 0, size, size);
+            }
         }
     };
     canvas.animatedLayers = layers.filter(layer => layer.info);
