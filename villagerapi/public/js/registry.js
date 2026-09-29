@@ -99,6 +99,7 @@ function listFor(input) {
     const field = input.dataset.field, path = input.dataset.path || '';
     if (field && FIELD_LISTS[field]) return FIELD_LISTS[field];
     if (/\.(wants|extra|gives)\.id$/.test(path) || /\.entries\.\d+\.item$/.test(path)) return 'item';
+    if (input.hasAttribute('data-ingredient')) return 'item';
     if (/^values\.\d+$/.test(path)) return 'worldgen/structure';
     if (/\.potion$/.test(path)) return 'potion';
     if (/\.song$/.test(path)) return 'jukebox_song';

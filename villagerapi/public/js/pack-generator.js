@@ -51,6 +51,7 @@
             render: () => `
                 <div class="grid">${field('Name', text('name', 'purpur_altar'))}${namespace()}</div>
                 <div class="grid">${field('Block model (optional)', '<span class="inline model-upload"><input type="file" accept=".json,application/json" data-model-upload><button type="button" class="link" data-action="edit-texture" data-texture-name="textureFront">Open in editor</button></span>', 'A Blockbench or Minecraft block model JSON. Leave empty for a full cube.')}</div>
+                ${json('recipeJson', 'Recipe', '{\n  "type": "minecraft:crafting_shaped",\n  "pattern": [ ... ],\n  "key": { ... },\n  "result": { "id": "..." }\n}', 8, 'recipe')}
                 <div class="tiles">
                     ${texture('textureFront', 'Front')}${texture('textureBack', 'Back')}${texture('textureLeft', 'Left')}
                     ${texture('textureRight', 'Right')}${texture('textureTop', 'Top')}${texture('textureBottom', 'Bottom')}

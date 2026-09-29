@@ -274,6 +274,17 @@ class VillagerPackBuilder {
             });
 
             if (customModel) this.json(`assets/${wsNamespace}/models/block/${name}.json`, customModel);
+
+            const recipe = ws.recipeJson;
+            if (recipe && typeof recipe === 'object' && recipe.type) {
+                const out = JSON.parse(JSON.stringify(recipe));
+                const own = `${wsNamespace}:${name}`;
+                if (out.result && typeof out.result === 'object' && !out.result.id && !out.result.item) out.result.id = own;
+                else if (!out.result && !/smithing_trim$/.test(out.type)) out.result = { id: own };
+                const empty = ['key', 'ingredients', 'ingredient', 'base'].some(k => k in out && (out[k] == null || (Array.isArray(out[k]) && !out[k].length) || (typeof out[k] === 'object' && !Array.isArray(out[k]) && !Object.keys(out[k]).length)));
+                if (empty) this.warnings.push(`Workstation "${name}" has a recipe with no ingredients, so it was skipped.`);
+                else this.json(`data/${wsNamespace}/recipe/${name}.json`, out);
+            }
             this.json(`assets/${wsNamespace}/models/item/${name}.json`, { parent: `${wsNamespace}:block/${name}` });
 
             if (this.options.itemDefinitions) {

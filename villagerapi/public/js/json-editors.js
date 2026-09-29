@@ -213,6 +213,91 @@
         return { props, raw: Object.keys(rest).length ? JSON.stringify(rest) : '' };
     }
 
+
+    /* ---------- recipes ---------- */
+
+    const RECIPE_TYPES = [
+        ['crafting_shaped', 'Shaped Crafting'], ['crafting_shapeless', 'Shapeless Crafting'], ['smelting', 'Smelting'], ['blasting', 'Blasting'],
+        ['smoking', 'Smoking'], ['campfire_cooking', 'Campfire Cooking'], ['stonecutting', 'Stonecutting'], ['smithing_transform', 'Smithing Transform'],
+        ['smithing_trim', 'Smithing Trim']
+    ];
+    const COOKING = { smelting: [200, 'misc'], blasting: [100, 'misc'], smoking: [100, 'food'], campfire_cooking: [600, 'food'] };
+    const CATEGORIES = { crafting: ['building', 'redstone', 'equipment', 'misc'], cooking: ['blocks', 'food', 'misc'] };
+    const newRecipe = () => ({ type: 'crafting_shaped', grid: Array(9).fill(''), ingredients: [''], ingredient: '', template: '', base: '', addition: '', pattern: '',
+        result: '', count: 1, category: 'misc', group: '', experience: 0.1, time: '' });
+
+    // One ingredient field: an item, a #tag, or alternatives separated by |.
+    function ingredientJson(text) {
+        const options = String(text || '').split('|').map(v => v.trim()).filter(Boolean);
+        if (!options.length) return null;
+        const one = v => (legacy() ? (v.startsWith('#') ? { tag: v.slice(1) } : { item: v }) : v);
+        if (options.length === 1) return one(options[0]);
+        return legacy() ? options.map(one) : options;
+    }
+    function ingredientText(value) {
+        if (value == null) return '';
+        if (Array.isArray(value)) return value.map(ingredientText).join(' | ');
+        if (typeof value === 'object') return value.tag ? '#' + value.tag : value.item || value.id || '';
+        return String(value);
+    }
+
+    function recipeJson(r) {
+        const type = r.type || 'crafting_shaped';
+        const out = { type: 'minecraft:' + type };
+        const result = { id: r.result || undefined, count: num(r.count, 1) };
+        if (result.count === 1 && !COOKING[type]) delete result.count;
+        if (type === 'crafting_shaped') {
+            const keys = new Map(), letters = 'ABCDEFGHI';
+            const cells = r.grid.map(cell => {
+                const text = String(cell || '').trim();
+                if (!text) return ' ';
+                if (!keys.has(text)) keys.set(text, letters[keys.size]);
+                return keys.get(text);
+            });
+            let rows = [0, 1, 2].map(i => cells.slice(i * 3, i * 3 + 3).join(''));
+            while (rows.length && !rows[0].trim()) rows.shift();
+            while (rows.length && !rows[rows.length - 1].trim()) rows.pop();
+            const used = [0, 1, 2].filter(c => rows.some(row => row[c] !== ' '));
+            if (used.length) rows = rows.map(row => row.slice(used[0], used[used.length - 1] + 1));
+            Object.assign(out, { category: r.category || 'misc', ...(r.group ? { group: r.group } : {}), pattern: rows,
+                key: Object.fromEntries([...keys].map(([text, letter]) => [letter, ingredientJson(text)])), result });
+        } else if (type === 'crafting_shapeless') {
+            Object.assign(out, { category: r.category || 'misc', ...(r.group ? { group: r.group } : {}), ingredients: r.ingredients.map(ingredientJson).filter(Boolean), result });
+        } else if (COOKING[type]) {
+            const [time, category] = COOKING[type];
+            Object.assign(out, { category: r.category && CATEGORIES.cooking.includes(r.category) ? r.category : category, ...(r.group ? { group: r.group } : {}),
+                ingredient: ingredientJson(r.ingredient), result: { id: r.result || undefined, ...(num(r.count, 1) !== 1 ? { count: num(r.count, 1) } : {}) },
+                experience: num(r.experience, 0.1), cookingtime: num(r.time, time) });
+        } else if (type === 'stonecutting') {
+            Object.assign(out, { ingredient: ingredientJson(r.ingredient), result: { id: r.result || undefined, count: num(r.count, 1) } });
+        } else if (type === 'smithing_transform') {
+            Object.assign(out, { template: ingredientJson(r.template), base: ingredientJson(r.base), addition: ingredientJson(r.addition), result: { id: r.result || undefined, ...(num(r.count, 1) !== 1 ? { count: num(r.count, 1) } : {}) } });
+        } else if (type === 'smithing_trim') {
+            Object.assign(out, { template: ingredientJson(r.template), base: ingredientJson(r.base), addition: ingredientJson(r.addition) });
+            if (!legacy() && r.pattern) out.pattern = r.pattern;
+        }
+        return out;
+    }
+
+    function recipeFrom(j) {
+        const r = newRecipe();
+        if (!j || !j.type) return r;
+        r.type = String(j.type).replace('minecraft:', '');
+        if (!RECIPE_TYPES.some(([t]) => t === r.type)) { r.type = 'crafting_shaped'; return r; }
+        const res = typeof j.result === 'string' ? { id: j.result } : (j.result || {});
+        r.result = res.id || res.item || ''; r.count = res.count || j.count || 1;
+        r.category = j.category || r.category; r.group = j.group || '';
+        if (r.type === 'crafting_shaped') {
+            (j.pattern || []).forEach((row, y) => [...row].forEach((ch, x) => { if (x < 3 && y < 3 && ch !== ' ') r.grid[y * 3 + x] = ingredientText((j.key || {})[ch]); }));
+        } else if (r.type === 'crafting_shapeless') {
+            r.ingredients = (j.ingredients || []).map(ingredientText);
+        } else {
+            r.ingredient = ingredientText(j.ingredient); r.template = ingredientText(j.template); r.base = ingredientText(j.base); r.addition = ingredientText(j.addition);
+            r.experience = j.experience ?? r.experience; r.time = j.cookingtime ?? ''; r.pattern = j.pattern || '';
+        }
+        return r;
+    }
+
     /* ---------- models ---------- */
 
     const newTrade = () => ({ map: false, props: [], wants: { id: 'minecraft:emerald', count: 1 }, extra: null, gives: { id: '', count: 1, components: '' },
@@ -246,6 +331,7 @@
                 })
             })) })
         },
+        recipe: { create: newRecipe, toJson: recipeJson, fromJson: recipeFrom },
         structures: {
             create: () => ({ replace: false, values: [''] }),
             toJson: m => ({ replace: !!m.replace, values: m.values.map(v => v.trim()).filter(Boolean) }),
@@ -463,6 +549,31 @@
                     <button type="button" class="link danger" data-op="remove-entry" data-pool="${i}" data-index="${j}">Remove</button></div>`).join('')}
                 <button type="button" class="link" data-op="add-entry" data-pool="${i}">+ Add Item</button></div>`).join('')
             + '<button type="button" class="link" data-op="add-pool">+ Add Pool</button>',
+        recipe: r => {
+            const cooking = !!COOKING[r.type], smithing = r.type.startsWith('smithing');
+            const ing = (path, value, label) => labelled(label, input(path, value, 'minecraft:stick or #minecraft:planks', 'text', 'data-ingredient'));
+            let body = '';
+            if (r.type === 'crafting_shaped') {
+                body = `<div class="je-recipe-grid">${r.grid.map((cell, i) => input(`grid.${i}`, cell, '', 'text', 'data-ingredient aria-label="Slot ' + (i + 1) + '"')).join('')}</div>`;
+            } else if (r.type === 'crafting_shapeless') {
+                body = `<div class="je-grid">${r.ingredients.map((v, i) => `<div class="je-row">${ing(`ingredients.${i}`, v, 'Ingredient ' + (i + 1))}<button type="button" class="link danger" data-op="remove-ingredient" data-index="${i}">Remove</button></div>`).join('')}</div>
+                    ${r.ingredients.length < 9 ? '<button type="button" class="link" data-op="add-ingredient">+ Add Ingredient</button>' : ''}`;
+            } else if (smithing) {
+                body = `<div class="je-grid">${ing('template', r.template, 'Template')}${ing('base', r.base, 'Base')}${ing('addition', r.addition, 'Addition')}
+                    ${r.type === 'smithing_trim' && !legacy() ? labelled('Trim Pattern', input('pattern', r.pattern, 'minecraft:spire')) : ''}</div>`;
+            } else {
+                body = `<div class="je-grid">${ing('ingredient', r.ingredient, 'Ingredient')}
+                    ${cooking ? labelled('Experience', input('experience', r.experience, '0.1', 'number', 'step="0.05" min="0"')) + labelled('Cooking Time (ticks)', input('time', r.time, String(COOKING[r.type][0]), 'number', 'min="1"')) : ''}</div>`;
+            }
+            const categories = cooking ? CATEGORIES.cooking : CATEGORIES.crafting;
+            return `<div class="je-grid">
+                    <label class="field"><span>Recipe Type</span><select data-path="type">${RECIPE_TYPES.map(([t, label]) => `<option value="${t}"${t === r.type ? ' selected' : ''}>${label}</option>`).join('')}</select></label>
+                    ${r.type === 'smithing_trim' ? '' : labelled('Result', input('result', r.result, 'This workstation', 'text', 'data-ingredient')) + labelled('Count', input('count', r.count, '1', 'number', 'min="1" max="64"'))}
+                    ${r.type.startsWith('crafting') || cooking ? `<label class="field"><span>Category</span><select data-path="category">${categories.map(c => `<option value="${c}"${c === r.category ? ' selected' : ''}>${c.charAt(0).toUpperCase() + c.slice(1)}</option>`).join('')}</select></label>` + labelled('Group (optional)', input('group', r.group, 'workstations')) : ''}
+                </div>
+                ${body}
+                <p class="je-hint">Ingredients take an item, a #tag, or alternatives separated by |. Leave Result empty to craft this workstation. Use Manual Mode for other or modded recipe types.</p>`;
+        },
         structures: m => `<label class="check"><input type="checkbox" data-path="replace"${m.replace ? ' checked' : ''}> Replace Tag</label>
             ${m.values.map((v, i) => `<div class="je-row">${input(`values.${i}`, v, 'minecraft:end_city')}<button type="button" class="link danger" data-op="remove-value" data-index="${i}">Remove</button></div>`).join('')}
             <button type="button" class="link" data-op="add-value">+ Add Structure</button>`
@@ -474,7 +585,7 @@
     const set = (object, path, value) => {
         const keys = path.split('.');
         const last = keys.pop();
-        get(object, keys.join('.'))[last] = value;
+        (keys.length ? get(object, keys.join('.')) : object)[last] = value;
     };
 
     const editors = new Set();
@@ -610,6 +721,8 @@
                     case 'add-entry': m.pools[d.pool].entries.push({ item: '', weight: 1, min: 1, max: 1 }); break;
                     case 'remove-entry': m.pools[d.pool].entries.splice(Number(d.index), 1); break;
                     case 'add-value': m.values.push(''); break;
+                    case 'add-ingredient': m.ingredients.push(''); break;
+                    case 'remove-ingredient': m.ingredients.splice(Number(d.index), 1); if (!m.ingredients.length) m.ingredients.push(''); break;
                     case 'remove-value': m.values.splice(Number(d.index), 1); break;
                 }
                 render(editor);

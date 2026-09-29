@@ -758,3 +758,6 @@ body > .footer { margin-top: auto; }
 #decompiler strong { font: 20px/1 "Minecraft Seven", system-ui, sans-serif; letter-spacing: .12em; font-weight: 400; }
 #decompiler span { font-size: 13px; color: #6e6e73; }
 @media (prefers-color-scheme: dark) { #decompiler { background: #000; color: #f5f5f7; } #decompiler span { color: #a1a1a6; } }
+
+.je-recipe-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 150px)); gap: 6px; }
+.je-recipe-grid input { font-size: 12px; }
