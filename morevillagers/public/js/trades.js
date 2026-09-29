@@ -204,7 +204,29 @@ export function describeStack(stack, names) {
     return stack;
 }
 
+function normalizeTrade(trade) {
+    if (!trade.buy_a && !trade.sell) return trade;
+    const stack = entry => (typeof entry === 'string' ? { id: entry, count: 1 }
+        : entry ? { id: entry.item || entry.id, count: entry.count, components: entry.components } : null);
+    const sell = typeof trade.sell === 'string' ? { item: trade.sell } : (trade.sell || {});
+    const type = String(sell.item_type || '').replace('minecraft:', '');
+    const normal = { ...trade, wants: stack(trade.buy_a), additional_wants: stack(trade.buy_b) || undefined };
+    if (type === 'treasure_map') {
+        normal.gives = { id: 'minecraft:filled_map', count: 1 };
+        normal.legacyMap = { destination: sell.structure_tag, name: sell.display_name };
+    } else if (type === 'enchanted_book') {
+        normal.gives = { id: 'minecraft:enchanted_book', count: 1 };
+        normal.randomEnchantment = true;
+    } else if (type === 'suspicious_stew') {
+        normal.gives = { id: 'minecraft:suspicious_stew', count: 1 };
+    } else {
+        normal.gives = stack(sell) || { id: 'minecraft:air' };
+    }
+    return normal;
+}
+
 async function describeTrade(trade, names) {
+    trade = normalizeTrade(trade);
     const cost = [trade.wants, trade.additional_wants].filter(Boolean).map(stack => describeStack({
         id: stack.id, count: number(stack.count), components: stack.components
     }, names));
@@ -225,6 +247,17 @@ async function describeTrade(trade, names) {
         result.map = await mapSpec(exploration);
     }
 
+    if (trade.legacyMap) {
+        result.id = 'minecraft:filled_map';
+        result.name = trade.legacyMap.name ? names.text(trade.legacyMap.name, 'Explorer Map') : 'Explorer Map';
+        result.tooltip = { name: result.name, color: 'white', lines: [] };
+        result.map = await mapSpec({ destination: trade.legacyMap.destination });
+    }
+    if (trade.randomEnchantment) {
+        result.detail = 'Random enchantment';
+        result.tooltip.lines.push({ text: 'Random enchantment', color: 'gray' });
+    }
+
     const enchantments = components['minecraft:enchantments'] || components['minecraft:stored_enchantments'];
     if (enchantments) {
         const levels = enchantments.levels || enchantments;
@@ -235,6 +268,7 @@ async function describeTrade(trade, names) {
     result.enchanted = components['minecraft:enchantment_glint_override'] !== undefined
         ? !!components['minecraft:enchantment_glint_override']
         : !!enchantments || /(^|:)enchanted_book$/.test(String(result.id));
+    if (trade.legacyMap) result.enchanted = false;
 
     return {
         cost,

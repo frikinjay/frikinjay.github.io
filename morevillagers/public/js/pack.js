@@ -1,7 +1,7 @@
 import { fetchJson, renderIcon, splitId, assetUrl, renderEntity, villagerElements, composeTextures, registerCanvasTexture, iconElement, textureMeta } from './mc-assets.js';
 import { setupPack, loadNames, initTrades, describeStack, slot, watchIcons, paint } from './trades.js';
 
-const MCMETA = 'https://raw.githubusercontent.com/misode/mcmeta/data/data';
+let MCMETA = 'https://raw.githubusercontent.com/misode/mcmeta/data/data';
 const VANILLA_TYPES = ['plains', 'desert', 'jungle', 'savanna', 'snow', 'swamp', 'taiga'];
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const title = value => value.split(/[_/]/).map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
@@ -243,9 +243,11 @@ async function init() {
     document.getElementById('pack-header').innerHTML = `
         ${pack.icon ? `<img class="pack-icon-large" src="./${escape(pack.icon)}" alt="" width="96" height="96">` : ''}
         <div><h1>${escape(pack.name)}</h1><p>${escape(pack.description)}</p>
-        <small>${[pack.version && 'v' + pack.version, pack.author && 'by ' + pack.author, pack.namespace].filter(Boolean).map(escape).join(' · ')}</small></div>`;
+        <small>${[pack.version && 'v' + pack.version, pack.author && 'by ' + pack.author, pack.namespace, 'Minecraft ' + (pack.minecraft || '26.3')].filter(Boolean).map(escape).join(' · ')}</small></div>`;
 
-    setupPack({ packPath: './' + pack.path, namespace: pack.namespace, version: '26.3', professions: pack.professions });
+    const minecraft = pack.minecraft || '26.3';
+    if (minecraft !== '26.3') MCMETA = `https://raw.githubusercontent.com/misode/mcmeta/${minecraft}-data/data`;
+    setupPack({ packPath: './' + pack.path, namespace: pack.namespace, version: minecraft, professions: pack.professions });
     names = await loadNames();
 
     document.querySelectorAll('[data-tab]').forEach(button => button.addEventListener('click', () => showTab(button.dataset.tab)));

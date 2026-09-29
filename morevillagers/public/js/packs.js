@@ -13,7 +13,7 @@ async function init() {
             <span class="pack-info">
                 <strong>${escape(pack.name)}</strong>
                 <span>${escape(pack.description)}</span>
-                <small>${[pack.version && 'v' + pack.version, pack.author && 'by ' + pack.author, `${pack.professions.length} professions`].filter(Boolean).map(escape).join(' · ')}</small>
+                <small>${[pack.version && 'v' + pack.version, pack.author && 'by ' + pack.author, 'Minecraft ' + (pack.minecraft || '26.3'), `${pack.professions.length} professions`].filter(Boolean).map(escape).join(' · ')}</small>
             </span>
         </a>`).join('');
 

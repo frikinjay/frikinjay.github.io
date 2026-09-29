@@ -2,7 +2,7 @@ const REPOSITORY = 'https://raw.githubusercontent.com/InventivetalentDev/minecra
 const ICON_SIZE = 96;
 const FACE_SHADE = { up: 1, down: 0.5, north: 0.8, south: 0.8, east: 0.6, west: 0.6 };
 const DEFAULT_TINT = 0x48b518;
-const CACHE_PREFIX = 'mcicon:v11:';
+const CACHE_PREFIX = 'mcicon:v12:';
 const MAX_ANIMATION_STATES = 64;
 const MAX_ANIMATION_TICKS = 2400;
 const canvasTextures = new Map();
@@ -183,6 +183,18 @@ function tintColor(tint) {
     return null;
 }
 
+function builtinSpecial(path) {
+    const heads = { skeleton_skull: 'skeleton', wither_skeleton_skull: 'wither_skeleton', zombie_head: 'zombie', creeper_head: 'creeper', dragon_head: 'dragon', piglin_head: 'piglin', player_head: 'player' };
+    if (heads[path]) return { type: 'head', kind: heads[path] };
+    if (path === 'chest') return { type: 'chest', texture: 'minecraft:normal' };
+    if (path === 'trapped_chest') return { type: 'chest', texture: 'minecraft:trapped' };
+    if (path === 'ender_chest') return { type: 'chest', texture: 'minecraft:ender' };
+    if (path === 'decorated_pot') return { type: 'decorated_pot' };
+    const shulker = path.match(/^(?:(.+)_)?shulker_box$/);
+    if (shulker) return { type: 'shulker_box', texture: shulker[1] ? `minecraft:shulker_${shulker[1]}` : 'minecraft:shulker' };
+    return null;
+}
+
 function pickModel(node) {
     if (!node || typeof node !== 'object') return null;
     const type = String(node.type || 'minecraft:model').replace('minecraft:', '');
@@ -256,6 +268,9 @@ async function describeItem(id, options = {}) {
         }
     }
 
+    if (typeof options.tint === 'number' && (!picked.tints || !picked.tints.length)) {
+        picked.tints = [{ type: 'minecraft:potion', default: options.tint }];
+    }
     if (typeof options.tint === 'number' && Array.isArray(picked.tints)) {
         picked.tints = picked.tints.map(tint => (tint && /potion/.test(String(tint.type)) ? { type: 'minecraft:constant', value: options.tint } : tint));
     }
@@ -267,6 +282,10 @@ async function describeItem(id, options = {}) {
     }
 
     const model = await resolveModel(picked.model);
+    if (model.entity) {
+        const builtin = builtinSpecial(path);
+        if (builtin) return { kind: 'special', special: builtin.type, data: builtin, display: model.display };
+    }
     if (model.elements && model.elements.length) {
         return { kind: 'block', model, tints: picked.tints };
     }

@@ -22,11 +22,10 @@ for (const entry of (await readdir(root, { withFileTypes: true })).filter(entry 
     if (!(await exists(join(dir, 'villagerapi_config.json')))) continue;
 
     const config = await readJson(join(dir, 'villagerapi_config.json'));
-    let description = config.description || '';
-    if (!description && await exists(join(dir, 'pack.mcmeta'))) {
-        const meta = await readJson(join(dir, 'pack.mcmeta'));
-        description = typeof meta.pack?.description === 'string' ? meta.pack.description : '';
-    }
+    const meta = (await exists(join(dir, 'pack.mcmeta'))) ? await readJson(join(dir, 'pack.mcmeta')) : {};
+    let description = config.description || (typeof meta.pack?.description === 'string' ? meta.pack.description : '');
+    // 26.x packs declare min_format/max_format; 1.21.1 packs only use pack_format/supported_formats.
+    const minecraft = config.minecraft_version || (meta.pack && (meta.pack.min_format !== undefined || meta.pack.max_format !== undefined) ? '26.3' : '1.21.1');
 
     packs.push({
         id: entry.name,
@@ -34,6 +33,7 @@ for (const entry of (await readdir(root, { withFileTypes: true })).filter(entry 
         namespace: config.namespace || entry.name,
         name: config.display_name || entry.name,
         version: config.version || '',
+        minecraft,
         author: config.author || '',
         description,
         icon: (await exists(join(dir, 'pack.png'))) ? `packs/${entry.name}/pack.png` : null,

@@ -26,7 +26,8 @@
       ],
       "biomeMappings": [
         "badlands"
-      ]
+      ],
+      "minecraft": "26.3"
     }
   ]
 }
