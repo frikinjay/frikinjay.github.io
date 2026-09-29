@@ -636,3 +636,9 @@ body > .footer { margin-top: auto; }
 .je-entry { background: var(--surface); padding: 10px; border-radius: 8px; }
 .je-add-extra { grid-column: span 2; display: flex; align-items: flex-end; padding-bottom: 9px; font-size: 13px; }
 .je-trade textarea { font-size: 12px; }
+.je-props { display: grid; gap: 8px; }
+.je-prop { padding: 10px; border-radius: 8px; background: var(--fill); display: grid; gap: 8px; }
+.je-hint { font-size: 11px; color: var(--tertiary); flex: 1 1 200px; }
+.je-note { font-size: 12px; color: var(--danger); margin: 0; }
+.je-wide { grid-column: 1 / -1; }
+.je-props select[data-add-prop] { max-width: 260px; }
