@@ -645,7 +645,11 @@ export async function open(options) {
     if (!block) setTitle();
     q('swatches').innerHTML = '';
     state.typeTexture = ['type', 'zombie_type', 'baby', 'baby_zombie'].includes(options.kind);
-    dialog.querySelector('[data-te-act="zombify"]').hidden = !(entity && state.typeTexture);
+    const zombifyButton = dialog.querySelector('[data-te-act="zombify"]');
+    zombifyButton.hidden = !entity;
+    zombifyButton.title = state.typeTexture
+        ? 'Darken and tear the texture like vanilla zombie villager type textures'
+        : 'Darken and tear this overlay. Vanilla zombie villagers use the same profession overlay, unchanged';
     dialog.querySelector('[data-te-act="copy-sibling"]').hidden = !(kind.zombie && options.sibling);
     q('slots').hidden = !block; q('slot-options').hidden = !block; q('mode-row').hidden = !(block && state.cube);
     q('face-mode').value = 'only';
@@ -653,9 +657,10 @@ export async function open(options) {
     q('rot-row').hidden = q('pitch-row').hidden = q('viewer').hidden = !kind.model;
     q('preview').hidden = !!kind.model;
     state.live = null;
-    if (entity && (options.version || '26.3') === '26.3') {
+    const version = options.version || '26.3';
+    if (entity && (version === '26.3' || kind.model !== 'baby')) {
         const liveKind = { villager: 'villager', type: 'villager', zombie: 'zombie', zombie_type: 'zombie', baby: 'baby', baby_zombie: 'baby_zombie' }[options.kind];
-        state.live = await villagerModel(liveKind, '26.3', entityBox, withPivot);
+        state.live = await villagerModel(liveKind, version, entityBox, withPivot);
     }
     state.outline = parts().map(() => true); state.visible = parts().map(() => true);
     const partList = parts();
