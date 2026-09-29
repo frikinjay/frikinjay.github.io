@@ -365,43 +365,45 @@
 
     const input = (path, value, placeholder = '', type = 'text', extra = '') =>
         `<input type="${type}" data-path="${path}" value="${esc(value)}" placeholder="${esc(placeholder)}" spellcheck="false" autocomplete="off" ${extra}>`;
-    const labelled = (label, control) => `<label class="field"><span>${label}</span>${control}</label>`;
+    const SMALL = new Set(['a', 'an', 'and', 'or', 'the', 'of', 'to', 'in', 'on', 'per', 'by', 'for', 'as', 'at']);
+    const tc = text => String(text).replace(/[A-Za-z][\w'’-]*/g, (word, index) => (index > 0 && SMALL.has(word.toLowerCase()) ? word.toLowerCase() : /^[A-Z]{2,}$/.test(word) ? word : word.charAt(0).toUpperCase() + word.slice(1)));
+    const labelled = (label, control) => `<label class="field"><span>${tc(label)}</span>${control}</label>`;
 
     function tradeHtml(base, t, index) {
         const p = `${base}.trades.${index}`;
         return `<div class="je-trade">
             <div class="je-row">
                 <strong>Trade ${index + 1}</strong>
-                <label class="check"><input type="checkbox" data-path="${p}.map"${t.map ? ' checked' : ''}> Explorer map</label>
+                <label class="check"><input type="checkbox" data-path="${p}.map"${t.map ? ' checked' : ''}> Explorer Map</label>
                 <button type="button" class="link danger" data-op="remove-trade" data-base="${base}" data-index="${index}">Remove</button>
             </div>
             <div class="je-grid">
                 ${labelled('Wants', input(`${p}.wants.id`, t.wants.id, 'minecraft:emerald'))}
                 ${labelled('Count', input(`${p}.wants.count`, t.wants.count, '1', 'number', 'min="1"'))}
                 ${t.extra
-                    ? labelled('Also wants', input(`${p}.extra.id`, t.extra.id, 'minecraft:compass')) + labelled('Count', input(`${p}.extra.count`, t.extra.count, '1', 'number', 'min="1"'))
-                    : `<div class="je-add-extra"><button type="button" class="link" data-op="add-extra" data-path="${p}">+ Second item wanted</button></div>`}
+                    ? labelled('Also Wants', input(`${p}.extra.id`, t.extra.id, 'minecraft:compass')) + labelled('Count', input(`${p}.extra.count`, t.extra.count, '1', 'number', 'min="1"'))
+                    : `<div class="je-add-extra"><button type="button" class="link" data-op="add-extra" data-path="${p}">+ Second Wanted Item</button></div>`}
                 ${t.map
-                    ? labelled('Structure tag', input(`${p}.mapInfo.tag`, t.mapInfo.tag, 'namespace:on_example_maps', 'text', 'list="je-map-tags" data-map-tag'))
+                    ? labelled('Structure Tag', input(`${p}.mapInfo.tag`, t.mapInfo.tag, 'namespace:on_example_maps', 'text', 'list="je-map-tags" data-map-tag'))
                       + labelled('Decoration', input(`${p}.mapInfo.decoration`, t.mapInfo.decoration, 'namespace:example_decoration'))
-                      + labelled('Name key', input(`${p}.mapInfo.name`, t.mapInfo.name, 'filled_map.example'))
-                      + (legacy() ? '' : labelled('Search radius', input(`${p}.mapInfo.radius`, t.mapInfo.radius, '100', 'number')))
+                      + labelled('Name Key', input(`${p}.mapInfo.name`, t.mapInfo.name, 'filled_map.example'))
+                      + (legacy() ? '' : labelled('Search Radius', input(`${p}.mapInfo.radius`, t.mapInfo.radius, '100', 'number')))
                     : labelled('Gives', input(`${p}.gives.id`, t.gives.id, 'minecraft:diamond', 'text', 'list="je-items"'))
                       + labelled('Count', input(`${p}.gives.count`, t.gives.count, '1', 'number', 'min="1"'))}
-                ${labelled('Max uses', input(`${p}.uses`, t.uses, '12', 'number', 'min="1"'))}
+                ${labelled('Max Uses', input(`${p}.uses`, t.uses, '12', 'number', 'min="1"'))}
                 ${labelled('XP', input(`${p}.xp`, t.xp, '1', 'number', 'min="0"'))}
-                ${labelled(legacy() ? 'Price multiplier' : 'Reputation discount', input(`${p}.discount`, t.discount, '0.05', 'number', 'step="0.01" min="0"'))}
-                ${labelled('List weight', input(`${p}.weight`, t.weight, 'Default', 'number', 'min="0"'))}
+                ${labelled(legacy() ? 'Price Multiplier' : 'Reputation Discount', input(`${p}.discount`, t.discount, '0.05', 'number', 'step="0.01" min="0"'))}
+                ${labelled('List Weight', input(`${p}.weight`, t.weight, 'Default', 'number', 'min="0"'))}
             </div>
-            ${t.map ? `<p class="je-hint">Pick one of this pack's Explorer Maps tags to fill in the decoration and name, or type another pack's tag. Untick Explorer map to go back to a regular item.</p>` : propsHtml(p, t)}
+            ${t.map ? `<p class="je-hint">Pick one of this pack’s Explorer Maps tags to fill in the decoration and name, or type another pack's tag. Untick Explorer Map to go back to a regular item.</p>` : propsHtml(p, t)}
         </div>`;
     }
 
     function propField(path, [key, label, kind, extra], value) {
         const id = `${path}.${key}`;
         if (kind === 'select') return labelled(label, `<select data-path="${id}">${extra.map(option => `<option value="${esc(option)}"${option === value ? ' selected' : ''}>${esc(option ? option.replace(/^minecraft:/, '') : 'None')}</option>`).join('')}</select>`);
-        if (kind === 'check') return `<label class="check"><input type="checkbox" data-path="${id}"${value ? ' checked' : ''}> ${label}</label>`;
-        if (kind === 'lines') return `<label class="field je-wide"><span>${label}</span><textarea rows="3" data-path="${id}" spellcheck="false" placeholder="${esc(extra)}">${esc(value)}</textarea></label>`;
+        if (kind === 'check') return `<label class="check"><input type="checkbox" data-path="${id}"${value ? ' checked' : ''}> ${tc(label)}</label>`;
+        if (kind === 'lines') return `<label class="field je-wide"><span>${tc(label)}</span><textarea rows="3" data-path="${id}" spellcheck="false" placeholder="${esc(extra)}">${esc(value)}</textarea></label>`;
         if (kind === 'color') return labelled(label, `<span class="inline"><input type="color" data-path="${id}" value="${esc(value || '#a06540')}"></span>`);
         return labelled(label, input(id, value, extra || '', kind === 'number' ? 'number' : 'text'));
     }
@@ -414,16 +416,16 @@
                 const def = PROPS[prop.type];
                 if (!def) return '';
                 return `<div class="je-prop">
-                    <div class="je-row"><strong>${def.label}</strong><span class="je-hint">${esc(def.hint)}</span>
+                    <div class="je-row"><strong>${tc(def.label)}</strong><span class="je-hint">${esc(def.hint)}</span>
                     <button type="button" class="link danger" data-op="remove-prop" data-path="${base}" data-index="${index}">Remove</button></div>
                     ${def.fields.length ? `<div class="je-grid">${def.fields.map(field => propField(`${base}.props.${index}`, field, prop[field[0]])).join('')}</div>` : ''}
                 </div>`;
             }).join('')}
             ${notes.map(note => `<p class="je-note">${esc(note)}</p>`).join('')}
             <div class="je-row">
-                <select data-add-prop="${base}" aria-label="Add item property"><option value="">+ Add item property</option><option value="__map">Explorer map (replaces the item)</option>${available.map(([key, def]) => `<option value="${key}">${def.label}</option>`).join('')}</select>
+                <select data-add-prop="${base}" aria-label="Add item property"><option value="">+ Add Item Property</option><option value="__map">Explorer Map (Replaces the Item)</option>${available.map(([key, def]) => `<option value="${key}">${tc(def.label)}</option>`).join('')}</select>
             </div>
-            <label class="field"><span>Other components (optional JSON)</span><textarea rows="2" data-path="${base}.gives.components" spellcheck="false" placeholder='{"minecraft:custom_model_data": 1}'>${esc(t.gives.components)}</textarea></label>
+            <label class="field"><span>Other Components (Optional JSON)</span><textarea rows="2" data-path="${base}.gives.components" spellcheck="false" placeholder='{"minecraft:custom_model_data": 1}'>${esc(t.gives.components)}</textarea></label>
         </div>`;
     }
 
@@ -432,13 +434,13 @@
             const data = levels[level];
             const p = `${base}.${level}`;
             return `<details class="je-level"${data.trades.length || level === '1' ? ' open' : ''}>
-                <summary>${LEVEL_NAMES[level]} <span>${data.trades.length} trade${data.trades.length === 1 ? '' : 's'}</span></summary>
+                <summary>${LEVEL_NAMES[level]} <span>${data.trades.length} ${data.trades.length === 1 ? 'Trade' : 'Trades'}</span></summary>
                 <div class="je-row">
-                    <label class="check"><input type="checkbox" data-path="${p}.replace"${data.replace ? ' checked' : ''}> Replace existing trades</label>
-                    ${labelled('Trades offered', input(`${p}.amount`, data.amount, 'All', 'number', 'min="1"'))}
+                    <label class="check"><input type="checkbox" data-path="${p}.replace"${data.replace ? ' checked' : ''}> Replace Existing Trades</label>
+                    ${labelled('Trades Offered', input(`${p}.amount`, data.amount, 'All', 'number', 'min="1"'))}
                 </div>
                 ${data.trades.map((t, i) => tradeHtml(p, t, i)).join('')}
-                <button type="button" class="link" data-op="add-trade" data-base="${p}">+ Add trade</button>
+                <button type="button" class="link" data-op="add-trade" data-base="${p}">+ Add Trade</button>
             </details>`;
         }).join('');
     }
@@ -446,24 +448,24 @@
     const RENDER = {
         trades: m => levelsHtml('levels', m.levels),
         biome: m => m.groups.map((g, i) => `<div class="je-group">
-                <div class="je-row">${labelled('Villager types (comma separated)', input(`groups.${i}.types`, g.types, 'minecraft:desert, minecraft:savanna'))}
+                <div class="je-row">${labelled('Villager Types (comma separated)', input(`groups.${i}.types`, g.types, 'minecraft:desert, minecraft:savanna'))}
                 <button type="button" class="link danger" data-op="remove-group" data-index="${i}">Remove</button></div>
                 ${levelsHtml(`groups.${i}.levels`, g.levels)}</div>`).join('')
-            + '<button type="button" class="link" data-op="add-group">+ Add villager types</button>',
+            + '<button type="button" class="link" data-op="add-group">+ Add Villager Types</button>',
         loot: m => m.pools.map((pool, i) => `<div class="je-group">
                 <div class="je-row">${labelled('Rolls', input(`pools.${i}.rolls`, pool.rolls, '1', 'number', 'min="1"'))}
-                <button type="button" class="link danger" data-op="remove-pool" data-index="${i}">Remove pool</button></div>
+                <button type="button" class="link danger" data-op="remove-pool" data-index="${i}">Remove Pool</button></div>
                 ${pool.entries.map((e, j) => `<div class="je-grid je-entry">
                     ${labelled('Item', input(`pools.${i}.entries.${j}.item`, e.item, 'minecraft:emerald'))}
                     ${labelled('Weight', input(`pools.${i}.entries.${j}.weight`, e.weight, '1', 'number', 'min="1"'))}
                     ${labelled('Min', input(`pools.${i}.entries.${j}.min`, e.min, '1', 'number', 'min="1"'))}
                     ${labelled('Max', input(`pools.${i}.entries.${j}.max`, e.max, '1', 'number', 'min="1"'))}
                     <button type="button" class="link danger" data-op="remove-entry" data-pool="${i}" data-index="${j}">Remove</button></div>`).join('')}
-                <button type="button" class="link" data-op="add-entry" data-pool="${i}">+ Add item</button></div>`).join('')
-            + '<button type="button" class="link" data-op="add-pool">+ Add pool</button>',
-        structures: m => `<label class="check"><input type="checkbox" data-path="replace"${m.replace ? ' checked' : ''}> Replace tag</label>
+                <button type="button" class="link" data-op="add-entry" data-pool="${i}">+ Add Item</button></div>`).join('')
+            + '<button type="button" class="link" data-op="add-pool">+ Add Pool</button>',
+        structures: m => `<label class="check"><input type="checkbox" data-path="replace"${m.replace ? ' checked' : ''}> Replace Tag</label>
             ${m.values.map((v, i) => `<div class="je-row">${input(`values.${i}`, v, 'minecraft:end_city')}<button type="button" class="link danger" data-op="remove-value" data-index="${i}">Remove</button></div>`).join('')}
-            <button type="button" class="link" data-op="add-value">+ Add structure</button>`
+            <button type="button" class="link" data-op="add-value">+ Add Structure</button>`
     };
 
     /* ---------- wiring ---------- */
@@ -522,7 +524,9 @@
             list.id = 'je-map-tags';
             document.body.appendChild(list);
         }
-        list.innerHTML = packMapTags().map(entry => `<option value="${esc(entry.tag)}">${esc(entry.name)}</option>`).join('');
+        const registryTags = [...((document.getElementById('reg-tag-worldgen-structure') || {}).options || [])].map(o => o.value.replace(/^#/, ''));
+        list.innerHTML = packMapTags().map(entry => `<option value="${esc(entry.tag)}">${esc(entry.name)}</option>`).join('')
+            + registryTags.map(tag => `<option value="${esc(tag)}"></option>`).join('');
     }
 
     function itemList() {

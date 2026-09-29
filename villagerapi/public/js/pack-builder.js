@@ -221,6 +221,23 @@ class VillagerPackBuilder {
             const wsNamespace = this.ns(ws.namespace);
             const textures = ws._textures || {};
             const uploaded = new Set();
+            let customModel = null;
+            if (textures.__model) {
+                try {
+                    customModel = JSON.parse(textures.__model);
+                    const keys = Object.keys(customModel.textures || {}).filter(key => !String(customModel.textures[key]).startsWith('#'));
+                    for (const key of keys) {
+                        if (this.image(`assets/${wsNamespace}/textures/block/${name}_${key}.png`, textures['model:' + key])) {
+                            customModel.textures[key] = `${wsNamespace}:block/${name}_${key}`;
+                            uploaded.add('front');
+                        }
+                    }
+                    if (!customModel.textures.particle && keys.length) customModel.textures.particle = `#${keys[0]}`;
+                } catch (error) {
+                    this.warnings.push(`Workstation "${name}" has a block model that is not valid JSON.`);
+                    customModel = null;
+                }
+            }
 
             Object.entries(faceFields).forEach(([face, field]) => {
                 if (this.image(`assets/${wsNamespace}/textures/block/${name}_${face}.png`, textures[field])) {
@@ -256,6 +273,7 @@ class VillagerPackBuilder {
                 }
             });
 
+            if (customModel) this.json(`assets/${wsNamespace}/models/block/${name}.json`, customModel);
             this.json(`assets/${wsNamespace}/models/item/${name}.json`, { parent: `${wsNamespace}:block/${name}` });
 
             if (this.options.itemDefinitions) {

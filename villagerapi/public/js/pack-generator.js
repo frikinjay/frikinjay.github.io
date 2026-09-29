@@ -19,7 +19,10 @@
 
     const escape = (value) => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-    const field = (label, control) => `<label class="field"><span>${label}</span>${control}</label>`;
+    const SMALL_WORDS = new Set(['a', 'an', 'and', 'or', 'the', 'of', 'to', 'in', 'on', 'per', 'by', 'for', 'as', 'at']);
+    const titleCase = text => String(text).replace(/[A-Za-z][\w'’-]*/g, (word, index) => (index > 0 && SMALL_WORDS.has(word.toLowerCase()) ? word.toLowerCase()
+        : /^[A-Z]{2,}$/.test(word) ? word : word.charAt(0).toUpperCase() + word.slice(1)));
+    const field = (label, control) => `<label class="field"><span>${titleCase(label)}</span>${control}</label>`;
 
     const text = (name, placeholder, extra = '') =>
         `<input type="text" data-field="${name}" placeholder="${escape(placeholder)}" autocomplete="off" spellcheck="false" ${extra}>`;
@@ -30,7 +33,7 @@
     const json = (name, label, placeholder, rows = 8, kind = null) => `
         <div class="field json-field"${kind ? ` data-json-editor="${kind}"` : ''}>
             <span class="inline"><span class="label">${label}</span>
-                ${kind ? `<label class="check manual-toggle"><input type="checkbox" data-manual="${name}"> Manual mode</label>` : ''}
+                ${kind ? `<label class="check manual-toggle"><input type="checkbox" data-manual="${name}"> Manual Mode</label>` : ''}
                 <button type="button" class="link manual-only" data-action="validate" data-target="${name}" style="font-size:12px">Validate</button></span>
             ${kind ? '<div class="json-editor"></div>' : ''}
             <textarea class="manual-only" data-field="${name}" rows="${rows}" placeholder="${escape(placeholder)}" spellcheck="false"></textarea>
@@ -38,7 +41,7 @@
         </div>`;
 
     const texture = (name, title, note) =>
-        `<label class="drop"><input type="file" accept="image/png" data-texture="${name}"><img alt="" data-preview="${name}"><span>${title}</span>${note ? `<small>${note}</small>` : ''}</label>`;
+        `<label class="drop"><input type="file" accept="image/png" data-texture="${name}"><img alt="" data-preview="${name}"><span>${title}</span>${note ? `<small>${note}</small>` : ''}<button type="button" class="drop-edit" data-action="edit-texture" data-texture-name="${name}">Edit</button></label>`;
 
     const namespace = () => field('Namespace', text('namespace', 'Pack namespace'));
 
@@ -47,6 +50,7 @@
             data: 'workstations', title: 'name',
             render: () => `
                 <div class="grid">${field('Name', text('name', 'purpur_altar'))}${namespace()}</div>
+                <div class="grid">${field('Block model (optional)', '<span class="inline model-upload"><input type="file" accept=".json,application/json" data-model-upload><button type="button" class="link" data-action="edit-texture" data-texture-name="textureFront">Open in editor</button></span>', 'A Blockbench or Minecraft block model JSON. Leave empty for a full cube.')}</div>
                 <div class="tiles">
                     ${texture('textureFront', 'Front')}${texture('textureBack', 'Back')}${texture('textureLeft', 'Left')}
                     ${texture('textureRight', 'Right')}${texture('textureTop', 'Top')}${texture('textureBottom', 'Bottom')}
@@ -65,8 +69,8 @@
             render: () => `
                 <div class="grid">${field('Name', text('name', 'jungle_dweller'))}${namespace()}</div>
                 <div class="tiles">
-                    ${texture('texture', 'Adult')}${texture('zombieTexture', 'Zombie', 'Optional')}
-                    ${texture('babyTexture', 'Baby', '26.3')}${texture('babyZombieTexture', 'Baby zombie', '26.3, optional')}
+                    ${texture('texture', 'Adult')}${texture('zombieTexture', 'Zombie', 'Required')}
+                    ${texture('babyTexture', 'Baby', '26.3')}${texture('babyZombieTexture', 'Baby Zombie', '26.3, required')}
                 </div>`
         },
         profession: {
@@ -77,7 +81,7 @@
                     ${field('POI type', text('poiType', 'alchemist'))}
                     ${field('Work sound', `<select data-field="workSound">${WORK_SOUNDS.map(([id, label]) => `<option value="minecraft:entity.villager.work_${id}">${label}</option>`).join('')}</select>`)}
                 </div>
-                <div class="tiles">${texture('texture', 'Overlay')}${texture('zombieTexture', 'Zombie overlay', 'Optional')}</div>`
+                <div class="tiles">${texture('texture', 'Overlay')}${texture('zombieTexture', 'Zombie Overlay', 'Required')}</div>`
         },
         trade: {
             data: 'trades', title: 'profession',
@@ -149,7 +153,7 @@
             ${field('Biome or tag', `<input type="text" data-row-field="biome" placeholder="#minecraft:is_badlands" value="${escape(values.biome)}" spellcheck="false">`)}
             ${field('Villager type', `<input type="text" data-row-field="villagerType" placeholder="badlands" value="${escape(values.villagerType)}" spellcheck="false">`)}
             ${field('Weight', `<input type="number" data-row-field="weight" min="1" value="${values.weight || 1}">`)}
-            <label class="check" style="padding-bottom:9px"><input type="checkbox" data-row-field="replace"${values.replace ? ' checked' : ''}>Override</label>`,
+            <label class="check"><input type="checkbox" data-row-field="replace"${values.replace ? ' checked' : ''}> Override</label>`,
         house: (values = {}) => `
             ${field('Name', `<input type="text" data-row-field="name" placeholder="house_1" value="${escape(values.name)}" spellcheck="false">`)}
             ${field('Pool', `<select data-row-field="kind"><option value="houses">Houses</option><option value="zombie_houses"${values.kind === 'zombie_houses' ? ' selected' : ''}>Abandoned</option></select>`)}
@@ -197,6 +201,8 @@
                     case 'add-row': this.addRow(entry, action.dataset.row); break;
                     case 'remove-row': this.removeRow(entry, action.closest('.subrow')); break;
                     case 'validate': this.validate(entry, action.dataset.target); break;
+                    case 'edit-texture': event.preventDefault(); this.editTexture(entry, action.dataset.textureName); break;
+                    case 'edit-pack-icon': event.preventDefault(); this.editPackIcon(); break;
                     case 'generate': this.generate(); break;
                     case 'go': this.show(action.dataset.target); break;
                 }
@@ -230,6 +236,16 @@
                 const entry = target.closest('.entry');
 
                 if (target.id === 'pack-icon-upload') this.readPackIcon(target);
+                else if (target.dataset.modelUpload !== undefined) {
+                    const entry = target.closest('.entry');
+                    const file = target.files[0];
+                    if (entry && file) file.text().then(text => {
+                        try { JSON.parse(text); } catch (error) { this.notify('That block model is not valid JSON', 'error'); return; }
+                        if (!this.textures[entry.id]) this.textures[entry.id] = {};
+                        this.textures[entry.id].__model = text;
+                        this.notify('Block model loaded. Open the editor to paint its textures');
+                    });
+                }
                 else if (target.name === 'mc-version') { this.refresh(); if (window.JsonEditors) window.JsonEditors.refreshAll(); }
                 else if (!entry) return;
                 else if (target.matches('[data-texture]')) this.readTexture(entry, target);
@@ -364,6 +380,75 @@
                 const zone = input.closest('.drop');
                 zone.classList.add('filled');
                 zone.querySelector('img').src = url;
+            });
+        }
+
+        textureKind(entry, name) {
+            const type = entry.dataset.type;
+            if (type === 'workstation') return 'block';
+            if (type === 'structureTag') return 'decoration';
+            if (name === 'babyZombieTexture') return 'baby_zombie';
+            if (name === 'babyTexture') return 'baby';
+            const zombie = name === 'zombieTexture';
+            if (type === 'type') return zombie ? 'zombie_type' : 'type';
+            return zombie ? 'zombie' : 'villager';
+        }
+
+        editTexture(entry, name) {
+            if (!window.TextureEditor) { this.notify('The texture editor is still loading', 'error'); return; }
+            const store = this.textures[entry.id] || {};
+            const siblingName = name === 'zombieTexture' ? 'texture' : name === 'babyZombieTexture' ? 'babyTexture' : null;
+            const kind = this.textureKind(entry, name);
+            const faceField = face => 'texture' + face.charAt(0).toUpperCase() + face.slice(1);
+            const setTile = (field, url) => {
+                if (!this.textures[entry.id]) this.textures[entry.id] = {};
+                this.textures[entry.id][field] = url;
+                const input = entry.querySelector(`[data-texture="${field}"]`);
+                const zone = input && input.closest('.drop');
+                if (zone) { zone.classList.add('filled'); zone.querySelector('img').src = url; }
+            };
+            if (kind === 'block') {
+                const model = store.__model ? JSON.parse(store.__model) : null;
+                window.TextureEditor.open({
+                    model,
+                    modelTextures: model ? Object.fromEntries(Object.keys(model.textures || {}).filter(key => !String(model.textures[key]).startsWith('#')).map(key => [key, store['model:' + key] || null])) : null,
+                    kind, title: (entry.querySelector('.entry-title') || {}).textContent || 'Workstation',
+                    face: name.replace(/^texture/, '').toLowerCase(),
+                    faces: Object.fromEntries(['front', 'back', 'left', 'right', 'top', 'bottom'].map(face => [face, store[faceField(face)] || null])),
+                    version: this.version().id,
+                    onSave: (url, faces, keys) => {
+                        Object.entries(faces || {}).forEach(([face, data]) => setTile(faceField(face), data));
+                        Object.entries(keys || {}).forEach(([key, data]) => { this.textures[entry.id]['model:' + key] = data; });
+                    }
+                });
+                return;
+            }
+            window.TextureEditor.open({
+                kind: this.textureKind(entry, name),
+                title: `${(entry.querySelector('.entry-title') || {}).textContent || 'Untitled'} · ${name.replace(/([A-Z])/g, ' $1').toLowerCase()}`,
+                src: store[name] || null,
+                sibling: siblingName ? store[siblingName] || null : null,
+                version: this.version().id,
+                onSave: url => {
+                    if (!this.textures[entry.id]) this.textures[entry.id] = {};
+                    this.textures[entry.id][name] = url;
+                    const input = entry.querySelector(`[data-texture="${name}"]`);
+                    const zone = input && input.closest('.drop');
+                    if (zone) { zone.classList.add('filled'); zone.querySelector('img').src = url; }
+                }
+            });
+        }
+
+        editPackIcon() {
+            if (!window.TextureEditor) return;
+            window.TextureEditor.open({
+                kind: 'icon', title: 'Pack icon', src: this.packIcon,
+                onSave: url => {
+                    this.packIcon = url;
+                    const zone = document.getElementById('pack-icon-upload').closest('.drop');
+                    zone.classList.add('filled');
+                    zone.querySelector('img').src = url;
+                }
             });
         }
 
@@ -537,7 +622,28 @@
             report.innerHTML = `<h3>${escape(title)}</h3>` + (lines.length ? `<ul>${lines.map(line => `<li>${escape(line)}</li>`).join('')}</ul>` : '');
         }
 
+        // Zombie variants render black and magenta in game without their textures, so fill any that are missing:
+        // profession overlays are copied (vanilla uses the same texture), type textures are zombified.
+        async fillZombieTextures() {
+            const filled = [];
+            for (const entry of document.querySelectorAll('[data-list="type"] > .entry, [data-list="profession"] > .entry')) {
+                const store = this.textures[entry.id];
+                if (!store) continue;
+                const isType = entry.dataset.type === 'type';
+                const pairs = [['texture', 'zombieTexture']].concat(isType ? [['babyTexture', 'babyZombieTexture']] : []);
+                for (const [from, to] of pairs) {
+                    if (!store[from] || store[to]) continue;
+                    store[to] = isType && window.TextureEditor ? await window.TextureEditor.zombify(store[from]) : store[from];
+                    const zone = entry.querySelector(`[data-texture="${to}"]`)?.closest('.drop');
+                    if (zone) { zone.classList.add('filled'); zone.querySelector('img').src = store[to]; }
+                    filled.push(((entry.querySelector('.entry-title') || {}).textContent || 'Untitled') + ' ' + to.replace(/([A-Z])/g, ' $1').toLowerCase());
+                }
+            }
+            if (filled.length) this.notify(`Filled ${filled.length} missing zombie texture${filled.length === 1 ? '' : 's'} automatically`);
+        }
+
         async generate() {
+            await this.fillZombieTextures();
             const meta = this.metadata();
             const options = this.version();
             const buttons = document.querySelectorAll('[data-action="generate"]');

@@ -22,6 +22,8 @@
   <script src="./js/pack-builder.js" defer></script>
   <script src="./js/json-editors.js" defer></script>
   <script src="./js/pack-generator.js" defer></script>
+  <script src="./js/texture-editor.js" type="module"></script>
+  <script src="./js/registry.js" type="module"></script>
   <style>#loader{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:#fbfbfd;color:#1d1d1f;font:20px/1 "Minecraft Seven",system-ui,sans-serif;letter-spacing:.12em}@media(prefers-color-scheme:dark){#loader{background:#000;color:#f5f5f7}}</style>
 </head>
 <body>
@@ -30,7 +32,7 @@
     <div class="nav-inner">
       <a class="logo" href="./"><span class="logo-block" aria-hidden="true" style="background-image: url('./img/villagerapi_logo.png');"></span>VAPI</a>
       <nav class="nav-links" aria-label="Main">
-        <a href="https://morevillagers.neoterra.online/">Packs</a>
+        <a href="https://morevillagers.neoterra.online/">Villager Packs</a>
         <a href="./" aria-current="page">Generator</a>
         <a data-docs="" href="https://github.com/frikinjay/villagerapi/blob/main/DOCUMENTATION_26_1.md">Docs</a>
       </nav>
@@ -44,7 +46,7 @@
           <div class="group"><p>Villagers</p><a class="item" href="#workstations" data-nav="workstations">Workstations<em data-count="workstation"></em></a><a class="item" href="#poi-types" data-nav="poi-types">POI Types<em data-count="poi"></em></a><a class="item" href="#villager-types" data-nav="villager-types">Villager Types<em data-count="type"></em></a><a class="item" href="#professions" data-nav="professions">Professions<em data-count="profession"></em></a></div>
           <div class="group"><p>Trading</p><a class="item" href="#trades" data-nav="trades">Trades<em data-count="trade"></em></a><a class="item" href="#biome-trades" data-nav="biome-trades">Biome Trades<em data-count="biomeTrade"></em></a><a class="item" href="#hero-gifts" data-nav="hero-gifts">Hero Gifts<em data-count="gift"></em></a><a class="item" href="#loot-tables" data-nav="loot-tables">Loot Tables<em data-count="lootTable"></em></a></div>
           <div class="group"><p>World</p><a class="item" href="#explorer-maps" data-nav="explorer-maps">Explorer Maps<em data-count="structureTag"></em></a><a class="item" href="#biome-mappings" data-nav="biome-mappings">Biome Mappings<em data-count="biomeMapping"></em></a><a class="item" href="#village-types" data-nav="village-types">Village Types<em data-count="villageType"></em></a><a class="item" href="#village-houses" data-nav="village-houses">Village Houses<em data-count="villageStructure"></em></a></div>
-          <div class="group"><p>Resources</p><a class="item" href="#tools" data-nav="tools">Structure Tools</a></div>
+          <div class="group"><p>Resources</p><a class="item" href="#mods" data-nav="mods">Mods &amp; Datapacks<em data-count="mods"></em></a><a class="item" href="#tools" data-nav="tools">Structure Tools</a></div>
       </nav>
       <div class="export">
         <div class="segmented" role="radiogroup" aria-label="Minecraft version">
@@ -70,8 +72,15 @@
             <label class="field"><span>Description</span><input type="text" id="pack-description" autocomplete="off"></label>
           </div></div>
           <div class="tiles" style="margin-top:12px;grid-template-columns:118px">
-            <label class="drop"><input type="file" id="pack-icon-upload" accept="image/png"><img alt=""><span>Pack icon</span></label>
+            <label class="drop"><input type="file" id="pack-icon-upload" accept="image/png"><img alt=""><span>Pack icon</span><button type="button" class="drop-edit" data-action="edit-pack-icon">Edit</button></label>
+
           </div>
+          <div class="field mod-sources" id="mod-sources">
+              <span class="label">Mods and Datapacks</span>
+              <label class="button small file-button">Upload Jars or Zips<input type="file" accept=".jar,.zip" multiple hidden></label>
+              <small>Items, blocks, structures, biomes, tags, villager types and professions inside them are suggested in every matching field. Vanilla IDs are suggested automatically.</small>
+              <ul data-mod-list></ul>
+            </div>
         </section>
 
         <section class="panel" data-panel="workstations">
@@ -157,6 +166,15 @@
             <div class="aside"><a data-docs="#village-structures" href="https://github.com/frikinjay/villagerapi/blob/main/DOCUMENTATION_26_1.md#village-structures" target="_blank" rel="noopener">Docs</a><button type="button" class="button" data-add="villageStructure">Add</button></div>
           </div>
           <div class="entries" data-list="villageStructure" data-empty="Nothing here yet"></div>
+        </section>
+
+        <section class="panel" data-panel="mods">
+          <div class="panel-head">
+            <div><h1>Mods &amp; Datapacks</h1><p>Add mod jars or datapacks to list their items, blocks, structures, biomes and more in every field.</p></div>
+          </div>
+          <label class="drop" style="min-height:120px"><input type="file" accept=".jar,.zip" multiple data-registry-upload><span>Add Mod Jars or Datapacks</span><small>.jar or .zip, several at once</small></label>
+          <ul class="downloads card" data-registry-sources style="margin-top:12px"></ul>
+          <p class="panel-note" data-registry-vanilla style="margin-top:10px;font-size:12px;color:var(--secondary)">Vanilla Minecraft entries for the selected version are always included.</p>
         </section>
 
         <section class="panel" data-panel="tools">
