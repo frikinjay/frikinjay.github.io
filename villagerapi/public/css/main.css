@@ -778,3 +778,12 @@ body > .footer { margin-top: auto; }
 .source-results .slot img, .source-results .slot .anim-icon { width: 32px; height: 32px; }
 [data-registry-sources].card { padding: 0; background: none; box-shadow: none; border: 0; }
 [data-registry-sources] > li.source { display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; box-sizing: border-box; border-bottom: 0; }
+
+/* Load existing pack */
+.load-pack { margin-bottom: 14px; }
+.load-pack .card-body { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.load-pack strong { display: block; font-weight: 500; }
+.load-pack small { display: block; color: var(--secondary); font-size: 13px; margin-top: 2px; }
+.load-pack-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.file-button { cursor: pointer; }
+.button.secondary { background: var(--fill); color: var(--text); }
