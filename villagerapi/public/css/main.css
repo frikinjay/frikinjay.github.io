@@ -613,3 +613,26 @@ html.is-loading { overflow: hidden; }
 body { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
 body > main, body > .app { flex: 1 0 auto; }
 body > .footer { margin-top: auto; }
+
+/* Visual JSON editors */
+.json-field .inline { gap: 14px; }
+.manual-toggle { margin-left: auto; font-size: 12px; color: var(--secondary); }
+.json-field[data-json-editor] .manual-only { display: none; }
+.json-field[data-json-editor].is-manual .manual-only { display: block; }
+.json-field[data-json-editor].is-manual button.manual-only { display: inline; }
+.json-field[data-json-editor].is-manual .json-editor { display: none; }
+.json-editor { display: grid; gap: 10px; }
+.je-level, .je-group { border-radius: 10px; background: var(--fill); padding: 10px 12px; }
+.je-group { display: grid; gap: 10px; }
+.je-level summary { cursor: pointer; font-size: 13px; padding: 2px 0; list-style-position: inside; }
+.je-level summary span { color: var(--tertiary); font-size: 12px; margin-left: 6px; }
+.je-level[open] { display: grid; gap: 10px; }
+.je-trade { display: grid; gap: 10px; padding: 12px; border-radius: 10px; background: var(--surface); box-shadow: 0 0 0 1px var(--hairline) inset; }
+.je-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
+.je-row strong { font-weight: 400; font-size: 13px; margin-right: auto; }
+.je-row .field { flex: 1 1 160px; }
+.je-row > input { flex: 1 1 200px; }
+.je-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; align-items: end; }
+.je-entry { background: var(--surface); padding: 10px; border-radius: 8px; }
+.je-add-extra { grid-column: span 2; display: flex; align-items: flex-end; padding-bottom: 9px; font-size: 13px; }
+.je-trade textarea { font-size: 12px; }

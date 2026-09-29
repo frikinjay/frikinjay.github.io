@@ -27,11 +27,14 @@
     const number = (name, value, min, max) =>
         `<input type="number" data-field="${name}" value="${value}"${min !== undefined ? ` min="${min}"` : ''}${max !== undefined ? ` max="${max}"` : ''}>`;
 
-    const json = (name, label, placeholder, rows = 8) => `
-        <div class="field">
-            <span class="inline"><span class="label">${label}</span><button type="button" class="link" data-action="validate" data-target="${name}" style="margin-left:auto;font-size:12px">Validate</button></span>
-            <textarea data-field="${name}" rows="${rows}" placeholder="${escape(placeholder)}" spellcheck="false"></textarea>
-            <span class="json-state" data-json-status="${name}" aria-live="polite"></span>
+    const json = (name, label, placeholder, rows = 8, kind = null) => `
+        <div class="field json-field"${kind ? ` data-json-editor="${kind}"` : ''}>
+            <span class="inline"><span class="label">${label}</span>
+                ${kind ? `<label class="check manual-toggle"><input type="checkbox" data-manual="${name}"> Manual mode</label>` : ''}
+                <button type="button" class="link manual-only" data-action="validate" data-target="${name}" style="font-size:12px">Validate</button></span>
+            ${kind ? '<div class="json-editor"></div>' : ''}
+            <textarea class="manual-only" data-field="${name}" rows="${rows}" placeholder="${escape(placeholder)}" spellcheck="false"></textarea>
+            <span class="json-state manual-only" data-json-status="${name}" aria-live="polite"></span>
         </div>`;
 
     const texture = (name, title, note) =>
@@ -80,13 +83,13 @@
             data: 'trades', title: 'profession',
             render: () => `
                 ${field('Profession', text('profession', 'alchemist or minecraft:farmer'))}
-                ${json('tradesJson', 'Levels', '{\n  "levels": {\n    "1": { "trades": [ ... ] }\n  }\n}', 10)}`
+                ${json('tradesJson', 'Levels', '{\n  "levels": {\n    "1": { "trades": [ ... ] }\n  }\n}', 10, 'trades')}`
         },
         biomeTrade: {
             data: 'biomeTrades', title: 'profession',
             render: () => `
                 ${field('Profession', text('profession', 'alchemist'))}
-                ${json('biomeJson', 'Villager type overrides', '{\n  "biome_overrides": {\n    "minecraft:desert": { "levels": { ... } }\n  }\n}', 9)}`
+                ${json('biomeJson', 'Villager type overrides', '{\n  "biome_overrides": {\n    "minecraft:desert": { "levels": { ... } }\n  }\n}', 9, 'biome')}`
         },
         gift: {
             data: 'gifts', title: 'profession',
@@ -96,7 +99,7 @@
             data: 'lootTables', title: 'name',
             render: () => `
                 ${field('Name', text('name', 'alchemist_gift'))}
-                ${json('lootJson', 'Loot table', '{\n  "type": "minecraft:gift",\n  "pools": [ ... ]\n}', 8)}`
+                ${json('lootJson', 'Loot table', '{\n  "type": "minecraft:gift",\n  "pools": [ ... ]\n}', 8, 'loot')}`
         },
         structureTag: {
             data: 'structureTags', title: 'tag',
@@ -107,7 +110,7 @@
                     ${field('Colour', `<span class="inline"><input type="color" value="#ac7bac" data-color-for="mapColor">${text('mapColor', '#ac7bac', 'value="#ac7bac"')}</span>`)}
                 </div>
                 <div class="tiles">${texture('decorationTexture', 'Icon', '8 × 8')}</div>
-                ${json('structuresJson', 'Structures', '{\n  "replace": false,\n  "values": ["minecraft:end_city"]\n}', 5)}`
+                ${json('structuresJson', 'Structures', '{\n  "replace": false,\n  "values": ["minecraft:end_city"]\n}', 5, 'structures')}`
         },
         biomeMapping: {
             data: 'biomeMappings', title: 'name', rows: 'mapping',
@@ -227,7 +230,7 @@
                 const entry = target.closest('.entry');
 
                 if (target.id === 'pack-icon-upload') this.readPackIcon(target);
-                else if (target.name === 'mc-version') this.refresh();
+                else if (target.name === 'mc-version') { this.refresh(); if (window.JsonEditors) window.JsonEditors.refreshAll(); }
                 else if (!entry) return;
                 else if (target.matches('[data-texture]')) this.readTexture(entry, target);
                 else if (target.matches('[data-row-file]')) this.readRowFile(entry, target);
@@ -296,6 +299,7 @@
                 <div class="entry-body">${config.render()}</div>`;
 
             list.appendChild(entry);
+            if (window.JsonEditors) window.JsonEditors.mount(entry);
             if (config.rows === 'mapping') this.addRow(entry, 'mapping');
 
             const first = entry.querySelector('input[type="text"], textarea');
