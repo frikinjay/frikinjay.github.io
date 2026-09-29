@@ -393,7 +393,7 @@
                 ${labelled(legacy() ? 'Price multiplier' : 'Reputation discount', input(`${p}.discount`, t.discount, '0.05', 'number', 'step="0.01" min="0"'))}
                 ${labelled('List weight', input(`${p}.weight`, t.weight, 'Default', 'number', 'min="0"'))}
             </div>
-            ${t.map ? '' : propsHtml(p, t)}
+            ${t.map ? `<p class="je-hint">Pick one of this pack's Explorer Maps tags to fill in the decoration and name, or type another pack's tag. Untick Explorer map to go back to a regular item.</p>` : propsHtml(p, t)}
         </div>`;
     }
 
@@ -421,7 +421,7 @@
             }).join('')}
             ${notes.map(note => `<p class="je-note">${esc(note)}</p>`).join('')}
             <div class="je-row">
-                <select data-add-prop="${base}" aria-label="Add item property"><option value="">+ Add item property</option>${available.map(([key, def]) => `<option value="${key}">${def.label}</option>`).join('')}</select>
+                <select data-add-prop="${base}" aria-label="Add item property"><option value="">+ Add item property</option><option value="__map">Explorer map (replaces the item)</option>${available.map(([key, def]) => `<option value="${key}">${def.label}</option>`).join('')}</select>
             </div>
             <label class="field"><span>Other components (optional JSON)</span><textarea rows="2" data-path="${base}.gives.components" spellcheck="false" placeholder='{"minecraft:custom_model_data": 1}'>${esc(t.gives.components)}</textarea></label>
         </div>`;
@@ -574,7 +574,8 @@
             editor.host.addEventListener('change', event => {
                 if (event.target.dataset.addProp !== undefined && event.target.value) {
                     const trade = get(editor.model, event.target.dataset.addProp);
-                    (trade.props ||= []).push({ type: event.target.value });
+                    if (event.target.value === '__map') trade.map = true;
+                    else (trade.props ||= []).push({ type: event.target.value });
                     render(editor);
                     return;
                 }
