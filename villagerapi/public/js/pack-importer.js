@@ -202,16 +202,50 @@ async function importPack(reader) {
         for (const row of rows) gen.addRow(e, 'mapping', { biome: row.biome, villagerType: String(row.villager_type || row.type || '').replace(`${ns}:`, ''), weight: row.weight || 1, replace: !!row.replace });
     }
 
+    const bytes = async path => { const blob = await reader.blob(path); return blob ? new Uint8Array(await blob.arrayBuffer()) : null; };
+
     const villageFiles = reader.paths.filter(p => /^villagers\/village_types\/[^/]+\/[^/]+\.json$/.test(p));
     for (const path of villageFiles) {
         const data = await json(reader, path); if (!data) continue;
+        const folder = path.split('/')[2], name = data.name || baseName(path);
         const e = add(gen, 'villageType');
-        setField(e, 'name', data.name || baseName(path)); setField(e, 'namespace', data.namespace || ns);
-        setField(e, 'folder', path.split('/')[2]); setField(e, 'weight', data.weight || 1); setField(e, 'biomes', data.biomes || []);
+        setField(e, 'name', name); setField(e, 'namespace', data.namespace || ns);
+        setField(e, 'folder', folder); setField(e, 'weight', data.weight || 1); setField(e, 'biomes', data.biomes || []);
         if (!setField(e, 'copyFrom', data.copy_from)) { setField(e, 'copyFrom', 'custom'); setField(e, 'copyFromCustom', data.copy_from); }
+        // Replacement structures live next to the village type file, in a folder named after it.
+        const prefix = `villagers/village_types/${folder}/${name}/`;
+        const overrides = reader.paths.filter(p => p.startsWith(prefix) && p.endsWith('.nbt'));
+        if (overrides.length) {
+            const store = gen.store(e);
+            store.overrides = {};
+            for (const file of overrides) store.overrides[file.slice(prefix.length)] = await bytes(file);
+            const state = e.querySelector('[data-override-state]');
+            if (state) state.textContent = `${overrides.length} ${overrides.length === 1 ? 'structure' : 'structures'}`;
+            e.querySelector('[data-override-folder]')?.closest('.drop')?.classList.add('filled');
+        }
     }
-    if (reader.paths.some(p => p.startsWith('villagers/village_structures/') || /^villagers\/village_types\/[^/]+\/[^/]+\//.test(p))) {
-        notes.push('Village structure .nbt files are not loaded. Add them again under Village Structures and Village Types if you need to change them.');
+
+    const structureFiles = reader.paths.filter(p => /^villagers\/village_structures\/[^/]+\/[^/]+\.json$/.test(p));
+    for (const path of structureFiles) {
+        const data = await json(reader, path); if (!data) continue;
+        const folder = path.split('/')[2];
+        const e = add(gen, 'villageStructure');
+        setField(e, 'villageType', data.village_type); setField(e, 'folder', folder); setField(e, 'namespace', data.namespace || ns);
+        e.querySelectorAll('[data-rows] > *').forEach(row => row.remove());
+        for (const kind of ['houses', 'zombie_houses']) {
+            for (const [name, house] of Object.entries(data[kind] || {})) {
+                const nbtPath = `villagers/village_structures/${folder}/${kind}/${name}.nbt`;
+                const hasFile = !house.location && reader.paths.includes(nbtPath);
+                const row = gen.addRow(e, 'house', { name, kind, location: house.location || '', weight: house.weight || 1, fileName: hasFile ? `${name}.nbt` : '' });
+                if (!row) continue;
+                const set = (field, value) => { const input = row.querySelector(`[data-row-field="${field}"]`); if (input && value !== undefined && value !== null) input.value = String(value); };
+                set('processors', house.processors);
+                set('elementType', house.element_type === 'single' ? 'single' : 'legacy');
+                set('maxCount', house.max_count);
+                if (hasFile) gen.store(e).rows[row.id] = { name: `${name}.nbt`, data: await bytes(nbtPath) };
+                else if (!house.location) notes.push(`House "${name}" in ${folder} has no structure file in the pack.`);
+            }
+        }
     }
 
     gen.refresh && gen.refresh();
