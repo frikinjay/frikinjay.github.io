@@ -1,10 +1,23 @@
 // Registry suggestions: vanilla IDs for the selected version plus IDs found in uploaded mod jars, datapacks and villager packs.
+import { configure, renderIcon, iconElement, addArchiveSource, removeArchiveSource } from './mc-assets.js';
 const REGISTRIES = ['item', 'block', 'worldgen/structure', 'worldgen/biome', 'enchantment', 'potion', 'mob_effect', 'instrument', 'jukebox_song',
     'trim_material', 'trim_pattern', 'villager_type', 'villager_profession', 'point_of_interest_type', 'banner_pattern'];
 const TAGS = ['worldgen/structure', 'worldgen/biome', 'item', 'block'];
 const vanilla = new Map();
-const modded = Object.fromEntries([...REGISTRIES, ...TAGS.map(t => 'tag/' + t)].map(key => [key, new Set()]));
+const KEYS = [...REGISTRIES, ...TAGS.map(t => 'tag/' + t)];
+const emptySets = () => Object.fromEntries(KEYS.map(key => [key, new Set()]));
+let modded = emptySets();
 const sources = [];
+let nextSource = 1;
+const KIND_LABELS = { item: 'Item', block: 'Block', 'worldgen/structure': 'Structure', 'worldgen/biome': 'Biome', enchantment: 'Enchantment', potion: 'Potion',
+    mob_effect: 'Effect', instrument: 'Instrument', jukebox_song: 'Song', trim_material: 'Trim Material', trim_pattern: 'Trim Pattern', villager_type: 'Villager Type',
+    villager_profession: 'Profession', point_of_interest_type: 'POI Type', banner_pattern: 'Banner Pattern', 'tag/worldgen/structure': 'Structure Tag',
+    'tag/worldgen/biome': 'Biome Tag', 'tag/item': 'Item Tag', 'tag/block': 'Block Tag' };
+
+function rebuild() {
+    modded = emptySets();
+    for (const source of sources) for (const key of KEYS) source.entries[key].forEach(id => modded[key].add(id));
+}
 let version = null;
 
 const listId = key => 'reg-' + key.replace(/[^a-z]+/g, '-');
@@ -56,8 +69,8 @@ async function addArchive(file) {
     let packNamespace = null;
     const config = zip.file('villagerapi_config.json');
     if (config) { try { packNamespace = JSON.parse(await config.async('string')).namespace; } catch (error) { /* ignore */ } }
-    let count = 0;
-    const add = (key, id) => { if (!modded[key].has(id)) { modded[key].add(id); count++; } };
+    const entries = emptySets();
+    const add = (key, id) => entries[key].add(id);
     const rules = [
         [/^assets\/([^/]+)\/(?:models\/item|items)\/(.+)\.json$/, 'item'],
         [/^assets\/([^/]+)\/blockstates\/(.+)\.json$/, 'block'],
@@ -86,7 +99,11 @@ async function addArchive(file) {
             add(pack[1] === 'types' ? 'villager_type' : pack[1] === 'professions' ? 'villager_profession' : 'point_of_interest_type', `${ns}:${name}`);
         }
     }
-    sources.push({ name: file.name, count });
+    const id = String(nextSource++);
+    const count = KEYS.reduce((sum, key) => sum + entries[key].size, 0);
+    addArchiveSource(id, zip);
+    sources.push({ id, name: file.name, entries, count });
+    rebuild();
     render(await loadVanilla(version || '26.3'));
     return count;
 }
@@ -121,22 +138,88 @@ function attach(root) {
 new MutationObserver(records => records.forEach(r => r.addedNodes.forEach(n => n.nodeType === 1 && attach(n)))).observe(document.body, { childList: true, subtree: true });
 document.addEventListener('change', e => { if (e.target.name === 'mc-version') refresh(); });
 
+const escapeHtml = v => String(v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function renderSources() {
+    const list = document.querySelector('[data-registry-sources]');
+    if (!list) return;
+    list.innerHTML = sources.map(source => `
+        <li class="source" data-source="${source.id}">
+            <div class="source-head"><strong>${escapeHtml(source.name)}</strong><span>${source.count} entries</span>
+                <button type="button" class="link danger" data-remove-source="${source.id}">Remove</button></div>
+            <input type="search" data-source-search="${source.id}" placeholder="Search ${escapeHtml(source.name)}" autocomplete="off" spellcheck="false">
+            <ul class="source-results" data-source-results="${source.id}"></ul>
+        </li>`).join('');
+    list.hidden = !sources.length;
+    const count = document.querySelector('[data-count="mods"]');
+    if (count) count.textContent = sources.length ? String(sources.length) : '';
+}
+
+function search(source, query) {
+    const results = [];
+    const needle = query.trim().toLowerCase();
+    if (!needle) return results;
+    for (const key of KEYS) {
+        for (const id of source.entries[key]) {
+            if (id.toLowerCase().includes(needle)) results.push({ key, id });
+            if (results.length >= 60) return results;
+        }
+    }
+    return results;
+}
+
+function showResults(sourceId, query) {
+    const source = sources.find(s => s.id === sourceId);
+    const host = document.querySelector(`[data-source-results="${sourceId}"]`);
+    if (!source || !host) return;
+    const results = search(source, query);
+    host.innerHTML = results.length
+        ? results.map(r => `<li><span class="slot slot-small" data-icon="${r.key === 'item' || r.key === 'block' ? escapeHtml(r.id) : ''}"></span><code>${escapeHtml(r.id)}</code><em>${KIND_LABELS[r.key] || r.key}</em></li>`).join('')
+        : (query.trim() ? '<li class="empty">No matches</li>' : '');
+    configure({ version: version || '26.3', local: {} });
+    host.querySelectorAll('[data-icon]').forEach(slot => {
+        const id = slot.dataset.icon;
+        if (!id) { slot.remove(); return; }
+        renderIcon(id).then(url => { const icon = iconElement(url); if (icon && slot.isConnected) slot.replaceChildren(icon); });
+    });
+}
+
 function mountUpload() {
-    const host = document.getElementById('mod-sources');
-    if (!host) return;
-    const input = host.querySelector('input[type="file"]'), list = host.querySelector('[data-mod-list]');
+    const input = document.querySelector('[data-registry-upload]');
+    const list = document.querySelector('[data-registry-sources]');
+    if (!input || !list) return;
     input.addEventListener('change', async () => {
         for (const file of input.files) {
             try {
                 const count = await addArchive(file);
-                if (window.Site) window.Site.toast(`${file.name}: ${count} IDs added to suggestions`);
+                if (window.Site) window.Site.toast(`${file.name}: ${count} entries added to suggestions`);
             } catch (error) {
                 if (window.Site) window.Site.toast(`${file.name} could not be read`, 'error');
             }
         }
         input.value = '';
-        list.innerHTML = sources.map(s => `<li>${s.name.replace(/[<>&]/g, '')} <span>${s.count} IDs</span></li>`).join('');
+        renderSources();
     });
+    let timer = 0;
+    list.addEventListener('input', e => {
+        const id = e.target.dataset.sourceSearch;
+        if (!id) return;
+        clearTimeout(timer);
+        timer = setTimeout(() => showResults(id, e.target.value), 150);
+    });
+    list.addEventListener('click', async e => {
+        const id = e.target.closest('[data-remove-source]')?.dataset.removeSource;
+        if (!id) return;
+        const index = sources.findIndex(s => s.id === id);
+        if (index < 0) return;
+        const [removed] = sources.splice(index, 1);
+        removeArchiveSource(id);
+        rebuild();
+        render(await loadVanilla(version || '26.3'));
+        renderSources();
+        if (window.Site) window.Site.toast(`${removed.name} removed`);
+    });
+    renderSources();
 }
 
 attach(document.body);

@@ -33,7 +33,14 @@ export function splitId(id, fallbackNamespace = 'minecraft') {
         : { ns: value.slice(0, index), path: value.slice(index + 1) };
 }
 
+const archives = new Map();
+export function addArchiveSource(id, zip) { archives.set(String(id), zip); }
+export function removeArchiveSource(id) { archives.delete(String(id)); }
+
 export function assetUrl(ns, path) {
+    for (const [id, zip] of archives) {
+        if (ns !== 'minecraft' && zip.file(`assets/${ns}/${path}`)) return `archive:${id}|assets/${ns}/${path}`;
+    }
     if (ns === 'minecraft') return `${REPOSITORY}/${config.version}/assets/minecraft/${path}`;
     const base = config.local[ns];
     return base ? `${base}/${ns}/${path}` : null;
@@ -42,9 +49,16 @@ export function assetUrl(ns, path) {
 export function fetchJson(url) {
     if (!url) return Promise.resolve(null);
     if (!jsonCache.has(url)) {
-        jsonCache.set(url, fetch(url).then(response => (response.ok ? response.json() : null)).catch(() => null));
+        jsonCache.set(url, readArchive(url, 'string').then(text => (text !== undefined ? JSON.parse(text) : fetch(url).then(response => (response.ok ? response.json() : null)))).catch(() => null));
     }
     return jsonCache.get(url);
+}
+
+async function readArchive(url, type) {
+    if (!String(url).startsWith('archive:')) return undefined;
+    const [id, path] = url.slice(8).split('|');
+    const file = archives.get(id) && archives.get(id).file(path);
+    return file ? file.async(type) : null;
 }
 
 function loadImage(url) {
@@ -56,7 +70,8 @@ function loadImage(url) {
             image.decoding = 'async';
             image.onload = () => resolve(image);
             image.onerror = () => resolve(null);
-            image.src = url;
+            if (String(url).startsWith('archive:')) readArchive(url, 'blob').then(blob => { if (blob) image.src = URL.createObjectURL(blob); else resolve(null); });
+            else image.src = url;
         }));
     }
     return imageCache.get(url);

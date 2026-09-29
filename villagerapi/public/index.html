@@ -42,11 +42,12 @@
   <div class="app" data-generator>
     <aside class="sidebar">
       <nav aria-label="Sections">
+          <div class="group"><p>Mods &amp; Datapacks</p><a class="item" href="#mods" data-nav="mods">Loaded Files<em data-count="mods"></em></a></div>
           <div class="group"><p>Pack</p><a class="item" href="#pack" data-nav="pack">Settings</a></div>
           <div class="group"><p>Villagers</p><a class="item" href="#workstations" data-nav="workstations">Workstations<em data-count="workstation"></em></a><a class="item" href="#poi-types" data-nav="poi-types">POI Types<em data-count="poi"></em></a><a class="item" href="#villager-types" data-nav="villager-types">Villager Types<em data-count="type"></em></a><a class="item" href="#professions" data-nav="professions">Professions<em data-count="profession"></em></a></div>
           <div class="group"><p>Trading</p><a class="item" href="#trades" data-nav="trades">Trades<em data-count="trade"></em></a><a class="item" href="#biome-trades" data-nav="biome-trades">Biome Trades<em data-count="biomeTrade"></em></a><a class="item" href="#hero-gifts" data-nav="hero-gifts">Hero Gifts<em data-count="gift"></em></a><a class="item" href="#loot-tables" data-nav="loot-tables">Loot Tables<em data-count="lootTable"></em></a></div>
           <div class="group"><p>World</p><a class="item" href="#explorer-maps" data-nav="explorer-maps">Explorer Maps<em data-count="structureTag"></em></a><a class="item" href="#biome-mappings" data-nav="biome-mappings">Biome Mappings<em data-count="biomeMapping"></em></a><a class="item" href="#village-types" data-nav="village-types">Village Types<em data-count="villageType"></em></a><a class="item" href="#village-houses" data-nav="village-houses">Village Houses<em data-count="villageStructure"></em></a></div>
-          <div class="group"><p>Resources</p><a class="item" href="#mods" data-nav="mods">Mods &amp; Datapacks<em data-count="mods"></em></a><a class="item" href="#tools" data-nav="tools">Structure Tools</a></div>
+          <div class="group"><p>Resources</p><a class="item" href="#tools" data-nav="tools">Structure Tools</a></div>
       </nav>
       <div class="export">
         <div class="segmented" role="radiogroup" aria-label="Minecraft version">
@@ -75,12 +76,6 @@
             <label class="drop"><input type="file" id="pack-icon-upload" accept="image/png"><img alt=""><span>Pack icon</span><button type="button" class="drop-edit" data-action="edit-pack-icon">Edit</button></label>
 
           </div>
-          <div class="field mod-sources" id="mod-sources">
-              <span class="label">Mods and Datapacks</span>
-              <label class="button small file-button">Upload Jars or Zips<input type="file" accept=".jar,.zip" multiple hidden></label>
-              <small>Items, blocks, structures, biomes, tags, villager types and professions inside them are suggested in every matching field. Vanilla IDs are suggested automatically.</small>
-              <ul data-mod-list></ul>
-            </div>
         </section>
 
         <section class="panel" data-panel="workstations">
@@ -170,7 +165,7 @@
 
         <section class="panel" data-panel="mods">
           <div class="panel-head">
-            <div><h1>Mods &amp; Datapacks</h1><p>Add mod jars or datapacks to list their items, blocks, structures, biomes and more in every field.</p></div>
+            <div><h1>Mods &amp; Datapacks</h1><p>Add mod jars, datapacks or villager packs to suggest their items, blocks, structures, biomes, tags, villager types and professions in every matching field.</p></div>
           </div>
           <label class="drop" style="min-height:120px"><input type="file" accept=".jar,.zip" multiple data-registry-upload><span>Add Mod Jars or Datapacks</span><small>.jar or .zip, several at once</small></label>
           <ul class="downloads card" data-registry-sources style="margin-top:12px"></ul>

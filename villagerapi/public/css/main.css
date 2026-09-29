@@ -761,3 +761,20 @@ body > .footer { margin-top: auto; }
 
 .je-recipe-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 150px)); gap: 6px; }
 .je-recipe-grid input { font-size: 12px; }
+
+/* Loaded mod jars and datapacks */
+[data-registry-sources] { list-style: none; padding: 0; display: grid; gap: 12px; }
+[data-registry-sources] .source { display: grid; gap: 10px; padding: 14px 16px; border-radius: 12px; background: var(--surface); box-shadow: 0 0 0 1px var(--hairline) inset; }
+.source-head { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.source-head strong { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.source-head span { color: var(--tertiary); font-size: 12px; margin-right: auto; white-space: nowrap; }
+.source-results { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; max-height: 320px; overflow-y: auto; }
+.source-results:empty { display: none; }
+.source-results li { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 13px; }
+.source-results li code { font-family: var(--mono, monospace); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.source-results li em { margin-left: auto; font-style: normal; font-size: 11px; color: var(--tertiary); white-space: nowrap; }
+.source-results li.empty { color: var(--tertiary); min-height: 0; }
+.source-results .slot { flex: none; }
+.source-results .slot img, .source-results .slot .anim-icon { width: 32px; height: 32px; }
+[data-registry-sources].card { padding: 0; background: none; box-shadow: none; border: 0; }
+[data-registry-sources] > li.source { display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; box-sizing: border-box; border-bottom: 0; }
