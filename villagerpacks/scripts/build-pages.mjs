@@ -1,5 +1,6 @@
 import { readFile, writeFile, mkdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
+import { shareCard } from './og-card.mjs';
 
 const SITE = 'https://villagerpacks.neoterra.dev';
 const GENERATOR = 'https://villagerapi.neoterra.dev';
@@ -121,10 +122,18 @@ function setMeta(html, { pageTitle, description, url, image }) {
 }
 
 async function packImage(publicDir, pack, details) {
-    const card = `img/og/${pack.id}.png`;
-    const hasCard = await readFile(join(publicDir, card)).then(() => true, () => false);
-    if (hasCard) return { url: `${SITE}/${card}`, width: 1200, height: 630, alt: `${pack.name}: ${plural(details.professions.length, 'villager profession')} and ${details.tradeCount} trades for Minecraft ${pack.minecraft}` };
-    return pack.icon ? { url: `${SITE}/${pack.icon}` } : null;
+    const stats = [plural(details.professions.length, 'Profession'), plural(details.tradeCount, 'Trade')];
+    if (pack.types && pack.types.length) stats.push(plural(pack.types.length, 'Villager Type'));
+    const card = await shareCard({
+        name: pack.name,
+        description: pack.description,
+        icon: pack.icon ? join(publicDir, pack.icon) : null,
+        minecraft: pack.minecraft || '26.3',
+        stats
+    });
+    const path = `img/og/${pack.id}.png`;
+    await writeFile(join(publicDir, path), card);
+    return { url: `${SITE}/${path}`, width: 1200, height: 630, alt: `${pack.name}: ${plural(details.professions.length, 'villager profession')} and ${details.tradeCount} trades for Minecraft ${pack.minecraft}` };
 }
 
 export async function buildPages(publicDir, packs) {
@@ -132,6 +141,8 @@ export async function buildPages(publicDir, packs) {
     const outDir = join(publicDir, 'pack');
     await rm(outDir, { recursive: true, force: true });
     await mkdir(outDir, { recursive: true });
+    await rm(join(publicDir, 'img', 'og'), { recursive: true, force: true });
+    await mkdir(join(publicDir, 'img', 'og'), { recursive: true });
 
     const urls = [SITE + '/'];
     const summaries = [];

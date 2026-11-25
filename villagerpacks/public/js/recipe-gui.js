@@ -107,6 +107,10 @@ export function createRecipeViewer({ dialog, names, packPath, mcmeta, fuels = []
     let index = 0;
     let item = null;
     let token = 0;
+    let states = [];
+    let wheel = 0;
+    let hovered = null;
+    const touch = window.matchMedia('(hover: none)');
 
     function resolveItems(ingredient) {
         if (Array.isArray(ingredient)) return Promise.all(ingredient.map(resolveItems)).then(lists => [...new Set(lists.flat())]);
@@ -117,7 +121,7 @@ export function createRecipeViewer({ dialog, names, packPath, mcmeta, fuels = []
             const { ns, path } = splitId(ingredient.slice(1));
             tagCache.set(ingredient, fetchJson(ns === 'minecraft' ? `${mcmeta}/minecraft/tags/item/${path}.json` : `${packPath}/data/${ns}/tags/item/${path}.json`)
                 .then(tag => Promise.all((tag && tag.values || []).map(value => resolveItems(typeof value === 'object' ? value.id : value))))
-                .then(lists => [...new Set(lists.flat())].slice(0, 24)));
+                .then(lists => [...new Set(lists.flat())].slice(0, 512)));
         }
         return tagCache.get(ingredient);
     }
@@ -165,6 +169,22 @@ export function createRecipeViewer({ dialog, names, packPath, mcmeta, fuels = []
         return paint(element);
     }
 
+    function addTipLine(element, text) {
+        let data;
+        try { data = JSON.parse(element.getAttribute('data-tip')); } catch (error) { data = null; }
+        if (!data) return;
+        if (typeof data === 'string') data = { name: data, color: 'white', lines: [] };
+        data.lines = [...(data.lines || []), { text, color: 'dark_gray' }];
+        element.setAttribute('data-tip', JSON.stringify(data));
+    }
+
+    function showOption(state) {
+        const stack = state.options[state.index];
+        const promise = fill(state.element, stack);
+        if (state.options.length > 1) addTipLine(state.element.firstElementChild, `${state.index + 1} of ${state.options.length} · ${touch.matches ? 'Tap' : 'Scroll'} to browse`);
+        return promise.then(() => ready.add(keyOf(stack)));
+    }
+
     function warm(stack) {
         const key = keyOf(stack);
         if (ready.has(key) || broken.has(key)) return;
@@ -193,22 +213,24 @@ export function createRecipeViewer({ dialog, names, packPath, mcmeta, fuels = []
         fill(host.querySelector('[data-result]'), result, Number(result.count || 1));
         const choice = host.querySelector('[data-choice]');
         if (choice) fill(choice, result);
-        const states = found.cells.map((options, i) => {
+        states = found.cells.map((options, i) => {
             const target = host.querySelector(`[data-cell="${i}"]`);
             if (!target || !options || !options.length) return null;
-            fill(target, options[0]).then(() => ready.add(keyOf(options[0])));
-            return { options, index: 0, element: target };
+            const state = { options, index: 0, element: target, lazy: options.length > 24 };
+            showOption(state);
+            return state;
         });
         const fuelSlot = host.querySelector('[data-fuel]');
         if (fuelSlot && found.fuel && found.fuel.length) {
-            fill(fuelSlot, found.fuel[0]).then(() => ready.add(keyOf(found.fuel[0])));
-            states.push({ options: found.fuel, index: 0, element: fuelSlot, lazy: true });
+            const state = { options: found.fuel, index: 0, element: fuelSlot, lazy: true };
+            showOption(state);
+            states.push(state);
         }
         const ahead = state => [1, 2, 3].forEach(step => warm(state.options[(state.index + step) % state.options.length]));
         states.forEach(state => { if (state && state.options.length > 1) state.lazy ? ahead(state) : state.options.slice(1).forEach(warm); });
         timer = setInterval(() => {
             for (const state of states) {
-                if (!state || state.options.length < 2) continue;
+                if (!state || state.options.length < 2 || state.element === hovered) continue;
                 let next = (state.index + 1) % state.options.length;
                 while (broken.has(keyOf(state.options[next])) && next !== state.index) next = (next + 1) % state.options.length;
                 if (!state.lazy) {
@@ -217,7 +239,7 @@ export function createRecipeViewer({ dialog, names, packPath, mcmeta, fuels = []
                 }
                 if (ready.has(keyOf(state.options[next])) && next !== state.index) {
                     state.index = next;
-                    if (dialog.open) fill(state.element, state.options[next]);
+                    if (dialog.open) showOption(state);
                 }
                 if (state.lazy) ahead(state);
             }
@@ -248,6 +270,42 @@ export function createRecipeViewer({ dialog, names, packPath, mcmeta, fuels = []
         }
     });
     dialog.addEventListener('close', () => clearInterval(timer));
+
+    host.addEventListener('pointerover', event => { hovered = event.target.closest('.mc-gui-slot'); });
+    host.addEventListener('pointerleave', () => { hovered = null; });
+
+    const stateAt = target => {
+        const cell = target.closest('.mc-gui-slot');
+        const state = cell && states.find(entry => entry && entry.element === cell);
+        return state && state.options.length > 1 ? state : null;
+    };
+
+    host.addEventListener('click', event => {
+        const state = event.pointerType === 'touch' || touch.matches ? stateAt(event.target) : null;
+        if (state) browse(state, 1, event);
+    });
+
+    host.addEventListener('wheel', event => {
+        const state = stateAt(event.target);
+        if (!state) return;
+        event.preventDefault();
+        wheel += event.deltaY || event.deltaX;
+        if (Math.abs(wheel) < 30) return;
+        const step = Math.sign(wheel);
+        wheel = 0;
+        browse(state, step, event);
+    }, { passive: false });
+
+    function browse(state, step, event) {
+        const count = state.options.length;
+        let next = (state.index + step + count) % count;
+        while (broken.has(keyOf(state.options[next])) && next !== state.index) next = (next + step + count) % count;
+        state.index = next;
+        showOption(state);
+        if (state.lazy) [1, 2, 3].forEach(ahead => warm(state.options[(next + ahead * step + count * 3) % count]));
+        const shown = state.element.firstElementChild;
+        if (shown) shown.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, clientX: event.clientX, clientY: event.clientY, pointerType: 'mouse' }));
+    }
 
     return {
         resolveItems,
