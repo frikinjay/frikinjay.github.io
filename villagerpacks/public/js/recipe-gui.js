@@ -1,4 +1,4 @@
-import { fetchJson, renderIcon, splitId, assetUrl } from './mc-assets.js';
+import { fetchJson, renderIcon, splitId } from './mc-assets.js';
 import { describeStack, slot, paint } from './trades.js';
 
 const FURNACE = (texture, title) => ({ texture, title, centred: true, inputs: [[56, 17]], fuel: [56, 53], result: [116, 35], flame: [56, 36], arrow: [79, 34] });
@@ -17,7 +17,7 @@ const GUIS = {
 const COOKING = { smelting: 200, blasting: 100, smoking: 100, campfire_cooking: 600 };
 
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const sprite = path => assetUrl('minecraft', `textures/gui/${path}.png`);
+const sprite = path => new URL(`../img/gui/${path}.png`, import.meta.url).href;
 const at = ([x, y]) => `left:calc(${x}px * var(--s));top:calc(${y}px * var(--s))`;
 const keyOf = stack => (stack.components ? JSON.stringify(stack) : stack.id);
 const full = id => (String(id).includes(':') ? String(id) : 'minecraft:' + id);
@@ -56,6 +56,32 @@ function craftingCells(recipe, type) {
         place(Object.entries(recipe).filter(([key, value]) => !skip.has(key) && (typeof value === 'string' || Array.isArray(value) || (value && (value.item || value.tag)))).map(([, value]) => value));
     }
     return cells;
+}
+
+const tagTitle = tag => tag.split(':').pop().split('/').pop().split('_').map(word => word[0].toUpperCase() + word.slice(1)).join(' ');
+
+function ingredientRefs(recipe, type) {
+    if (type.startsWith('smithing')) return [recipe.base, recipe.addition];
+    if (recipe.pattern && recipe.key) return [...new Set(recipe.pattern.join('').replace(/ /g, ''))].map(key => recipe.key[key]);
+    if (recipe.ingredients) return recipe.ingredients;
+    if (recipe.ingredient) return [recipe.ingredient];
+    if (recipe.reagent) return [recipe.reagent];
+    return [];
+}
+
+function variantLabel(recipe, item, names) {
+    const type = String(recipe.type || '').replace('minecraft:', '');
+    if (type === 'crafting_decorated_pot') return 'With Sherds';
+    if (full(item) === 'minecraft:decorated_pot') return 'Plain';
+    const name = ref => {
+        if (Array.isArray(ref)) return ref.length ? name(ref[0]) : null;
+        if (ref && typeof ref === 'object') return name(ref.item || ref.id || (ref.tag ? '#' + ref.tag : null));
+        if (typeof ref !== 'string') return null;
+        return ref.startsWith('#') ? `Any ${tagTitle(ref.slice(1))}` : names.item(full(ref));
+    };
+    const parts = [...new Set(ingredientRefs(recipe, type).map(name).filter(Boolean))];
+    if (!parts.length) return '';
+    return 'From ' + (parts.length > 2 ? `${parts.slice(0, 2).join(', ')} and More` : parts.join(' and '));
 }
 
 function potionStack(entry) {
@@ -114,6 +140,14 @@ export function createRecipeViewer({ dialog, names, packPath, mcmeta, fuels = []
         }
         if (type === 'crafting_special_repairitem') return null;
         const cells = await Promise.all(craftingCells(recipe, type).map(stacks));
+        if (type === 'crafting_decorated_pot') {
+            cells.forEach((options, i) => {
+                if (!options || options.length < 2) return;
+                const sherds = options.filter(stack => stack.id !== 'minecraft:brick');
+                const shift = Math.floor(i / 2) % Math.max(1, sherds.length);
+                cells[i] = [...sherds.slice(shift), ...sherds.slice(0, shift), ...options.filter(stack => stack.id === 'minecraft:brick')];
+            });
+        }
         return { type, gui: GUIS.crafting, cells, result };
     }
 
@@ -194,10 +228,13 @@ export function createRecipeViewer({ dialog, names, packPath, mcmeta, fuels = []
         clearInterval(timer);
         const mine = ++token;
         if (nav) nav.hidden = sources.length < 2;
-        if (page) page.textContent = `${index + 1} of ${sources.length}`;
         const recipe = sources.length ? await sources[index]() : null;
         const found = recipe ? await layout(recipe) : null;
         if (mine !== token) return;
+        if (page) {
+            const label = recipe && sources.length > 1 ? variantLabel(recipe, item, names) : '';
+            page.replaceChildren(...(label ? [Object.assign(document.createElement('b'), { textContent: label })] : []), Object.assign(document.createElement('small'), { textContent: `${index + 1} of ${sources.length}` }));
+        }
         missing.hidden = !!found;
         draw(found || { gui: GUIS.crafting, cells: [], result: { id: item } });
     }

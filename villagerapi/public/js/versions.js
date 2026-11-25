@@ -15,7 +15,7 @@ const MODERN_DOCS = 'https://github.com/frikinjay/villagerapi/blob/main/DOCUMENT
 const VillagerPackVersions = {
     '26.4': {
         id: '26.4',
-        label: '26.4 snapshot',
+        label: '26.4 Snapshot',
         game: '26.4-snapshot-9',
         registries: '26.4-snapshot-9',
         assets: '26.3',
@@ -127,6 +127,23 @@ function currentVillagerPackVersion() {
     const picker = document.querySelector('[name="mc-version"]');
     return VillagerPackVersions[picker && picker.value] || VillagerPackVersions[DEFAULT_VERSION];
 }
+
+const VERSION_KEY = 'villagerapi-mc-version';
+
+(function restoreVersion() {
+    const picker = document.querySelector('[name="mc-version"]');
+    if (!picker) return;
+    let saved = null;
+    try { saved = localStorage.getItem(VERSION_KEY); } catch (error) { }
+    if (saved && VillagerPackVersions[saved] && [...picker.options].some(option => option.value === saved)) {
+        picker.value = saved;
+        if (picker._ts) picker._ts.sync();
+    }
+    document.addEventListener('change', event => {
+        if (event.target !== picker) return;
+        try { localStorage.setItem(VERSION_KEY, picker.value); } catch (error) { }
+    });
+})();
 
 window.VillagerPackVersions = VillagerPackVersions;
 window.currentVillagerPackVersion = currentVillagerPackVersion;

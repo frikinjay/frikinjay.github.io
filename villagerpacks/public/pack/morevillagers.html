@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <base href="/">
+  <meta name="darkreader-lock">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>More Villagers: 10 New Minecraft Villager Professions</title>
   <meta name="description" content="More Villagers adds 10 new villager professions to Minecraft 26.3: Enderologist, Engineer, Explorer and 7 more. See all 264 trades and workstations.">
@@ -12,8 +13,11 @@
   <meta property="og:url" content="https://villagerpacks.neoterra.dev/pack/morevillagers">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Villager Packs">
-  <meta property="og:image" content="https://villagerpacks.neoterra.dev/packs/morevillagers/pack.png">
-  <meta name="twitter:card" content="summary">
+  <meta property="og:image" content="https://villagerpacks.neoterra.dev/img/og/morevillagers.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="More Villagers: 10 villager professions and 264 trades for Minecraft 26.3">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
   <link rel="icon" type="image/png" href="./favicon.png">
@@ -30,7 +34,8 @@
   <script src="./js/ui-controls.js" defer></script>
   <link rel="modulepreload" href="./js/mc-assets.js">
   <script src="./js/pack.js" type="module"></script>
-  <style>#loader{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:#fbfbfd;color:#1d1d1f;font:20px/1 "Minecraft Seven",system-ui,sans-serif;letter-spacing:.12em}@media(prefers-color-scheme:dark){#loader{background:#000;color:#f5f5f7}}</style>
+  <style>@font-face{font-family:"Loader Seven";src:url("/fonts/MinecraftSeven2.woff2") format("woff2");font-display:block;size-adjust:50%}#loader{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:#fbfbfd;color:#1d1d1f;font:20px/1 "Loader Seven",system-ui,sans-serif;letter-spacing:.12em}@media(prefers-color-scheme:dark){#loader{background:#000;color:#f5f5f7}}</style>
+  <noscript><style>#loader{display:none}html.is-loading{overflow:auto}</style></noscript>
   <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"CreativeWork","@id":"https://villagerpacks.neoterra.dev/pack/morevillagers#pack","name":"More Villagers","headline":"More Villagers: 10 New Minecraft Villager Professions","description":"More Villagers adds 10 new villager professions to Minecraft 26.3: Enderologist, Engineer, Explorer and 7 more. See all 264 trades and workstations.","url":"https://villagerpacks.neoterra.dev/pack/morevillagers","version":"1.26.11.2","image":"https://villagerpacks.neoterra.dev/packs/morevillagers/pack.png","author":{"@type":"Person","name":"frikinjay"},"genre":"Minecraft villager pack","keywords":"Minecraft villagers, custom villager trades, villager professions, VillagerAPI, More Villagers","about":{"@type":"VideoGame","name":"Minecraft"},"isPartOf":{"@type":"WebSite","name":"Villager Packs","url":"https://villagerpacks.neoterra.dev/"}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Villager Packs","item":"https://villagerpacks.neoterra.dev/"},{"@type":"ListItem","position":2,"name":"More Villagers","item":"https://villagerpacks.neoterra.dev/pack/morevillagers"}]}]}</script>
 </head>
 <body data-pack="morevillagers">
@@ -65,7 +70,7 @@
       </section>
 
       <section data-panel="professions" hidden>
-        <label class="type-picker"><span>Villager type</span><select id="type-select"></select></label>
+        <label class="type-picker"><span>Villager Type</span><select id="type-select"></select></label>
         <div class="villager-grid" id="professions-list"></div>
       </section>
 
@@ -81,143 +86,6 @@
         <div id="professions">
           <p class="no-results" id="no-results" hidden>No results</p>
         </div>
-      </section>
-
-      <section class="pack-text prose" aria-labelledby="pack-about">
-        <h2 id="pack-about">About More Villagers</h2>
-        <p>More Villagers is a villager pack for <a href="https://modrinth.com/mod/villagerapi">VillagerAPI</a> on Minecraft 26.3 with Fabric or NeoForge. It adds 10 villager professions, 1 villager type and 264 custom villager trades, plus new village houses for Badlands, Desert, Plains, Savanna, Snowy and Taiga villages. Every profession has its own workstation, so unemployed villagers pick up the new jobs just like vanilla ones.</p>
-        <h3>Villager professions</h3>
-        <ul class="pack-facts">
-            <li><b>Enderologist</b> works at the Purpur Altar and has 25 trades across 5 levels.</li>
-            <li><b>Engineer</b> works at the Blueprint Table and has 24 trades across 5 levels.</li>
-            <li><b>Explorer</b> works at the Decorated Pot and has 21 trades across 5 levels.</li>
-            <li><b>Florist</b> works at the Gardening Table and has 34 trades across 5 levels.</li>
-            <li><b>Hunter</b> works at the Hunting Post and has 24 trades across 5 levels.</li>
-            <li><b>Iceman</b> works at the Chiller and has 22 trades across 5 levels.</li>
-            <li><b>Miner</b> works at the Mining Bench and has 25 trades across 5 levels.</li>
-            <li><b>Netherologist</b> works at the Decayed Workbench and has 26 trades across 5 levels.</li>
-            <li><b>Oceanographer</b> works at the Oceanography Table and has 28 trades across 5 levels.</li>
-            <li><b>Forester</b> works at the Forestry Bench and has 35 trades across 5 levels.</li>
-        </ul>
-        <h3>Villager types</h3>
-        <ul class="pack-facts">
-            <li><b>Badlands</b> villagers live in Badlands, Wooded Badlands and Eroded Badlands.</li>
-        </ul>
-        <h3>Make your own</h3>
-        <p>Want different trades or another profession? Load this pack, or the mod jar it comes in, into the <a href="https://villagerapi.neoterra.dev/">villager pack generator</a>, change anything and download your own pack. No code needed.</p>
-        <details class="trade-list">
-          <summary>All 264 More Villagers trades</summary>
-          <h4>Enderologist</h4>
-          <p class="trade-level">Level 1 · Novice · offers 2 of these 5</p>
-          <ul><li>24 End Stone for 1 Emerald</li><li>4 Emeralds for 3 End Rods</li><li>16 Chorus Fruit for 1 Emerald</li><li>1 Emerald for 2 Obsidian</li><li>1 Emerald for 4 End Stone Bricks</li></ul>
-          <p class="trade-level">Level 2 · Apprentice · offers 2 of these 5</p>
-          <ul><li>20 Popped Chorus Fruit for 1 Emerald</li><li>5 Emeralds for 1 Phantom Membrane</li><li>3 Phantom Membranes for 1 Emerald</li><li>4 Emeralds for 1 Potion of Slow Falling</li><li>1 Emerald for 4 Purpur Blocks</li></ul>
-          <p class="trade-level">Level 3 · Journeyman · offers 2 of these 5</p>
-          <ul><li>4 Ender Pearls for 1 Emerald</li><li>3 Emeralds for 8 Firework Rockets</li><li>6 Emeralds for 1 Ender Eye</li><li>4 Emeralds for 1 Chorus Flower</li><li>8 End Rods for 1 Emerald</li></ul>
-          <p class="trade-level">Level 4 · Expert · offers 2 of these 5</p>
-          <ul><li>6 Emeralds for 2 Dragon Breath</li><li>14 Emeralds for 1 End City Explorer Map</li><li>1 Shulker Shell for 4 Emeralds</li><li>8 Emeralds for 1 Ender Chest</li><li>3 Dragon Breath for 1 Emerald</li></ul>
-          <p class="trade-level">Level 5 · Master · offers 2 of these 5</p>
-          <ul><li>8 Emeralds + 1 Ender Pearl for 2 Ender Pearls</li><li>64 Emeralds + 1 Skeleton Skull for 1 Dragon Head</li><li>20 Emeralds for 1 Enchanted Book (Feather Falling IV)</li><li>16 Emeralds for 1 Enchanted Book (Unbreaking III)</li><li>26 Emeralds + 8 Diamonds for 1 Spire Armor Trim Smithing Template</li></ul>
-          <h4>Engineer</h4>
-          <p class="trade-level">Level 1 · Novice · offers 2 of these 5</p>
-          <ul><li>20 Redstone for 1 Emerald</li><li>4 Emeralds for 3 Repeaters</li><li>12 Copper Ingots for 1 Emerald</li><li>1 Emerald for 4 Redstone Torches</li><li>1 Emerald for 4 Levers</li></ul>
-          <p class="trade-level">Level 2 · Apprentice · offers 2 of these 5</p>
-          <ul><li>12 Redstone Torches for 1 Emerald</li><li>3 Emeralds for 3 Droppers</li><li>4 Emeralds for 1 Dispenser</li><li>4 Iron Ingots for 1 Emerald</li><li>1 Emerald for 2 Tripwire Hooks</li></ul>
-          <p class="trade-level">Level 3 · Journeyman · offers 2 of these 5</p>
-          <ul><li>4 Redstone Lamps for 1 Emerald</li><li>4 Emeralds for 1 Observer</li><li>5 Emeralds for 1 Comparator</li><li>8 Tripwire Hooks for 1 Emerald</li><li>1 Emerald for 1 Redstone Block</li></ul>
-          <p class="trade-level">Level 4 · Expert · offers 2 of these 5</p>
-          <ul><li>5 Emeralds for 1 Piston</li><li>6 Emeralds for 1 Sticky Piston</li><li>6 Emeralds for 1 Crafter</li><li>2 Emeralds for 1 Copper Bulb</li><li>6 Emeralds for 1 Sculk Sensor</li></ul>
-          <p class="trade-level">Level 5 · Master · offers 2 of these 4</p>
-          <ul><li>5 Emeralds for 2 Daylight Detectors</li><li>7 Emeralds for 1 Hopper</li><li>8 Emeralds for 1 Calibrated Sculk Sensor</li><li>9 Emeralds for 1 Hopper Minecart</li></ul>
-          <h4>Explorer</h4>
-          <p class="trade-level">Level 1 · Novice · offers 2 of these 4</p>
-          <ul><li>6 Maps for 1 Emerald</li><li>24 Emeralds + 1 Map for 1 Trail Ruins Explorer Map</li><li>1 Compass for 1 Emerald</li><li>1 Emerald for 6 Bread</li></ul>
-          <p class="trade-level">Level 2 · Apprentice · offers 2 of these 5</p>
-          <ul><li>24 Paper for 1 Emerald</li><li>8 Emeralds + 1 Compass for 1 Recovery Compass</li><li>6 Leather for 1 Emerald</li><li>4 Emeralds for 1 Clock</li><li>6 Emeralds for 1 Saddle</li></ul>
-          <p class="trade-level">Level 3 · Journeyman · offers 2 of these 4</p>
-          <ul><li>18 Emeralds for 1 Spyglass</li><li>28 Emeralds for 1 Enchanted Diamond Boots (Feather Falling IV, Depth Strider III)</li><li>12 Emeralds + 1 Map for 1 Desert Pyramid Explorer Map</li><li>4 Emeralds for 1 Potion of Swiftness</li></ul>
-          <p class="trade-level">Level 4 · Expert · offers 2 of these 4</p>
-          <ul><li>38 Emeralds + 1 Map for 1 Trial Chambers Explorer Map</li><li>1 Trial Key for 12 Emeralds</li><li>4 Emeralds for 8 Wind Charges</li><li>16 Emeralds + 1 Map for 1 Woodland Mansion Explorer Map</li></ul>
-          <p class="trade-level">Level 5 · Master · offers 2 of these 4</p>
-          <ul><li>48 Emeralds + 2 Ender Pearls for 1 Shulker Box</li><li>48 Emeralds + 1 Map for 1 Ancient City Explorer Map</li><li>20 Emeralds + 1 Map for 1 Buried Treasure Map</li><li>1 Ominous Trial Key for 32 Emeralds</li></ul>
-          <h4>Florist</h4>
-          <p class="trade-level">Level 1 · Novice · offers 2 of these 7</p>
-          <ul><li>3 Flower Pots for 1 Emerald</li><li>3 Emeralds for 1 Honeycomb</li><li>16 Poppies for 1 Emerald</li><li>1 Emerald for 8 Bone Meal</li><li>1 Emerald for 1 Blue Orchid</li><li>1 Emerald for 4 Wildflowers</li><li>1 Emerald for 2 Cactus Flowers</li></ul>
-          <p class="trade-level">Level 2 · Apprentice · offers 2 of these 7</p>
-          <ul><li>24 Vines for 1 Emerald</li><li>1 Emerald for 2 Glow Berries</li><li>12 Sunflowers for 1 Emerald</li><li>1 Emerald for 4 Lily Pads</li><li>2 Emeralds for 1 Flowering Azalea</li><li>1 Emerald for 4 Pale Hanging Moss</li><li>1 Emerald for 2 Red Shrubs</li></ul>
-          <p class="trade-level">Level 3 · Journeyman · offers 2 of these 8</p>
-          <ul><li>1 Emerald for 2 Small Dripleaf</li><li>6 Emeralds for 1 Honey Bottle</li><li>4 Honeycombs for 1 Emerald</li><li>2 Emeralds for 1 Big Dripleaf</li><li>1 Emerald for 4 Moss Blocks</li><li>2 Emeralds for 1 Firefly Bush</li><li>1 Emerald for 4 Pale Moss Blocks</li><li>1 Emerald for 2 Shelf Mushrooms</li></ul>
-          <p class="trade-level">Level 4 · Expert · offers 2 of these 7</p>
-          <ul><li>32 Moss Blocks for 1 Emerald</li><li>13 Emeralds for 1 Swamp Explorer Map</li><li>8 Emeralds for 1 Spore Blossom</li><li>6 Emeralds for 1 Pitcher Pod</li><li>6 Emeralds for 1 Torchflower Seeds</li><li>2 Honey Bottles for 1 Emerald</li><li>4 Emeralds for 1 Open Eyeblossom</li></ul>
-          <p class="trade-level">Level 5 · Master · offers 2 of these 5</p>
-          <ul><li>6 Emeralds for 1 Bee Nest</li><li>15 Emeralds for 1 Jungle Explorer Map</li><li>1 Torchflower for 1 Emerald</li><li>1 Pitcher Plant for 1 Emerald</li><li>24 Emeralds + 4 Diamonds for 1 Sniffer Egg</li></ul>
-          <h4>Hunter</h4>
-          <p class="trade-level">Level 1 · Novice · offers 2 of these 5</p>
-          <ul><li>32 Bones for 1 Emerald</li><li>5 Emeralds for 2 Slime Balls</li><li>32 Rotten Flesh for 1 Emerald</li><li>18 String for 1 Emerald</li><li>1 Emerald for 16 Arrows</li></ul>
-          <p class="trade-level">Level 2 · Apprentice · offers 2 of these 5</p>
-          <ul><li>24 Spider Eyes for 1 Emerald</li><li>5 Emeralds for 1 Fermented Spider Eye</li><li>24 Feathers for 1 Emerald</li><li>3 Emeralds for 1 Crossbow</li><li>2 Emeralds for 4 Spectral Arrows</li></ul>
-          <p class="trade-level">Level 3 · Journeyman · offers 2 of these 5</p>
-          <ul><li>20 Gunpowder for 1 Emerald</li><li>5 Emeralds for 1 Magma Cream</li><li>2 Rabbit Feet for 1 Emerald</li><li>2 Emeralds for 1 Lead</li><li>8 Emeralds for 1 Enchanted Bow (Power III)</li></ul>
-          <p class="trade-level">Level 4 · Expert · offers 2 of these 5</p>
-          <ul><li>5 Emeralds for 1 Blaze Rod</li><li>13 Emeralds for 1 Outpost Explorer Map</li><li>1 Ghast Tear for 2 Emeralds</li><li>2 Emeralds + 8 Arrows for 8 Arrows of Poison</li><li>2 Emeralds + 8 Arrows for 8 Arrows of Slowness</li></ul>
-          <p class="trade-level">Level 5 · Master · offers 2 of these 4</p>
-          <ul><li>8 Emeralds for 1 Ghast Tear</li><li>8 Emeralds for 1 Rabbit Foot</li><li>24 Emeralds + 1 Diamond Sword for 1 Enchanted Diamond Sword (Sharpness IV, Looting II)</li><li>20 Emeralds for 1 Enchanted Book (Looting III)</li></ul>
-          <h4>Iceman</h4>
-          <p class="trade-level">Level 1 · Novice · offers 2 of these 4</p>
-          <ul><li>5 Spruce Logs for 1 Emerald</li><li>1 Emerald for 8 Ice</li><li>14 Snowballs for 1 Emerald</li><li>3 Emeralds for 1 Leather Boots</li></ul>
-          <p class="trade-level">Level 2 · Apprentice · offers 2 of these 4</p>
-          <ul><li>3 Ferns for 1 Emerald</li><li>1 Powder Snow Bucket for 1 Emerald</li><li>12 Sweet Berries for 1 Emerald</li><li>2 Emeralds for 1 Campfire</li></ul>
-          <p class="trade-level">Level 3 · Journeyman · offers 2 of these 4</p>
-          <ul><li>6 Snow Blocks for 1 Emerald</li><li>4 Emeralds for 4 Packed Ice</li><li>10 Emeralds for 1 Igloo Explorer Map</li><li>15 Cod for 1 Emerald</li></ul>
-          <p class="trade-level">Level 4 · Expert · offers 2 of these 5</p>
-          <ul><li>18 Red Wool for 1 Emerald</li><li>24 Emeralds for 2 Rabbit Hides</li><li>2 Blue Ice for 1 Emerald</li><li>6 Emeralds for 1 Goat Horn (Ponder)</li><li>16 Emeralds for 1 Enchanted Book (Frost Walker II)</li></ul>
-          <p class="trade-level">Level 5 · Master · offers 2 of these 5</p>
-          <ul><li>12 Emeralds for 1 Diamond Shovel</li><li>25 Emeralds for 2 Christmas Chests</li><li>8 Emeralds for 4 Blue Ice</li><li>18 Emeralds + 1 Diamond Shovel for 1 Enchanted Diamond Shovel (Silk Touch I, Efficiency III)</li><li>20 Emeralds + 1 Diamond Boots for 1 Enchanted Diamond Boots (Frost Walker II, Unbreaking III)</li></ul>
-          <h4>Miner</h4>
-          <p class="trade-level">Level 1 · Novice · offers 2 of these 5</p>
-          <ul><li>20 Deepslate for 1 Emerald</li><li>1 Emerald for 5 Calcite</li><li>32 Cobblestone for 1 Emerald</li><li>24 Tuff for 1 Emerald</li><li>1 Emerald for 16 Torches</li></ul>
-          <p class="trade-level">Level 2 · Apprentice · offers 2 of these 5</p>
-          <ul><li>15 Raw Copper for 1 Emerald</li><li>12 Raw Iron for 1 Emerald</li><li>15 Coal for 1 Emerald</li><li>26 Flint for 1 Emerald</li><li>2 Emeralds for 1 Iron Pickaxe</li></ul>
-          <p class="trade-level">Level 3 · Journeyman · offers 2 of these 5</p>
-          <ul><li>10 Raw Gold for 1 Emerald</li><li>1 Emerald for 2 Amethyst Shards</li><li>12 Lapis Lazuli for 1 Emerald</li><li>3 Emeralds for 16 Rails</li><li>2 Emeralds for 1 Minecart</li></ul>
-          <p class="trade-level">Level 4 · Expert · offers 2 of these 5</p>
-          <ul><li>50 Torches for 1 Emerald</li><li>13 Emeralds for 1 Mineshaft Explorer Map</li><li>1 Diamond for 1 Emerald</li><li>4 Emeralds for 1 Potion of Night Vision</li><li>4 Emeralds for 6 Powered Rails</li></ul>
-          <p class="trade-level">Level 5 · Master · offers 2 of these 5</p>
-          <ul><li>12 Emeralds for 1 Diamond Pickaxe</li><li>15 Emeralds for 1 Ancient City Explorer Map</li><li>24 Emeralds + 1 Diamond Pickaxe for 1 Enchanted Diamond Pickaxe (Efficiency IV, Fortune II, Unbreaking III)</li><li>20 Emeralds + 1 Diamond Pickaxe for 1 Enchanted Diamond Pickaxe (Silk Touch I, Efficiency III)</li><li>1 Echo Shard for 12 Diamonds</li></ul>
-          <h4>Netherologist</h4>
-          <p class="trade-level">Level 1 · Novice · offers 2 of these 5</p>
-          <ul><li>24 Basalt for 1 Emerald</li><li>1 Emerald for 10 Nether Bricks</li><li>32 Netherrack for 1 Emerald</li><li>20 Soul Sand for 1 Emerald</li><li>1 Emerald for 1 Soul Lantern</li></ul>
-          <p class="trade-level">Level 2 · Apprentice · offers 2 of these 6</p>
-          <ul><li>24 Blackstone for 1 Emerald</li><li>4 Emeralds for 1 Nether Quartz Ore</li><li>16 Quartz for 1 Emerald</li><li>1 Emerald for 4 Magma Blocks</li><li>3 Emeralds for 1 Glowstone</li><li>2 Emeralds for 1 Warped Fungus on a Stick</li></ul>
-          <p class="trade-level">Level 3 · Journeyman · offers 2 of these 5</p>
-          <ul><li>4 Obsidian for 1 Emerald</li><li>13 Emeralds for 1 Fortress Explorer Map</li><li>22 Nether Wart for 1 Emerald</li><li>4 Emeralds for 1 Potion of Fire Resistance</li><li>2 Emeralds for 3 Fire Charges</li></ul>
-          <p class="trade-level">Level 4 · Expert · offers 2 of these 5</p>
-          <ul><li>4 Gold Ingots for 1 Emerald</li><li>14 Emeralds for 1 Bastion Explorer Map</li><li>2 Blaze Rods for 1 Emerald</li><li>1 Ghast Tear for 8 Emeralds</li><li>3 Emeralds for 1 Crying Obsidian</li></ul>
-          <p class="trade-level">Level 5 · Master · offers 2 of these 5</p>
-          <ul><li>20 Emeralds for 1 Music Disc Pigstep</li><li>24 Emeralds for 1 Enchanted Book (Fire Protection IV)</li><li>24 Emeralds + 1 Diamond Sword for 1 Enchanted Diamond Sword (Fire Aspect II, Unbreaking III)</li><li>1 Wither Skeleton Skull for 16 Emeralds</li><li>24 Emeralds for 1 Piglin Head</li></ul>
-          <h4>Oceanographer</h4>
-          <p class="trade-level">Level 1 · Novice · offers 2 of these 6</p>
-          <ul><li>14 Prismarine for 1 Emerald</li><li>6 Emeralds for 1 Sea Lantern</li><li>32 Kelp for 1 Emerald</li><li>24 Seagrass for 1 Emerald</li><li>1 Emerald for 1 Fishing Rod</li><li>1 Emerald for 12 Dried Kelp</li></ul>
-          <p class="trade-level">Level 2 · Apprentice · offers 2 of these 6</p>
-          <ul><li>14 Prismarine Bricks for 1 Emerald</li><li>20 Emeralds for 1 Sponge</li><li>15 Cod for 1 Emerald</li><li>13 Salmon for 1 Emerald</li><li>1 Emerald for 4 Prismarine Shards</li><li>3 Emeralds for 1 Tropical Fish Bucket</li></ul>
-          <p class="trade-level">Level 3 · Journeyman · offers 2 of these 6</p>
-          <ul><li>12 Dark Prismarine for 1 Emerald</li><li>13 Emeralds for 1 Shipwreck Explorer Map</li><li>6 Tropical Fish for 1 Emerald</li><li>4 Pufferfish for 1 Emerald</li><li>5 Emeralds for 1 Potion of Water Breathing</li><li>2 Emeralds for 3 Prismarine Crystals</li></ul>
-          <p class="trade-level">Level 4 · Expert · offers 2 of these 5</p>
-          <ul><li>3 Emeralds for 1 Nautilus Shell</li><li>32 Emeralds for 1 Heart of the Sea</li><li>14 Emeralds for 1 Ocean Monument Explorer Map</li><li>1 Nautilus Shell for 1 Emerald</li><li>3 Emeralds for 1 Turtle Scute</li></ul>
-          <p class="trade-level">Level 5 · Master · offers 2 of these 5</p>
-          <ul><li>64 Emeralds for 1 Trident</li><li>18 Emeralds for 1 Enchanted Book (Respiration III)</li><li>22 Emeralds for 1 Enchanted Book (Depth Strider III)</li><li>20 Emeralds + 1 Trident for 1 Enchanted Trident (Loyalty III, Unbreaking III)</li><li>1 Trident for 48 Emeralds</li></ul>
-          <h4>Forester</h4>
-          <p class="trade-level">Level 1 · Novice · offers 2 of these 6</p>
-          <ul><li>6 Oak Saplings for 1 Emerald</li><li>1 Emerald for 1 Oak Log</li><li>6 Birch Saplings for 1 Emerald</li><li>1 Emerald for 1 Birch Log</li><li>32 Sticks for 1 Emerald</li><li>1 Emerald for 1 Stone Axe</li></ul>
-          <p class="trade-level">Level 2 · Apprentice · offers 2 of these 6</p>
-          <ul><li>6 Spruce Saplings for 1 Emerald</li><li>1 Emerald for 1 Spruce Log</li><li>6 Dark Oak Saplings for 1 Emerald</li><li>1 Emerald for 1 Dark Oak Log</li><li>15 Charcoal for 1 Emerald</li><li>3 Emeralds for 1 Iron Axe</li></ul>
-          <p class="trade-level">Level 3 · Journeyman · offers 2 of these 9</p>
-          <ul><li>6 Acacia Saplings for 1 Emerald</li><li>1 Emerald for 1 Acacia Log</li><li>6 Jungle Saplings for 1 Emerald</li><li>1 Emerald for 1 Jungle Log</li><li>32 Bamboo for 1 Emerald</li><li>4 Emeralds for 1 Cherry Sapling</li><li>1 Emerald for 1 Cherry Log</li><li>6 Poplar Saplings for 1 Emerald</li><li>1 Emerald for 1 Poplar Log</li></ul>
-          <p class="trade-level">Level 4 · Expert · offers 2 of these 8</p>
-          <ul><li>1 Emerald for 1 Warped Stem</li><li>1 Emerald for 1 Crimson Stem</li><li>5 Emeralds for 1 Mangrove Propagule</li><li>8 Apples for 1 Emerald</li><li>1 Emerald for 8 Scaffolding</li><li>1 Emerald for 1 Mangrove Log</li><li>6 Pale Oak Saplings for 1 Emerald</li><li>1 Emerald for 1 Pale Oak Log</li></ul>
-          <p class="trade-level">Level 5 · Master · offers 2 of these 6</p>
-          <ul><li>12 Emeralds for 1 Diamond Axe</li><li>12 Emeralds for 1 Diamond Hoe</li><li>24 Emeralds + 1 Diamond Axe for 1 Enchanted Diamond Axe (Efficiency IV, Unbreaking III)</li><li>8 Emeralds for 1 Jukebox</li><li>12 Crimson Fungus for 1 Emerald</li><li>12 Warped Fungus for 1 Emerald</li></ul>
-        </details>
       </section>
     </div>
   </main>

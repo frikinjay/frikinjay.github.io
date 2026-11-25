@@ -25,6 +25,9 @@
 .pack-icon-large { display: grid; place-items: center; }
 .pack-icon-large img { width: 80px; height: 80px; image-rendering: pixelated; }
 .recipe-nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; font-size: 13px; }
+.recipe-page { display: grid; justify-items: center; gap: 3px; min-width: 0; text-align: center; }
+.recipe-page b { font-weight: 400; font-size: 14px; color: #3f3f3f; }
+.recipe-page small { font-size: 11px; color: #6b6b6b; }
 
 .mc-gui { --s: 2; --h: 78; position: relative; width: calc(176px * var(--s)); height: calc(var(--h) * 1px * var(--s)); image-rendering: pixelated; }
 .mc-gui::before { content: ""; position: absolute; left: 0; right: 0; top: 0; bottom: calc(4px * var(--s)); background: var(--gui) 0 0 / calc(256px * var(--s)) calc(256px * var(--s)) no-repeat; }

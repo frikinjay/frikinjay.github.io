@@ -39,11 +39,14 @@
         function sync() {
             const opt = select.options[select.selectedIndex];
             label.textContent = opt ? opt.textContent : '';
-            button.title = label.textContent;
             button.disabled = select.disabled;
             button.hidden = select.hidden;
         }
         sync();
+        button.addEventListener('pointerover', () => {
+            if (label.scrollWidth > label.clientWidth) button.setAttribute('data-tip', JSON.stringify(label.textContent));
+            else button.removeAttribute('data-tip');
+        });
         button.addEventListener('click', () => (open && open.owner === button ? closeOpen() : openList()));
         button.addEventListener('keydown', e => {
             if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(e.key)) { e.preventDefault(); openList(); }
@@ -379,12 +382,12 @@
         });
     }
 
-    const PLAYER_KEY = 'contentapi-preview-player';
+    const PLAYER_KEY = 'preview-player';
     const playerListeners = new Set();
     const player = {
         get() {
             let v = {};
-            try { v = JSON.parse(localStorage.getItem(PLAYER_KEY) || localStorage.getItem('contentapi-display-viewer') || '{}') || {}; } catch (error) { v = {}; }
+            try { v = JSON.parse(localStorage.getItem(PLAYER_KEY) || '{}') || {}; } catch (error) { v = {}; }
             return { slim: !!v.slim, username: v.username || '', skinData: v.skinData || null };
         },
         set(changes) {

@@ -195,5 +195,21 @@
     });
     window.addEventListener('scroll', function () { if (tipOwner) hideTip(); }, { passive: true });
 
+    function scrollsInside(node, dialog) {
+        for (; node && node !== dialog.parentNode; node = node.parentElement) {
+            var style = window.getComputedStyle(node);
+            if (/(auto|scroll)/.test(style.overflowY + style.overflowX) && (node.scrollHeight > node.clientHeight || node.scrollWidth > node.clientWidth)) return true;
+            if (node === dialog) return false;
+        }
+        return false;
+    }
+    document.addEventListener('wheel', function (event) {
+        var dialog = document.querySelector('dialog[open]');
+        if (!dialog || !dialog.matches(':modal')) return;
+        var target = event.target instanceof Element ? event.target : null;
+        if (target && dialog.contains(target) && scrollsInside(target, dialog)) return;
+        event.preventDefault();
+    }, { passive: false });
+
     window.Site = { toast: toast, ready: ready, showLoader: showLoader, hideLoader: hideLoader };
 })();

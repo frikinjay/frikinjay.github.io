@@ -95,7 +95,7 @@ input[type="file"]::file-selector-button { margin-right: 10px; padding: 6px 12px
 .button.danger { background: var(--danger); color: #fff; }
 .button.danger:hover { background: var(--danger); filter: brightness(1.1); color: #fff; }
 
-html:has(dialog[open]) { overflow: hidden; }
+@media (pointer: coarse) { html:has(dialog[open]) { overflow: hidden; } }
 dialog { overscroll-behavior: contain; }
 dialog * { overscroll-behavior: contain; }
 

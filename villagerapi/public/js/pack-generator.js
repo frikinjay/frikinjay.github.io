@@ -10,11 +10,11 @@
     ];
 
     const VANILLA_VILLAGES = [
-        ['minecraft:village_plains', 'Plains village'],
-        ['minecraft:village_desert', 'Desert village'],
-        ['minecraft:village_savanna', 'Savanna village'],
-        ['minecraft:village_snowy', 'Snowy village'],
-        ['minecraft:village_taiga', 'Taiga village']
+        ['minecraft:village_plains', 'Plains Village'],
+        ['minecraft:village_desert', 'Desert Village'],
+        ['minecraft:village_savanna', 'Savanna Village'],
+        ['minecraft:village_snowy', 'Snowy Village'],
+        ['minecraft:village_taiga', 'Taiga Village']
     ];
 
     const escape = (value) => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -50,7 +50,7 @@
             data: 'workstations', title: 'name',
             render: () => `
                 <div class="grid">${field('Name', text('name', 'purpur_altar'))}${namespace()}</div>
-                <div class="grid">${field('Block model (optional)', '<span class="inline model-upload"><input type="file" accept=".json,application/json" data-model-upload><button type="button" class="link" data-action="edit-texture" data-texture-name="textureFront">Open in editor</button></span>', 'A Blockbench or Minecraft block model JSON. Leave empty for a full cube.')}</div>
+                <div class="grid">${field('Block model (optional)', '<span class="inline model-upload"><input type="file" accept=".json,application/json" data-model-upload><button type="button" class="link" data-action="edit-texture" data-texture-name="textureFront">Open in Editor</button></span>', 'A Blockbench or Minecraft block model JSON. Leave empty for a full cube.')}</div>
                 ${json('recipeJson', 'Recipe', '{\n  "type": "minecraft:crafting_shaped",\n  "pattern": [ ... ],\n  "key": { ... },\n  "result": { "id": "..." }\n}', 8, 'recipe')}
                 <div class="tiles">
                     ${texture('textureFront', 'Front')}${texture('textureBack', 'Back')}${texture('textureLeft', 'Left')}
@@ -122,7 +122,7 @@
             render: () => `
                 ${field('File name', text('name', 'badlands'))}
                 <div class="subrows" data-rows></div>
-                <div><button type="button" class="link" data-action="add-row" data-row="mapping">Add biome</button></div>`
+                <div><button type="button" class="link" data-action="add-row" data-row="mapping">Add Biome</button></div>`
         },
         villageType: {
             data: 'villageTypes', title: 'name',
@@ -134,7 +134,7 @@
                     ${field('Folder', text('folder', 'badlands'))}${field('Weight', number('weight', 1, 1))}
                 </div>
                 ${field('Biomes', '<textarea data-field="biomes" data-format="lines" rows="3" placeholder="#minecraft:is_badlands" spellcheck="false"></textarea>')}
-                <label class="drop"><input type="file" webkitdirectory directory multiple data-override-folder><span>Replacement structures</span><small data-override-state>Folder, optional</small></label>`
+                <label class="drop"><input type="file" webkitdirectory directory multiple data-override-folder><span>Replacement Structures</span><small data-override-state>Folder, optional</small></label>`
         },
         wandering: {
             data: 'wanderingTrades', title: 'name',
@@ -149,9 +149,9 @@
                     ${field('Village', text('villageType', 'minecraft:village_plains', 'list="village-options"'))}
                     ${field('Folder', text('folder', 'plains'))}${namespace()}
                 </div>
-                <label class="drop"><input type="file" accept=".nbt" multiple data-bulk-houses><span>Add structures</span><small>.nbt files</small></label>
+                <label class="drop"><input type="file" accept=".nbt" multiple data-bulk-houses><span>Add Structures</span><small>.nbt files</small></label>
                 <div class="subrows" data-rows></div>
-                <div><button type="button" class="link" data-action="add-row" data-row="house">Add house</button></div>`
+                <div><button type="button" class="link" data-action="add-row" data-row="house">Add House</button></div>`
         }
     };
 
