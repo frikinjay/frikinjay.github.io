@@ -1,0 +1,19 @@
+# VillagerAPI
+
+> VillagerAPI is a Minecraft mod for Fabric and NeoForge (1.21.1, 1.21.11, 26.1.2, 26.2, 26.3 and the 26.4 snapshot) that adds custom villagers from data files called villager packs: new villager professions and workstations, villager types, trades from Novice to Master, biome trades, Hero of the Village gifts, explorer maps, wandering trader trades and village houses. No code is needed. This site hosts a free villager pack generator that runs in the browser.
+
+- [Villager pack generator](https://villagerapi.neoterra.dev/): make custom villagers, professions, trades and wandering trader trades in the browser and download them as a villager pack for Minecraft 1.21.1, 1.21.11, 26.1.2, 26.2, 26.3 or the 26.4 snapshot
+- [Guide: how to make custom Minecraft villagers](https://villagerapi.neoterra.dev/guide): installing packs, what a pack can add, custom villager trades, changing vanilla trades
+- [Guide: custom wandering trader trades](https://villagerapi.neoterra.dev/wandering-trader): add, remove or replace wandering trader trades and trade pools
+- [Villager Packs](https://villagerpacks.neoterra.dev/): browse finished villager packs such as More Villagers, with every profession and trade
+
+## Downloads
+
+- [VillagerAPI on Modrinth](https://modrinth.com/mod/villagerapi)
+- [VillagerAPI on CurseForge](https://www.curseforge.com/minecraft/mc-mods/villagerapi)
+- [More Villagers: Re-employed on Modrinth](https://modrinth.com/mod/more-villagers-re-employed): 10 new villager professions built on VillagerAPI
+
+## Reference
+
+- [Documentation for Minecraft 26.x and 1.21.11](https://github.com/frikinjay/villagerapi/blob/main/DOCUMENTATION_26_1.md)
+- [Documentation for Minecraft 1.21.1](https://github.com/frikinjay/villagerapi/blob/main/DOCUMENTATION_1_21_1.md)

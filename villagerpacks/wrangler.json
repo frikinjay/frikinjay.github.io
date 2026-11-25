@@ -1,0 +1,8 @@
+{
+  "name": "villagerpacks",
+  "compatibility_date": "2025-11-26",
+  "assets": {
+    "directory": "./public",
+    "not_found_handling": "404-page"
+  }
+}

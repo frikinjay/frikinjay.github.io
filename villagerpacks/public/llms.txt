@@ -1,0 +1,10 @@
+# Villager Packs
+
+> Browse villager packs for VillagerAPI, the Minecraft mod (Fabric and NeoForge, Minecraft 1.21.1, 1.21.11, 26.1.2, 26.2, 26.3 and 26.4) that adds custom villager professions, villager types, trades, wandering trader trades and village houses from data files, without code.
+
+- [Villager pack generator](https://villagerapi.neoterra.dev/): make your own custom villagers and trades in the browser and download them as a villager pack
+- [VillagerAPI on Modrinth](https://modrinth.com/mod/villagerapi)
+
+## Packs
+
+- [More Villagers](https://villagerpacks.neoterra.dev/pack/morevillagers): More Villagers adds 10 new villager professions to Minecraft 26.3: Enderologist, Engineer, Explorer and 7 more. See all 264 trades and workstations.

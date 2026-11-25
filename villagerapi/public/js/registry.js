@@ -1,4 +1,3 @@
-// Registry suggestions: vanilla IDs for the selected version plus IDs found in uploaded mod jars, datapacks and villager packs.
 import { configure, renderIcon, iconElement, addArchiveSource, removeArchiveSource } from './mc-assets.js';
 const REGISTRIES = ['item', 'block', 'worldgen/structure', 'worldgen/biome', 'enchantment', 'potion', 'mob_effect', 'instrument', 'jukebox_song',
     'trim_material', 'trim_pattern', 'villager_type', 'villager_profession', 'point_of_interest_type', 'banner_pattern'];
@@ -31,7 +30,7 @@ async function loadVanilla(ver) {
         try {
             const data = await (await fetch(`${base}/registries/data.json`)).json();
             for (const key of REGISTRIES) out[key] = (data[key] || []).map(id => 'minecraft:' + id);
-        } catch (error) { /* offline: mod entries still work */ }
+        } catch (error) { }
         await Promise.all(TAGS.map(async tag => {
             try {
                 const data = await (await fetch(`${base}/data/tag/${tag}/data.json`)).json();
@@ -54,9 +53,8 @@ function render(data) {
 }
 
 async function refresh() {
-    const current = (document.querySelector('input[name="mc-version"]:checked') || {}).value || '26.3';
-    version = current;
-    render(await loadVanilla(current));
+    version = window.currentVillagerPackVersion().registries;
+    render(await loadVanilla(version));
 }
 
 async function addArchive(file) {
@@ -68,7 +66,7 @@ async function addArchive(file) {
     const zip = await JSZip.loadAsync(file);
     let packNamespace = null;
     const config = zip.file('villagerapi_config.json');
-    if (config) { try { packNamespace = JSON.parse(await config.async('string')).namespace; } catch (error) { /* ignore */ } }
+    if (config) { try { packNamespace = JSON.parse(await config.async('string')).namespace; } catch (error) { } }
     const entries = emptySets();
     const add = (key, id) => entries[key].add(id);
     const rules = [
@@ -108,7 +106,6 @@ async function addArchive(file) {
     return count;
 }
 
-// Which list each input should use, by its field name or editor path.
 const FIELD_LISTS = {
     block: 'block', profession: 'villager_profession', poiType: 'point_of_interest_type', villageType: 'worldgen/structure', copyFromCustom: 'worldgen/structure'
 };
@@ -176,7 +173,7 @@ function showResults(sourceId, query) {
     host.innerHTML = results.length
         ? results.map(r => `<li><span class="slot slot-small" data-icon="${r.key === 'item' || r.key === 'block' ? escapeHtml(r.id) : ''}"></span><code>${escapeHtml(r.id)}</code><em>${KIND_LABELS[r.key] || r.key}</em></li>`).join('')
         : (query.trim() ? '<li class="empty">No matches</li>' : '');
-    configure({ version: version || '26.3', local: {} });
+    configure({ version: window.currentVillagerPackVersion().assets, local: {} });
     host.querySelectorAll('[data-icon]').forEach(slot => {
         const id = slot.dataset.icon;
         if (!id) { slot.remove(); return; }

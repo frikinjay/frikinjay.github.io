@@ -5,10 +5,10 @@
     const LEVEL_NAMES = { 1: 'Novice', 2: 'Apprentice', 3: 'Journeyman', 4: 'Expert', 5: 'Master' };
     const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const num = (value, fallback) => (value === '' || value === null || value === undefined || Number.isNaN(Number(value)) ? fallback : Number(value));
-    const version = () => (document.querySelector('input[name="mc-version"]:checked') || {}).value || '26.3';
-    const legacy = () => version() === '1.21.1';
+    const profile = () => window.currentVillagerPackVersion();
+    const legacy = () => profile().tradeFormat === 'legacy';
+    const WANDERING_POOLS = [['buying', 'Buying (the trader buys items)'], ['uncommon', 'Uncommon'], ['common', 'Common'], ['custom', 'New pool']];
 
-    /* ---------- item properties ---------- */
 
     const POTIONS = ['water','mundane','thick','awkward','night_vision','long_night_vision','invisibility','long_invisibility','leaping','long_leaping','strong_leaping',
         'fire_resistance','long_fire_resistance','swiftness','long_swiftness','strong_swiftness','slowness','long_slowness','strong_slowness','turtle_master','long_turtle_master',
@@ -27,11 +27,11 @@
     const PROPS = {
         potion: { label: 'Potion', hint: 'potion, splash_potion, lingering_potion, tipped_arrow',
             fields: [['potion', 'Potion', 'select', POTIONS], ['color', 'Custom colour (optional)', 'color']] },
-        random_potion: { label: 'Random potion', hint: 'Picked from a potion tag when the trade is created. Minecraft 26.3 only',
-            fields: [['options', 'Potion tag', 'text', '#minecraft:tradeable']], only: '26.3' },
+        random_potion: { label: 'Random potion', hint: 'Picked from a potion tag when the trade is created. Minecraft 26.1.2 and newer',
+            fields: [['options', 'Potion tag', 'text', '#minecraft:tradeable']], only: 'randomPotion' },
         enchantments: { label: 'Enchantments', hint: 'One per line, e.g. minecraft:sharpness 5. Stored on enchanted books automatically',
             fields: [['lines', 'Enchantments', 'lines', 'minecraft:unbreaking 3']] },
-        random_enchantment: { label: 'Random enchantment', hint: 'Books: random enchantment from a tag. Gear: random enchantments by level (26.3 only)',
+        random_enchantment: { label: 'Random enchantment', hint: 'Books: random enchantment from a tag. Gear: random enchantments by level (1.21.11 and newer)',
             fields: [['mode', 'Target', 'select', ['book', 'gear']], ['options', 'Enchantment tag', 'text', '#minecraft:tradeable'], ['min', 'Min level', 'number', '5'], ['max', 'Max level', 'number', '19']] },
         stew: { label: 'Suspicious stew', hint: 'One effect per line with seconds, e.g. minecraft:night_vision 5. Random picks one of them',
             fields: [['lines', 'Effects', 'lines', 'minecraft:night_vision 5'], ['random', 'Pick one at random', 'check']] },
@@ -74,7 +74,6 @@
         return out;
     }
 
-    // Returns { components, modifiers, legacySell, notes } for one trade's properties.
     function applyProps(t) {
         const result = { components: {}, modifiers: [], legacySell: null, notes: [] };
         const itemPath = String(t.gives.id || '').replace(/^minecraft:/, '');
@@ -88,7 +87,7 @@
                     break;
                 }
                 case 'random_potion':
-                    if (legacy()) result.notes.push('Random potions need Minecraft 26.3.');
+                    if (!profile().randomPotion) result.notes.push('Random potions need Minecraft 26.1.2 or newer.');
                     else result.modifiers.push({ function: 'minecraft:set_random_potion', options: p.options || '#minecraft:tradeable' });
                     break;
                 case 'enchantments': {
@@ -105,7 +104,7 @@
                     if (legacy()) {
                         if (book) result.legacySell = { item_type: 'enchanted_book', enchantment_tag: (p.options || '#minecraft:tradeable').replace(/^#/, ''),
                             ...(p.min ? { min_level: num(p.min, 1) } : {}), ...(p.max ? { max_level: num(p.max, 1) } : {}) };
-                        else result.notes.push('Random gear enchantments need Minecraft 26.3.');
+                        else result.notes.push('Random gear enchantments need Minecraft 1.21.11 or newer.');
                         break;
                     }
                     result.modifiers.push(book
@@ -170,7 +169,6 @@
         return result;
     }
 
-    // Reads components and modifiers back into properties; anything unknown stays as raw JSON.
     function propsFrom(components, modifiers, legacySell) {
         const props = [];
         const rest = { ...(components || {}) };
@@ -214,7 +212,6 @@
     }
 
 
-    /* ---------- recipes ---------- */
 
     const RECIPE_TYPES = [
         ['crafting_shaped', 'Shaped Crafting'], ['crafting_shapeless', 'Shapeless Crafting'], ['smelting', 'Smelting'], ['blasting', 'Blasting'],
@@ -226,7 +223,6 @@
     const newRecipe = () => ({ type: 'crafting_shaped', grid: Array(9).fill(''), ingredients: [''], ingredient: '', template: '', base: '', addition: '', pattern: '',
         result: '', count: 1, category: 'misc', group: '', experience: 0.1, time: '' });
 
-    // One ingredient field: an item, a #tag, or alternatives separated by |.
     function ingredientJson(text) {
         const options = String(text || '').split('|').map(v => v.trim()).filter(Boolean);
         if (!options.length) return null;
@@ -298,7 +294,6 @@
         return r;
     }
 
-    /* ---------- models ---------- */
 
     const newTrade = () => ({ map: false, props: [], wants: { id: 'minecraft:emerald', count: 1 }, extra: null, gives: { id: '', count: 1, components: '' },
         mapInfo: { tag: '', decoration: '', name: '', radius: 100 }, uses: 12, xp: 1, discount: 0.05, weight: '' });
@@ -319,19 +314,24 @@
                     const entry = { type: 'minecraft:item', name: e.item };
                     if (num(e.weight, 1) !== 1) entry.weight = num(e.weight, 1);
                     const min = num(e.min, 1), max = num(e.max, min);
-                    if (min !== 1 || max !== 1) entry.functions = [{ function: 'minecraft:set_count', count: min === max ? min : { min, max } }];
+                    if (min !== 1 || max !== 1) {
+                        if (profile().lootModifiers) entry.modifier = { type: 'minecraft:set_count', count: min === max ? min : { type: 'minecraft:uniform', min, max } };
+                        else entry.functions = [{ function: 'minecraft:set_count', count: min === max ? min : { min, max } }];
+                    }
                     return entry;
                 })
             })) }),
             fromJson: j => ({ pools: ((j && j.pools) || []).map(pool => ({
                 rolls: typeof pool.rolls === 'number' ? pool.rolls : 1,
                 entries: (pool.entries || []).map(e => {
-                    const count = ((e.functions || []).find(f => String(f.function).endsWith('set_count')) || {}).count;
+                    const modifiers = [].concat(e.functions || [], e.modifier || []);
+                    const count = (modifiers.find(f => String(f.function || f.type).endsWith('set_count')) || {}).count;
                     return { item: e.name || '', weight: e.weight || 1, min: typeof count === 'object' ? count.min : (count || 1), max: typeof count === 'object' ? count.max : (count || 1) };
                 })
             })) })
         },
         recipe: { create: newRecipe, toJson: recipeJson, fromJson: recipeFrom },
+        wandering: { create: () => ({ replace: false, remove: '', pools: [] }), toJson: wanderingJson, fromJson: wanderingFrom },
         structures: {
             create: () => ({ replace: false, values: [''] }),
             toJson: m => ({ replace: !!m.replace, values: m.values.map(v => v.trim()).filter(Boolean) }),
@@ -345,7 +345,7 @@
             const data = levels[level];
             if (!data || !data.trades.length) continue;
             const value = { trades: data.trades.map(tradeJson) };
-            if (data.replace) value.replace = true;
+            if (data.replace && profile().levelReplace) value.replace = true;
             if (data.amount !== '' && data.amount !== undefined) value.trade_list_amount = num(data.amount, 1);
             out[level] = value;
         }
@@ -395,6 +395,44 @@
         Object.assign(out, { max_uses: num(t.uses, 12), xp: num(t.xp, 1), reputation_discount: num(t.discount, 0.05) });
         if (weight !== undefined) out.trade_list_weight = weight;
         return out;
+    }
+
+    function wanderingJson(m) {
+        const out = {};
+        if (m.replace) out.replace = true;
+        const remove = lines(m.remove).map(id => (id.includes(':') ? id : 'minecraft:' + id));
+        if (remove.length) out.remove = remove;
+        const pools = {};
+        for (const pool of m.pools) {
+            const name = pool.name === 'custom' ? (pool.custom || '').trim() : pool.name;
+            if (!name) continue;
+            const value = {};
+            if (pool.trades.length) value.trades = pool.trades.map(t => { const { trade_list_weight, ...rest } = tradeJson(t); return rest; });
+            if (pool.amount !== '' && pool.amount !== undefined) value.amount = Math.max(0, num(pool.amount, 0));
+            if (pool.replace && pool.name !== 'custom') value.replace = true;
+            if (Object.keys(value).length) pools[name] = value;
+        }
+        if (Object.keys(pools).length) out.pools = pools;
+        return out;
+    }
+
+    function wanderingFrom(j) {
+        const known = WANDERING_POOLS.map(([id]) => id).filter(id => id !== 'custom');
+        return {
+            replace: !!(j && j.replace),
+            remove: ((j && j.remove) || []).join('\n'),
+            pools: Object.entries((j && j.pools) || {}).map(([key, value]) => {
+                const short = key.replace(/^minecraft:/, '');
+                const pool = Array.isArray(value) ? { trades: value } : (value || {});
+                return {
+                    name: known.includes(short) ? short : 'custom',
+                    custom: known.includes(short) ? '' : key,
+                    amount: pool.amount !== undefined ? pool.amount : '',
+                    replace: !!pool.replace,
+                    trades: (pool.trades || []).map(tradeFrom)
+                };
+            })
+        };
     }
 
     function stackFrom(value) {
@@ -447,7 +485,6 @@
         return out;
     }
 
-    /* ---------- rendering ---------- */
 
     const input = (path, value, placeholder = '', type = 'text', extra = '') =>
         `<input type="${type}" data-path="${path}" value="${esc(value)}" placeholder="${esc(placeholder)}" spellcheck="false" autocomplete="off" ${extra}>`;
@@ -455,7 +492,7 @@
     const tc = text => String(text).replace(/[A-Za-z][\w'’-]*/g, (word, index) => (index > 0 && SMALL.has(word.toLowerCase()) ? word.toLowerCase() : /^[A-Z]{2,}$/.test(word) ? word : word.charAt(0).toUpperCase() + word.slice(1)));
     const labelled = (label, control) => `<label class="field"><span>${tc(label)}</span>${control}</label>`;
 
-    function tradeHtml(base, t, index) {
+    function tradeHtml(base, t, index, wandering = false) {
         const p = `${base}.trades.${index}`;
         return `<div class="je-trade">
             <div class="je-row">
@@ -479,7 +516,7 @@
                 ${labelled('Max Uses', input(`${p}.uses`, t.uses, '12', 'number', 'min="1"'))}
                 ${labelled('XP', input(`${p}.xp`, t.xp, '1', 'number', 'min="0"'))}
                 ${labelled(legacy() ? 'Price Multiplier' : 'Reputation Discount', input(`${p}.discount`, t.discount, '0.05', 'number', 'step="0.01" min="0"'))}
-                ${labelled('List Weight', input(`${p}.weight`, t.weight, 'Default', 'number', 'min="0"'))}
+                ${wandering ? '' : labelled('List Weight', input(`${p}.weight`, t.weight, 'Default', 'number', 'min="0"'))}
             </div>
             ${t.map ? `<p class="je-hint">Pick one of this pack’s Explorer Maps tags to fill in the decoration and name, or type another pack's tag. Untick Explorer Map to go back to a regular item.</p>` : propsHtml(p, t)}
         </div>`;
@@ -495,7 +532,7 @@
     }
 
     function propsHtml(base, t) {
-        const available = Object.entries(PROPS).filter(([, def]) => !def.only || def.only === version());
+        const available = Object.entries(PROPS).filter(([, def]) => !def.only || profile()[def.only]);
         const notes = applyProps(t).notes;
         return `<div class="je-props">
             ${(t.props || []).map((prop, index) => {
@@ -522,7 +559,7 @@
             return `<details class="je-level"${data.trades.length || level === '1' ? ' open' : ''}>
                 <summary>${LEVEL_NAMES[level]} <span>${data.trades.length} ${data.trades.length === 1 ? 'Trade' : 'Trades'}</span></summary>
                 <div class="je-row">
-                    <label class="check"><input type="checkbox" data-path="${p}.replace"${data.replace ? ' checked' : ''}> Replace Existing Trades</label>
+                    ${profile().levelReplace ? `<label class="check"><input type="checkbox" data-path="${p}.replace"${data.replace ? ' checked' : ''}> Replace Existing Trades</label>` : ''}
                     ${labelled('Trades Offered', input(`${p}.amount`, data.amount, 'All', 'number', 'min="1"'))}
                 </div>
                 ${data.trades.map((t, i) => tradeHtml(p, t, i)).join('')}
@@ -531,8 +568,35 @@
         }).join('');
     }
 
+    function wanderingHtml(m) {
+        const defaults = profile().wandering;
+        const pools = m.pools.map((pool, i) => {
+            const p = `pools.${i}`;
+            const label = pool.name === 'custom' ? (pool.custom || 'New pool') : (WANDERING_POOLS.find(([id]) => id === pool.name) || [])[1];
+            const fallback = pool.name === 'custom' ? 'All' : String(defaults[pool.name]);
+            return `<details class="je-level" open>
+                <summary>${esc(label)} <span>${pool.trades.length} ${pool.trades.length === 1 ? 'Trade' : 'Trades'}</span></summary>
+                <div class="je-row">
+                    <label class="field"><span>Pool</span><select data-path="${p}.name">${WANDERING_POOLS.map(([id, text]) => `<option value="${id}"${id === pool.name ? ' selected' : ''}>${text}</option>`).join('')}</select></label>
+                    ${pool.name === 'custom' ? labelled('Pool Name', input(`${p}.custom`, pool.custom, 'mypack:festive')) : ''}
+                    ${labelled('Trades Offered', input(`${p}.amount`, pool.amount, fallback, 'number', 'min="0"'))}
+                    ${pool.name === 'custom' ? '' : `<label class="check"><input type="checkbox" data-path="${p}.replace"${pool.replace ? ' checked' : ''}> Replace Vanilla Trades</label>`}
+                    <button type="button" class="link danger" data-op="remove-wandering-pool" data-index="${i}">Remove Pool</button>
+                </div>
+                ${pool.trades.map((t, k) => tradeHtml(p, t, k, true)).join('')}
+                <button type="button" class="link" data-op="add-trade" data-base="${p}">+ Add Trade</button>
+            </details>`;
+        }).join('');
+        return `<div class="je-row"><label class="check"><input type="checkbox" data-path="replace"${m.replace ? ' checked' : ''}> Replace All Vanilla Trades</label></div>
+            <label class="field je-wide"><span>Remove Trades With These Items (One per Line)</span><textarea rows="3" data-path="remove" spellcheck="false" placeholder="minecraft:pufferfish_bucket">${esc(m.remove)}</textarea></label>
+            ${pools}
+            <button type="button" class="link" data-op="add-wandering-pool">+ Add Pool</button>
+            <p class="je-hint">Each wandering trader picks a number of trades from every pool: ${defaults.buying} buying, ${defaults.uncommon} uncommon and ${defaults.common} common on this Minecraft version. A new pool without a number gives all of its trades to every trader. Explorer maps sell as <code>minecraft:filled_map</code>, so remove that ID to drop map trades.</p>`;
+    }
+
     const RENDER = {
         trades: m => levelsHtml('levels', m.levels),
+        wandering: wanderingHtml,
         biome: m => m.groups.map((g, i) => `<div class="je-group">
                 <div class="je-row">${labelled('Villager Types (comma separated)', input(`groups.${i}.types`, g.types, 'minecraft:desert, minecraft:savanna'))}
                 <button type="button" class="link danger" data-op="remove-group" data-index="${i}">Remove</button></div>
@@ -579,7 +643,6 @@
             <button type="button" class="link" data-op="add-value">+ Add Structure</button>`
     };
 
-    /* ---------- wiring ---------- */
 
     const get = (object, path) => path.split('.').reduce((value, key) => (value == null ? value : value[key]), object);
     const set = (object, path, value) => {
@@ -724,6 +787,8 @@
                     case 'add-ingredient': m.ingredients.push(''); break;
                     case 'remove-ingredient': m.ingredients.splice(Number(d.index), 1); if (!m.ingredients.length) m.ingredients.push(''); break;
                     case 'remove-value': m.values.splice(Number(d.index), 1); break;
+                    case 'add-wandering-pool': m.pools.push({ name: m.pools.some(pool => pool.name === 'common') ? 'custom' : 'common', custom: '', amount: '', replace: false, trades: [newTrade()] }); break;
+                    case 'remove-wandering-pool': m.pools.splice(Number(d.index), 1); break;
                 }
                 render(editor);
             });

@@ -71,7 +71,7 @@
                 <div class="grid">${field('Name', text('name', 'jungle_dweller'))}${namespace()}</div>
                 <div class="tiles">
                     ${texture('texture', 'Adult')}${texture('zombieTexture', 'Zombie', 'Required')}
-                    ${texture('babyTexture', 'Baby', '26.3')}${texture('babyZombieTexture', 'Baby Zombie', '26.3, required')}
+                    ${texture('babyTexture', 'Baby', '26.1.2 and newer')}${texture('babyZombieTexture', 'Baby Zombie', '26.1.2 and newer, required')}
                 </div>`
         },
         profession: {
@@ -135,6 +135,12 @@
                 </div>
                 ${field('Biomes', '<textarea data-field="biomes" data-format="lines" rows="3" placeholder="#minecraft:is_badlands" spellcheck="false"></textarea>')}
                 <label class="drop"><input type="file" webkitdirectory directory multiple data-override-folder><span>Replacement structures</span><small data-override-state>Folder, optional</small></label>`
+        },
+        wandering: {
+            data: 'wanderingTrades', title: 'name',
+            render: () => `
+                ${field('File name', text('name', 'wandering_trader'))}
+                ${json('wanderingJson', 'Wandering trader', '{\n  "remove": [ ... ],\n  "pools": {\n    "common": { "trades": [ ... ] }\n  }\n}', 10, 'wandering')}`
         },
         villageStructure: {
             data: 'villageStructures', title: 'villageType', rows: 'house',
@@ -416,7 +422,7 @@
                     kind, title: (entry.querySelector('.entry-title') || {}).textContent || 'Workstation',
                     face: name.replace(/^texture/, '').toLowerCase(),
                     faces: Object.fromEntries(['front', 'back', 'left', 'right', 'top', 'bottom'].map(face => [face, store[faceField(face)] || null])),
-                    version: this.version().id,
+                    version: this.version().assets, game: this.version().game, babies: this.version().babyTextures,
                     onSave: (url, faces, keys) => {
                         Object.entries(faces || {}).forEach(([face, data]) => setTile(faceField(face), data));
                         Object.entries(keys || {}).forEach(([key, data]) => { this.textures[entry.id]['model:' + key] = data; });
@@ -429,7 +435,7 @@
                 title: `${(entry.querySelector('.entry-title') || {}).textContent || 'Untitled'} · ${name.replace(/([A-Z])/g, ' $1').toLowerCase()}`,
                 src: store[name] || null,
                 sibling: siblingName ? store[siblingName] || null : null,
-                version: this.version().id,
+                version: this.version().assets, game: this.version().game, babies: this.version().babyTextures,
                 onSave: url => {
                     if (!this.textures[entry.id]) this.textures[entry.id] = {};
                     this.textures[entry.id][name] = url;
@@ -525,8 +531,7 @@
         }
 
         version() {
-            const checked = document.querySelector('input[name="mc-version"]:checked');
-            return VillagerPackVersions[checked ? checked.value : '26.3'];
+            return window.currentVillagerPackVersion();
         }
 
         metadata() {
@@ -555,6 +560,9 @@
             const meta = this.metadata();
             document.querySelectorAll('[data-pack-total]').forEach(el => { el.textContent = total; });
             document.querySelectorAll('[data-docs]').forEach(link => { link.href = this.version().docs + (link.dataset.docs || ''); });
+            document.querySelectorAll('[data-requires]').forEach(el => { el.hidden = !this.version()[el.dataset.requires]; });
+            const current = document.querySelector(`[data-panel="${location.hash.slice(1)}"]`);
+            if (current && current.hidden) this.show('pack');
         }
 
         collect(type, errors) {
@@ -623,8 +631,6 @@
             report.innerHTML = `<h3>${escape(title)}</h3>` + (lines.length ? `<ul>${lines.map(line => `<li>${escape(line)}</li>`).join('')}</ul>` : '');
         }
 
-        // Zombie variants render black and magenta in game without their textures, so fill any that are missing:
-        // profession overlays are copied (vanilla uses the same texture), type textures are zombified.
         async fillZombieTextures() {
             const filled = [];
             for (const entry of document.querySelectorAll('[data-list="type"] > .entry, [data-list="profession"] > .entry')) {

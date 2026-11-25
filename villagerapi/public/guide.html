@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>How to Make Custom Minecraft Villagers | VillagerAPI</title>
+  <meta name="description" content="Add custom villager professions, trades, villager types, wandering trader trades and village houses to Minecraft with VillagerAPI. No code needed.">
+  <link rel="canonical" href="https://villagerapi.neoterra.dev/guide">
+  <meta property="og:title" content="How to Make Custom Minecraft Villagers | VillagerAPI">
+  <meta property="og:description" content="Add custom villager professions, trades, villager types, wandering trader trades and village houses to Minecraft with VillagerAPI. No code needed.">
+  <meta property="og:url" content="https://villagerapi.neoterra.dev/guide">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="VillagerAPI">
+  <meta property="og:image" content="https://villagerapi.neoterra.dev/img/villagerapi_logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="preload" href="/fonts/MCTenLowercaseAlt.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/MinecraftSeven2.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/css/main.css">
+  <script src="/js/site.js" defer></script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"TechArticle","headline":"How to make custom Minecraft villagers and trades","description":"Add custom villager professions, villager types, trades, wandering trader trades and village houses to Minecraft with VillagerAPI and a villager pack.","url":"https://villagerapi.neoterra.dev/guide","author":{"@type":"Person","name":"frikinjay","url":"https://github.com/frikinjay"},"about":[{"@type":"VideoGame","name":"Minecraft"},{"@type":"SoftwareApplication","name":"VillagerAPI","applicationCategory":"GameApplication","operatingSystem":"Minecraft with Fabric or NeoForge","url":"https://modrinth.com/mod/villagerapi"}]},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Villager pack generator","item":"https://villagerapi.neoterra.dev/"},{"@type":"ListItem","position":2,"name":"Guide","item":"https://villagerapi.neoterra.dev/guide"}]}]}</script>
+</head>
+<body>
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="logo" href="/"><span class="logo-block" aria-hidden="true" style="background-image: url('/img/villagerapi_logo.png');"></span>VAPI</a>
+      <nav class="nav-links" aria-label="Main">
+        <a href="https://villagerpacks.neoterra.dev/">Packs</a>
+        <a href="/">Generator</a>
+        <a href="/guide" aria-current="page">Guide</a>
+        <a href="https://github.com/frikinjay/villagerapi/blob/main/DOCUMENTATION_26_1.md">Docs</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <article class="prose">
+        <h1>How to make custom Minecraft villagers</h1>
+        <p class="lead">VillagerAPI is a Minecraft mod that adds villagers from data files. With a villager pack you can add new villager professions, villager types, trades, Hero of the Village gifts, wandering trader trades and village houses without writing code.</p>
+
+        <h2>What you need</h2>
+        <ul>
+          <li><a href="https://modrinth.com/mod/villagerapi">VillagerAPI</a> for Fabric or NeoForge. It runs on Minecraft 1.21.1, 1.21.11, 26.1.2, 26.2, 26.3 and the 26.4 snapshot (Fabric only on 26.4).</li>
+          <li>A villager pack. Make one with the <a href="/">villager pack generator</a>, start from a pack on <a href="https://villagerpacks.neoterra.dev/">Villager Packs</a>, or write the JSON files by hand.</li>
+        </ul>
+
+        <h2>Install a villager pack</h2>
+        <ol>
+          <li>Install VillagerAPI and start the game once. A <code>villagerpacks</code> folder appears in your game folder.</li>
+          <li>Put the pack in that folder. It can be a plain folder, a <code>.zip</code> or a <code>.jar</code>.</li>
+          <li>Start the game. The log lists every pack VillagerAPI found and anything wrong with it.</li>
+        </ol>
+        <p>On a server, install VillagerAPI on the server and on every player's game, and use the same packs on both. Mods can also ship a villager pack inside their jar, which is how <a href="https://modrinth.com/mod/more-villagers-re-employed">More Villagers: Re-employed</a> adds its ten professions.</p>
+
+        <h2>What a villager pack can add</h2>
+        <table>
+          <thead><tr><th>Folder</th><th>What it adds</th></tr></thead>
+          <tbody>
+            <tr><td><code>villagers/workstations</code></td><td>Workstation blocks for your professions.</td></tr>
+            <tr><td><code>villagers/poi_types</code></td><td>Links a workstation block to a profession, so unemployed villagers take the job.</td></tr>
+            <tr><td><code>villagers/professions</code></td><td>New villager professions with their work sound and look.</td></tr>
+            <tr><td><code>villagers/types</code></td><td>Villager types, the regional looks like desert or snowy villagers.</td></tr>
+            <tr><td><code>villagers/biome_mappings</code></td><td>Which villager type spawns in which biome.</td></tr>
+            <tr><td><code>villagers/trades</code></td><td>Trades from Novice to Master, for your professions or vanilla and modded ones.</td></tr>
+            <tr><td><code>villagers/biome_trades</code></td><td>Trades only villagers of certain types offer.</td></tr>
+            <tr><td><code>villagers/gifts</code></td><td>What villagers throw to the Hero of the Village.</td></tr>
+            <tr><td><code>villagers/structure_tags</code></td><td>Explorer maps that lead to any structure.</td></tr>
+            <tr><td><code>villagers/wandering_trader</code></td><td>Wandering trader trades. See the <a href="/wandering-trader">wandering trader guide</a>.</td></tr>
+            <tr><td><code>villagers/village_types</code>, <code>village_structures</code></td><td>New villages and village houses.</td></tr>
+          </tbody>
+        </table>
+        <p>Every pack also has a <code>villagerapi_config.json</code> with its namespace, name and version, and a <code>pack.mcmeta</code>.</p>
+
+        <h2>Custom villager trades</h2>
+        <p>Trades are written per profession and per level, from 1 (Novice) to 5 (Master). On Minecraft 1.21.11 and newer they use the game's own trade format:</p>
+<pre><code>{
+  "profession": "minecraft:farmer",
+  "levels": {
+    "1": [
+      {
+        "wants": { "id": "minecraft:wheat", "count": 30 },
+        "gives": { "id": "minecraft:emerald" },
+        "max_uses": 16,
+        "xp": 2
+      }
+    ]
+  }
+}</code></pre>
+        <p>This adds a wheat trade to every novice farmer and keeps their usual trades. Set <code>"replace": true</code> on a level to swap out the original trades instead, use <code>trade_list_amount</code> to give each villager a random few of your trades, and <code>trade_list_max</code> to cap the total. Items can carry components, so enchanted gear, potions and named items all work, and explorer maps can lead to any structure.</p>
+
+        <h2>Questions</h2>
+        <h3>Can I change vanilla villager trades?</h3>
+        <p>Yes. Point a trade file's <code>profession</code> at a vanilla or modded profession, such as <code>minecraft:librarian</code>, and add to or replace any of its levels.</p>
+        <h3>Can I change the wandering trader?</h3>
+        <p>Yes. A pack can add trades to the wandering trader, remove trades for any item, change how many trades it offers, add new trade pools or replace its trades entirely. The <a href="/#wandering-trader">generator's Wandering Trader panel</a> does it without writing JSON, and the <a href="/wandering-trader">wandering trader guide</a> explains every option.</p>
+        <h3>Which Minecraft versions are supported?</h3>
+        <p>VillagerAPI runs on 1.21.1, 1.21.11, 26.1.2, 26.2, 26.3 and the 26.4 snapshot with Fabric or NeoForge (Fabric only on 26.4), and the generator exports packs for every one of them. On 26.1.2 and 26.2 VillagerAPI is more limited: it has no new villages or village houses, no <code>replace</code> or <code>trade_list_max</code> on trade levels, and biome mappings only take single biomes, without tags or weights. Trades for an existing profession also work differently there: they join its trade pool, and the villager offers as many trades as you listed, picked from vanilla's and yours together. The generator leaves the unsupported options out when you pick 26.1.2 / 26.2. Pick the version you play before you download, since some files differ between versions.</p>
+        <h3>Where is the full reference?</h3>
+        <p>Every field is described in the documentation for <a href="https://github.com/frikinjay/villagerapi/blob/main/DOCUMENTATION_26_1.md">Minecraft 26.x and 1.21.11</a> and <a href="https://github.com/frikinjay/villagerapi/blob/main/DOCUMENTATION_1_21_1.md">Minecraft 1.21.1</a>.</p>
+      </article>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <span>Not affiliated with Mojang Studios or Microsoft.</span>
+      <nav aria-label="Footer">
+        <a href="https://modrinth.com/mod/villagerapi">Modrinth</a>
+        <a href="https://www.curseforge.com/minecraft/mc-mods/villagerapi">CurseForge</a>
+        <a href="https://github.com/frikinjay/villagerapi">GitHub</a>
+        <a href="https://discord.gg/aPPEPJWG39">Discord</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,5 +1,3 @@
-// Reads model geometry straight from Minecraft's client code, the way mcsrc (github.com/FabricMC/mcsrc) does:
-// the client jar is downloaded from Mojang after the player accepts the EULA, and classes are decompiled in the browser with Vineflower.
 const MANIFEST = 'https://piston-meta.mojang.com/mc/game/version_manifest_v2.json';
 const EULA_KEY = 'mcsrc-eula-accepted';
 const CACHE = 'villagerapi-minecraft-jars-v1';
@@ -25,7 +23,7 @@ export function askEula() {
             const choice = e.target.closest('[data-eula]');
             if (!choice) return;
             const yes = choice.dataset.eula === 'yes';
-            if (yes) { try { localStorage.setItem(EULA_KEY, '1'); } catch (error) { /* ignore */ } }
+            if (yes) { try { localStorage.setItem(EULA_KEY, '1'); } catch (error) { } }
             dialog.close(); dialog.remove(); resolve(yes);
         });
         dialog.addEventListener('cancel', () => { dialog.remove(); resolve(false); });
@@ -117,7 +115,7 @@ export async function findClasses(version, pattern) {
 
 export async function decompileClass(version, className) {
     const key = SOURCE_PREFIX + version + ':' + className;
-    try { const cached = localStorage.getItem(key); if (cached) return cached; } catch (error) { /* ignore */ }
+    try { const cached = localStorage.getItem(key); if (cached) return cached; } catch (error) { }
     const { zip, mappings } = await clientJar(version);
     screen(className.split('/').pop());
     const { decompile } = await import('./vendor/vf/vf.js');
@@ -136,7 +134,7 @@ export async function decompileClass(version, className) {
     if (mappings) screen('Remapping ' + className.split('/').pop());
     const result = await decompile([className], { source: provide });
     const source = result[className] || Object.values(result)[0] || '';
-    try { localStorage.setItem(key, source); } catch (error) { /* storage full: keep in memory only */ }
+    try { localStorage.setItem(key, source); } catch (error) { }
     return source;
 }
 
@@ -293,7 +291,6 @@ const MODEL_CLASSES = {
     baby_zombie: { classes: [/\/BabyZombieVillagerModel\.class$/, /\/ZombieVillagerModel\.class$/], prefer: [/[Bb]aby/, /^createBodyLayer$/], baby: true }
 };
 
-// Loads a villager model from the game's own code; resolves null when declined or unavailable.
 export async function villagerModel(kind, version, entityBox, withPivot) {
     const spec = MODEL_CLASSES[kind];
     if (!spec || !(await askEula())) return null;
@@ -322,9 +319,7 @@ export async function villagerModel(kind, version, entityBox, withPivot) {
 }
 
 
-/* ---------- Mojang mappings and class remapping (for obfuscated versions such as 1.21.1) ---------- */
 
-// Parses ProGuard-style client mappings. Member lines are kept per class and parsed only when a class is remapped.
 export function parseMappings(text) {
     const toObf = new Map(), toNamed = new Map(), lines = new Map();
     let current = null;
@@ -351,7 +346,6 @@ function typeDesc(type, toObf) {
     return dims + 'L' + (toObf ? toObf.get(named) || named : named) + ';';
 }
 
-// Member names of one obfuscated class: key "obfName obfDescriptor" -> named name.
 function members(mappings, obf) {
     if (mappings.members.has(obf)) return mappings.members.get(obf);
     const map = new Map();
@@ -371,8 +365,6 @@ function remapDesc(desc, mappings) {
     return desc.replace(/L([^;]+);/g, (all, name) => 'L' + (mappings.toNamed.get(name) || name) + ';');
 }
 
-// Rewrites a class file's constant pool with Mojang names. New UTF-8 and NameAndType entries are appended,
-// so shared entries are never changed in place.
 export async function remapClass(bytes, mappings, zip) {
     const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
     const count = view.getUint16(8);
@@ -399,7 +391,6 @@ export async function remapClass(bytes, mappings, zip) {
     const addNat = (name, desc) => { extra.push({ tag: 12, a: name, b: desc }); return next++; };
     const patch = [];
 
-    // Member references: remap name and descriptor using the owner's (or a superclass's) mappings.
     const superOf = new Map();
     const lookup = async (owner, name, desc) => {
         for (let cls = owner, depth = 0; cls && depth < 12; depth++) {
@@ -419,7 +410,6 @@ export async function remapClass(bytes, mappings, zip) {
         const newDesc = remapDesc(desc, mappings);
         if (named !== name || newDesc !== desc) patch.push([entry.start + 3, addNat(addUtf(named), addUtf(newDesc))]);
     }
-    // Class names, descriptors in NameAndType / method types, and this class's own members.
     const replaceUtf = new Map();
     for (let i = 1; i < pool.length; i++) {
         const entry = pool[i];
@@ -457,7 +447,6 @@ export async function remapClass(bytes, mappings, zip) {
         if (named !== name) restPatch.push([at + 2, addUtf(named)]);
         if (newDesc !== desc) restPatch.push([at + 4, addUtf(newDesc)]);
     }
-    // Drop generic Signature attributes' obfuscated names by leaving them; Vineflower falls back to descriptors.
 
     const encoder = new TextEncoder();
     const extraBytes = [];
@@ -483,7 +472,6 @@ export async function remapClass(bytes, mappings, zip) {
 
 const superCache = new Map();
 function superName(zip, obf) {
-    // Reads only the superclass name from a class file header; cached per class.
     if (!superCache.has(obf)) {
         const file = zip && zip.file(obf + '.class');
         superCache.set(obf, file ? file.async('uint8array').then(readSuper).catch(() => null) : Promise.resolve(null));

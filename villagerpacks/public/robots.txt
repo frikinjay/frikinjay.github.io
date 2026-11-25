@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://villagerpacks.neoterra.dev/sitemap.xml

@@ -1,8 +1,8 @@
-const REPOSITORY = 'https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets';
+const CDN = 'https://cdn.jsdelivr.net/gh/InventivetalentDev/minecraft-assets@';
 const ICON_SIZE = 96;
 const FACE_SHADE = { up: 1, down: 0.5, north: 0.8, south: 0.8, east: 0.6, west: 0.6 };
 const DEFAULT_TINT = 0x48b518;
-const CACHE_PREFIX = 'mcicon:v12:';
+const CACHE_VERSION = 'v14';
 const MAX_ANIMATION_STATES = 64;
 const MAX_ANIMATION_TICKS = 2400;
 const canvasTextures = new Map();
@@ -12,7 +12,7 @@ export function registerCanvasTexture(id, canvas) {
     if (three && three.textures) three.textures.delete(id);
 }
 
-const config = { version: '26.3', local: {} };
+const config = { version: '26.3', local: {}, animated: {} };
 const jsonCache = new Map();
 const imageCache = new Map();
 const iconCache = new Map();
@@ -20,9 +20,12 @@ const iconCache = new Map();
 let threePromise = null;
 let three = null;
 let queue = Promise.resolve();
+let failures = 0;
 
 export function configure(options) {
-    Object.assign(config, options);
+    const { animated, ...rest } = options;
+    Object.assign(config, rest);
+    if (animated) config.animated = { ...config.animated, ...Object.fromEntries(Object.entries(animated).map(([ns, list]) => [ns, new Set(list)])) };
 }
 
 export function splitId(id, fallbackNamespace = 'minecraft') {
@@ -41,15 +44,62 @@ export function assetUrl(ns, path) {
     for (const [id, zip] of archives) {
         if (ns !== 'minecraft' && zip.file(`assets/${ns}/${path}`)) return `archive:${id}|assets/${ns}/${path}`;
     }
-    if (ns === 'minecraft') return `${REPOSITORY}/${config.version}/assets/minecraft/${path}`;
+    if (ns === 'minecraft') return `${CDN}${config.version}/assets/minecraft/${path}`;
     const base = config.local[ns];
     return base ? `${base}/${ns}/${path}` : null;
+}
+
+const fallbackUrl = url => {
+    const match = /^https:\/\/cdn\.jsdelivr\.net\/gh\/([^/]+\/[^/@]+)@([^/]+)\/(.+)$/.exec(url);
+    return match ? `https://raw.githubusercontent.com/${match[1]}/${match[2]}/${match[3]}` : null;
+};
+
+async function getJson(url) {
+    const response = await fetch(url).catch(() => null);
+    if (response && response.ok) return response.json().catch(() => null);
+    if (response && response.status === 404) return null;
+    const backup = fallbackUrl(url);
+    const retry = backup ? await fetch(backup).catch(() => null) : null;
+    if (retry && retry.ok) return retry.json().catch(() => null);
+    if (!retry || retry.status !== 404) {
+        failures++;
+        jsonCache.delete(url);
+    }
+    return null;
+}
+
+function imageFrom(url) {
+    return new Promise(resolve => {
+        const image = new Image();
+        image.crossOrigin = 'anonymous';
+        image.decoding = 'async';
+        image.onload = () => resolve(image);
+        image.onerror = () => resolve(null);
+        image.src = url;
+    });
+}
+
+function remoteImage(url) {
+    return imageFrom(url).then(image => {
+        if (image) return image;
+        const backup = fallbackUrl(url);
+        if (!backup) return null;
+        return imageFrom(backup).then(async retry => {
+            if (retry) return retry;
+            const check = await fetch(backup, { method: 'HEAD' }).catch(() => null);
+            if (!check || check.status !== 404) {
+                failures++;
+                imageCache.delete(url);
+            }
+            return null;
+        });
+    });
 }
 
 export function fetchJson(url) {
     if (!url) return Promise.resolve(null);
     if (!jsonCache.has(url)) {
-        jsonCache.set(url, readArchive(url, 'string').then(text => (text !== undefined ? JSON.parse(text) : fetch(url).then(response => (response.ok ? response.json() : null)))).catch(() => null));
+        jsonCache.set(url, readArchive(url, 'string').then(text => (text !== undefined ? (text === null ? null : JSON.parse(text)) : getJson(url))).catch(() => null));
     }
     return jsonCache.get(url);
 }
@@ -64,15 +114,9 @@ async function readArchive(url, type) {
 function loadImage(url) {
     if (!url) return Promise.resolve(null);
     if (!imageCache.has(url)) {
-        imageCache.set(url, new Promise(resolve => {
-            const image = new Image();
-            image.crossOrigin = 'anonymous';
-            image.decoding = 'async';
-            image.onload = () => resolve(image);
-            image.onerror = () => resolve(null);
-            if (String(url).startsWith('archive:')) readArchive(url, 'blob').then(blob => { if (blob) image.src = URL.createObjectURL(blob); else resolve(null); });
-            else image.src = url;
-        }));
+        imageCache.set(url, String(url).startsWith('archive:')
+            ? readArchive(url, 'blob').then(blob => (blob ? imageFrom(URL.createObjectURL(blob)) : null))
+            : remoteImage(url));
     }
     return imageCache.get(url);
 }
@@ -94,10 +138,30 @@ function firstFrame(image) {
 
 const animationCache = new Map();
 
+const vanillaAnimated = new Map();
+
+function vanillaAnimatedList() {
+    const version = config.version;
+    if (!vanillaAnimated.has(version)) {
+        const local = /^https?:/.test(import.meta.url);
+        vanillaAnimated.set(version, local
+            ? fetch(new URL(`../data/${version}/vanilla-animated.json`, import.meta.url)).then(r => (r.ok ? r.json() : null)).then(list => (Array.isArray(list) ? new Set(list) : null)).catch(() => null)
+            : Promise.resolve(null));
+    }
+    return vanillaAnimated.get(version);
+}
+
+async function hasMeta(url) {
+    const match = /\/assets\/([^/]+)\/(textures\/.+\.png)$/.exec(url);
+    if (!match) return true;
+    const known = match[1] === 'minecraft' && !config.animated.minecraft ? await vanillaAnimatedList() : config.animated[match[1]];
+    return !known || known.has(match[2]);
+}
+
 function loadAnimation(url) {
     if (!url) return Promise.resolve(null);
     if (!animationCache.has(url)) {
-        animationCache.set(url, fetchJson(url + '.mcmeta').then(meta => (meta && meta.animation ? meta.animation : null)));
+        animationCache.set(url, hasMeta(url).then(meta => (meta ? fetchJson(url + '.mcmeta').then(data => (data && data.animation ? data.animation : null)) : null)));
     }
     return animationCache.get(url);
 }
@@ -830,7 +894,7 @@ async function renderBlock(description) {
     const holder = new THREE.Group();
     holder.add(group);
     const rotation = transform.rotation || [0, 0, 0];
-    holder.rotation.set(rotation[0] * Math.PI / 180, -rotation[1] * Math.PI / 180, -rotation[2] * Math.PI / 180, 'XYZ');
+    holder.rotation.set(rotation[0] * Math.PI / 180, rotation[1] * Math.PI / 180, rotation[2] * Math.PI / 180, 'XYZ');
     const scale = transform.scale || [1, 1, 1];
     holder.scale.set(scale[0], scale[1], scale[2]);
     const translation = transform.translation || [0, 0, 0];
@@ -922,36 +986,70 @@ async function composeMap(spec) {
 }
 
 export function renderMapIcon(key, spec) {
-    const cacheKey = 'map|' + key;
-    if (iconCache.has(cacheKey)) return iconCache.get(cacheKey);
-    const cached = readCache(cacheKey);
-    if (cached) {
-        const ready = Promise.resolve(cached);
-        iconCache.set(cacheKey, ready);
-        return ready;
-    }
-    const promise = composeMap(spec).then(url => {
-        if (url) writeCache(cacheKey, url);
+    const id = 'map|' + key;
+    if (iconCache.has(id)) return iconCache.get(id);
+    const before = failures;
+    const promise = readCache(id).then(cached => cached || composeMap(spec).then(url => {
+        if (url && failures === before) writeCache(id, url);
         return url;
-    }).catch(() => null);
-    iconCache.set(cacheKey, promise);
+    })).catch(() => null);
+    iconCache.set(id, promise);
     return promise;
 }
 
-function readCache(id) {
-    try {
-        const value = localStorage.getItem(CACHE_PREFIX + config.version + ':' + id);
-        return value && value.startsWith('{') ? JSON.parse(value) : value;
-    } catch (error) {
-        return null;
+let database = null;
+
+function openCache() {
+    if (!database) {
+        database = new Promise(resolve => {
+            if (typeof indexedDB === 'undefined') return resolve(null);
+            try {
+                Object.keys(localStorage).filter(key => key.startsWith('mcicon:')).forEach(key => localStorage.removeItem(key));
+            } catch (error) {
+            }
+            setTimeout(() => resolve(null), 2000);
+            try {
+                const request = indexedDB.open('mc-icons', 1);
+                request.onupgradeneeded = () => request.result.createObjectStore('icons');
+                request.onsuccess = () => {
+                    const db = request.result;
+                    db.onversionchange = () => db.close();
+                    resolve(db);
+                };
+                request.onerror = () => resolve(null);
+                request.onblocked = () => resolve(null);
+            } catch (error) {
+                resolve(null);
+            }
+        });
     }
+    return database;
 }
 
-function writeCache(id, url) {
+function cacheKey(id) {
+    return `${CACHE_VERSION}:${config.version}:${id}`;
+}
+
+async function readCache(id) {
+    const db = await openCache();
+    if (!db) return null;
+    return new Promise(resolve => {
+        try {
+            const request = db.transaction('icons').objectStore('icons').get(cacheKey(id));
+            request.onsuccess = () => resolve(request.result || null);
+            request.onerror = () => resolve(null);
+        } catch (error) {
+            resolve(null);
+        }
+    });
+}
+
+async function writeCache(id, url) {
+    const db = await openCache();
+    if (!db) return;
     try {
-        localStorage.setItem(CACHE_PREFIX + config.version + ':' + id, typeof url === 'string' ? url : JSON.stringify(url));
+        db.transaction('icons', 'readwrite').objectStore('icons').put(url, cacheKey(id));
     } catch (error) {
-        /* storage full or unavailable */
     }
 }
 
@@ -959,14 +1057,14 @@ export function renderIcon(id, options = {}) {
     const key = String(id) + (typeof options.tint === 'number' ? '|' + options.tint.toString(16) : '');
     if (iconCache.has(key)) return iconCache.get(key);
 
-    const cached = readCache(key);
-    if (cached) {
-        const ready = Promise.resolve(cached);
-        iconCache.set(key, ready);
-        return ready;
-    }
+    const promise = readCache(key).then(cached => cached || draw(id, key, options));
+    iconCache.set(key, promise);
+    return promise;
+}
 
-    const promise = describeItem(String(id), options).then(description => preloadTextures(description).then(() => description)).then(description => {
+function draw(id, key, options) {
+    const before = failures;
+    return describeItem(String(id), options).then(description => preloadTextures(description).then(() => description)).then(description => {
         const task = () => {
             if (description.kind === 'flat') return renderFlat(description);
             if (description.kind === 'block' || description.kind === 'special') return renderBlock(description);
@@ -976,12 +1074,16 @@ export function renderIcon(id, options = {}) {
         queue = run.catch(() => null);
         return run;
     }).then(url => {
-        if (url) writeCache(key, url);
+        if (failures === before) {
+            if (url) writeCache(key, url);
+        } else {
+            iconCache.delete(key);
+        }
         return url;
-    }).catch(() => null);
-
-    iconCache.set(key, promise);
-    return promise;
+    }).catch(() => {
+        iconCache.delete(key);
+        return null;
+    });
 }
 
 

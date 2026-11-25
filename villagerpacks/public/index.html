@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" class="is-loading">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Villager Packs: Custom Minecraft Villagers and Trades</title>
+  <meta name="description" content="Villager packs for Minecraft: new villager professions, villager types, custom trades and village houses for VillagerAPI on Fabric and NeoForge.">
+  <link rel="canonical" href="https://villagerpacks.neoterra.dev/">
+  <meta property="og:title" content="Villager Packs: Custom Minecraft Villagers and Trades">
+  <meta property="og:description" content="Villager packs for Minecraft: new villager professions, villager types, custom trades and village houses for VillagerAPI on Fabric and NeoForge.">
+  <meta property="og:url" content="https://villagerpacks.neoterra.dev/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Villager Packs">
+  <meta property="og:image" content="https://villagerpacks.neoterra.dev/img/villagerapi_logo.png">
+  <meta name="twitter:card" content="summary">
+  <meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/png" href="./favicon.png">
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+  <link rel="preload" href="./fonts/MCTenLowercaseAlt.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="./fonts/MinecraftSeven2.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="./css/main.css">
+  <link rel="stylesheet" href="./css/controls.css">
+  <link rel="stylesheet" href="./css/packs.css">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
+  <link rel="modulepreload" href="./js/mc-assets.js">
+  <script src="./js/site.js" defer></script>
+  <script src="./js/ui-controls.js" defer></script>
+  <script src="./js/packs.js" defer></script>
+  <style>#loader{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:#fbfbfd;color:#1d1d1f;font:20px/1 "Minecraft Seven",system-ui,sans-serif;letter-spacing:.12em}@media(prefers-color-scheme:dark){#loader{background:#000;color:#f5f5f7}}</style>
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "Villager Packs", "alternateName": "VillagerAPI villager packs", "url": "https://villagerpacks.neoterra.dev/", "description": "Villager packs for Minecraft: new villager professions, villager types, custom trades and village houses for VillagerAPI on Fabric and NeoForge.", "about": {"@type": "VideoGame", "name": "Minecraft"}, "publisher": {"@type": "Person", "name": "frikinjay", "url": "https://github.com/frikinjay"}}</script>
+  <script type="application/ld+json" data-packs>{"@context":"https://schema.org","@type":"ItemList","name":"Minecraft villager packs","itemListElement":[{"@type":"ListItem","position":1,"url":"https://villagerpacks.neoterra.dev/pack/morevillagers","name":"More Villagers"}]}</script>
+</head>
+<body>
+  <div id="loader" role="status" aria-live="polite">LOADING...</div>
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="logo" href="./"><span class="logo-block" aria-hidden="true" style="background-image: url('./img/more_villagers_re_logo.png');"></span>VAPI</a>
+      <nav class="nav-links" aria-label="Main">
+        <a href="./" aria-current="page">Packs</a>
+        <a href="https://villagerapi.neoterra.dev/">Generator</a>
+        <a href="https://villagerapi.neoterra.dev/guide">Guide</a>
+        <a href="https://github.com/frikinjay/villagerapi/blob/main/DOCUMENTATION_26_1.md">Docs</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <div class="intro">
+        <h1>Villager Packs</h1>
+        <p>Custom Minecraft villagers, professions, trades and villages, made with VillagerAPI.</p>
+        <div class="actions">
+          <a class="chevron" href="https://modrinth.com/mod/villagerapi">Get VillagerAPI</a>
+          <a class="chevron" href="https://villagerapi.neoterra.dev/">Build your own</a>
+        </div>
+      </div>
+      <label class="search pack-search">
+        <span class="sr-only">Search villager packs</span>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <input type="search" id="pack-search" placeholder="Search packs" autocomplete="off">
+      </label>
+      <div class="pack-grid" id="pack-grid">
+        <a class="pack-card" href="./pack/morevillagers" data-search="more villagers morevillagers frikinjay adds new villager professions, types, workstations and trades">
+            <span class="pack-card-head">
+                <span class="pack-icon"><img src="./packs/morevillagers/pack.png" alt="" width="64" height="64"></span>
+                <span class="pack-title"><strong>More Villagers</strong><span>by frikinjay</span></span>
+            </span>
+            <span class="pack-desc">Adds new villager professions, types, workstations and trades</span>
+            <span class="pack-tags"><span><b>10</b> professions</span><span><b>1</b> villager type</span><span>v1.26.11.2</span><span>Minecraft 26.3</span></span>
+        </a>
+      </div>
+      <p class="no-results" id="no-packs" hidden>No villager packs found</p>
+
+      <section class="site-text prose" aria-labelledby="what-is">
+        <h2 id="what-is">What is a villager pack?</h2>
+        <p>A villager pack is a folder of JSON files and textures that <a href="https://modrinth.com/mod/villagerapi">VillagerAPI</a> loads into Minecraft. It can add new villager professions with their own workstations, villager types for any biome, trades from Novice to Master, Hero of the Village gifts, wandering trader trades and new village houses. VillagerAPI runs on Fabric and NeoForge for Minecraft 1.21.1, 1.21.11, 26.1.2, 26.2, 26.3 and the 26.4 snapshot (Fabric only on 26.4).</p>
+        <h2>Questions</h2>
+        <h3>How do I add custom villagers to Minecraft?</h3>
+        <p>Install VillagerAPI, then put a villager pack in the <code>villagerpacks</code> folder of your game folder or server folder. Mods like <a href="https://modrinth.com/mod/more-villagers-re-employed">More Villagers: Re-employed</a> come with their pack built in.</p>
+        <h3>Can I make my own villager trades without code?</h3>
+        <p>Yes. The <a href="https://villagerapi.neoterra.dev/">villager pack generator</a> runs in your browser. Add professions, workstations, trades, wandering trader trades, gifts and villages for any Minecraft version VillagerAPI supports, then download the finished pack. You can also load an existing pack, or a mod jar that contains one, and change it.</p>
+        <h3>Can a villager pack change the wandering trader?</h3>
+        <p>Yes. Since VillagerAPI 1.26.11.2 a pack can add trades to the wandering trader, remove trades for any item, change how many trades it offers or replace its trades entirely. The <a href="https://villagerapi.neoterra.dev/#wandering-trader">generator</a> has a panel for it, and the <a href="https://villagerapi.neoterra.dev/wandering-trader">wandering trader guide</a> explains every option.</p>
+        <h3>Do villager packs work on servers?</h3>
+        <p>Yes. Install VillagerAPI on the server and on every player's game, and put the same villager packs on both.</p>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <span>Not affiliated with Mojang Studios or Microsoft.</span>
+      <nav aria-label="Footer">
+        <a href="https://modrinth.com/mod/villagerapi">Modrinth</a>
+        <a href="https://github.com/frikinjay/villagerapi">GitHub</a>
+        <a href="https://discord.gg/aPPEPJWG39">Discord</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

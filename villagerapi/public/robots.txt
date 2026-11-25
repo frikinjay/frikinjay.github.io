@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://villagerapi.neoterra.online/sitemap.xml
+Sitemap: https://villagerapi.neoterra.dev/sitemap.xml

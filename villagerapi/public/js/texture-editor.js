@@ -19,7 +19,6 @@ const ADULT_PARTS = [
     { name: 'Body', boxes: [[16, 20, 8, 12, 6]], elements: [4] }, { name: 'Robe', boxes: [[0, 38, 8, 20, 6]], elements: [5] },
     { name: 'Arms', boxes: [[44, 22, 4, 8, 4], [40, 38, 8, 4, 4]], elements: [6, 7, 8] }, { name: 'Legs', boxes: [[0, 22, 4, 12, 4]], elements: [9, 10] }
 ];
-// 26.3 baby villager, reconstructed from the villager_baby texture layout.
 const BABY_PARTS = [
     { name: 'Head', boxes: [[0, 0, 8, 8, 7]], elements: [0] }, { name: 'Nose', boxes: [[24, 0, 2, 2, 1]], elements: [1] },
     { name: 'Body', boxes: [[0, 15, 4, 4, 3]], elements: [2] }, { name: 'Arms', boxes: [[16, 15, 4, 2, 3], [36, 15, 2, 4, 2]], elements: [3, 4, 5] },
@@ -217,7 +216,6 @@ function ui() {
     return dialog;
 }
 
-/* ---------- pixel operations on the active canvas ---------- */
 
 function snapshot() {
     state.undo.push(state.ctx.getImageData(0, 0, state.w, state.h));
@@ -288,7 +286,6 @@ function applyTool(x, y, phase, last) {
     changed();
 }
 
-/* ---------- slots (workstation faces or model texture keys) ---------- */
 
 function hasContent(canvas) {
     const d = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
@@ -367,7 +364,6 @@ function updateTextures() {
     }
 }
 
-// Elements for a block model: its own elements, or a cube from a common parent.
 function blockElements(model) {
     if (model && Array.isArray(model.elements) && model.elements.length) return model.elements;
     const t = (model && model.textures) || {};
@@ -407,7 +403,6 @@ function preview() {
     viewer.refresh();
 }
 
-/* ---------- 2D canvas and overlay ---------- */
 
 function parts() {
     if (state.live) return state.live.groups.map(g => ({ name: title(g.name), boxes: g.boxes.map(([u, v, w, h, d]) => [u, v, w, h, d]), elements: g.elements }));
@@ -443,8 +438,6 @@ function setTitle() {
     q('title').textContent = bits.join(' · ');
 }
 
-// Vanilla zombie villager type textures are the normal ones darkened a little, slightly desaturated and torn:
-// edge pixels and a few inner pixels are removed. Profession textures are identical to the normal ones.
 function zombifyData(data, w, h) {
     let seed = 1337;
     const rand = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
@@ -658,9 +651,9 @@ export async function open(options) {
     q('preview').hidden = !!kind.model;
     state.live = null;
     const version = options.version || '26.3';
-    if (entity && (version === '26.3' || kind.model !== 'baby')) {
+    if (entity && (options.babies || kind.model !== 'baby')) {
         const liveKind = { villager: 'villager', type: 'villager', zombie: 'zombie', zombie_type: 'zombie', baby: 'baby', baby_zombie: 'baby_zombie' }[options.kind];
-        state.live = await villagerModel(liveKind, version, entityBox, withPivot);
+        state.live = await villagerModel(liveKind, options.game || version, entityBox, withPivot);
     }
     state.outline = parts().map(() => true); state.visible = parts().map(() => true);
     const partList = parts();

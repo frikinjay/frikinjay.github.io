@@ -127,8 +127,9 @@
             tipElement = document.createElement('div');
             tipElement.className = 'mc-tooltip';
             tipElement.setAttribute('aria-hidden', 'true');
-            document.body.appendChild(tipElement);
         }
+        var host = (element.closest && element.closest('dialog[open]')) || document.body;
+        if (tipElement.parentNode !== host) host.appendChild(tipElement);
         if (tipOwner !== element) {
             tipElement.textContent = '';
             tipElement.appendChild(tipLine(data.name, data.color, 'mc-tooltip-line mc-tooltip-title'));
@@ -159,7 +160,15 @@
         window.clearTimeout(tipTimer);
     }
 
+    function adoptTitle(element) {
+        var titled = element && element.closest && element.closest('[title]');
+        if (!titled) return;
+        var text = titled.getAttribute('title');
+        titled.removeAttribute('title');
+        if (text) titled.setAttribute('data-tip', JSON.stringify({ name: text, color: 'white', lines: [] }));
+    }
     document.addEventListener('pointerover', function (event) {
+        adoptTitle(event.target);
         if (event.pointerType === 'touch') return;
         var target = event.target.closest && event.target.closest('[data-tip]');
         if (target) showTip(target, event.clientX, event.clientY);

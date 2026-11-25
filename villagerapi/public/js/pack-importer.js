@@ -1,4 +1,3 @@
-// Loads an existing villager pack (zip, mod jar or folder) into the generator so it can be edited.
 const CUBE_FACES = { north: 'front', south: 'back', east: 'left', west: 'right', up: 'top', down: 'bottom' };
 
 async function loadZipLib() {
@@ -13,7 +12,6 @@ async function loadZipLib() {
 
 const toDataUrl = blob => new Promise(resolve => { const r = new FileReader(); r.onload = () => resolve(r.result); r.onerror = () => resolve(null); r.readAsDataURL(blob); });
 
-// A reader exposes the pack's files relative to the folder that holds villagerapi_config.json.
 async function zipReader(file) {
     const JSZip = await loadZipLib();
     let zip = await JSZip.loadAsync(file);
@@ -91,13 +89,13 @@ async function importPack(reader) {
     const meta = await json(reader, 'pack.mcmeta') || {};
     const ns = config.namespace || 'my_villagers';
 
-    // Start from a clean generator.
     document.querySelectorAll('[data-list] > .entry').forEach(e => e.remove());
     gen.textures = {};
 
     const legacy = !(meta.pack && (meta.pack.min_format !== undefined || meta.pack.max_format !== undefined));
-    const radio = document.querySelector(`input[name="mc-version"][value="${legacy ? '1.21.1' : '26.3'}"]`);
-    if (radio && !radio.checked) { radio.checked = true; radio.dispatchEvent(new Event('change', { bubbles: true })); }
+    const picker = document.querySelector('[name="mc-version"]');
+    const current = window.currentVillagerPackVersion();
+    if (picker && legacy !== (current.tradeFormat === 'legacy')) { picker.value = legacy ? '1.21.1' : '26.3'; picker.dispatchEvent(new Event('change', { bubbles: true })); }
     const setPack = (id, value) => { const el = document.getElementById(id); if (el && value !== undefined) { el.value = value; el.dispatchEvent(new Event('input', { bubbles: true })); } };
     setPack('pack-namespace', ns); setPack('pack-display-name', config.display_name); setPack('pack-description', config.description);
     setPack('pack-version', config.version); setPack('pack-author', config.author); setPack('pack-creative-icon', config.creative_tab_icon);
@@ -183,6 +181,12 @@ async function importPack(reader) {
         const { profession, ...rest } = data;
         const e = add(gen, 'biomeTrade'); setField(e, 'profession', profession || `${ns}:${baseName(path)}`); setJson(e, 'biomeJson', rest);
     }
+    for (const path of inDir(reader, 'villagers/wandering_trader/')) {
+        const data = await json(reader, path); if (!data) continue;
+        const e = add(gen, 'wandering');
+        setField(e, 'name', path.slice('villagers/wandering_trader/'.length, -'.json'.length).replace(/\//g, '_'));
+        setJson(e, 'wanderingJson', data);
+    }
     for (const path of inDir(reader, 'villagers/gifts/')) {
         const data = await json(reader, path); if (!data) continue;
         const e = add(gen, 'gift');
@@ -212,7 +216,6 @@ async function importPack(reader) {
         setField(e, 'name', name); setField(e, 'namespace', data.namespace || ns);
         setField(e, 'folder', folder); setField(e, 'weight', data.weight || 1); setField(e, 'biomes', data.biomes || []);
         if (!setField(e, 'copyFrom', data.copy_from)) { setField(e, 'copyFrom', 'custom'); setField(e, 'copyFromCustom', data.copy_from); }
-        // Replacement structures live next to the village type file, in a folder named after it.
         const prefix = `villagers/village_types/${folder}/${name}/`;
         const overrides = reader.paths.filter(p => p.startsWith(prefix) && p.endsWith('.nbt'));
         if (overrides.length) {
@@ -256,7 +259,7 @@ async function run(reader, label) {
     const gen = window.villagerGen;
     if (!reader) { gen.notify(`${label} is not a villager pack: no villagerapi_config.json was found`, 'error'); return; }
     const existing = document.querySelectorAll('[data-list] > .entry').length;
-    if (existing && !confirm('Loading a pack replaces everything currently in the generator. Continue?')) return;
+    if (existing && !(await window.UIControls.confirm('Everything currently in the generator is replaced by the loaded pack.', { title: 'Replace the Current Pack?', ok: 'Replace', danger: true }))) return;
     try {
         const result = await importPack(reader);
         gen.notify(`Loaded ${result.name}. Edit anything and download it again.`);

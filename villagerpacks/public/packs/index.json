@@ -1,0 +1,62 @@
+{
+  "packs": [
+    {
+      "id": "morevillagers",
+      "path": "packs/morevillagers",
+      "namespace": "morevillagers",
+      "name": "More Villagers",
+      "version": "1.26.11.2",
+      "minecraft": "26.3",
+      "author": "frikinjay",
+      "description": "Adds new villager professions, types, workstations and trades",
+      "icon": "packs/morevillagers/pack.png",
+      "professions": [
+        "enderian",
+        "engineer",
+        "explorer",
+        "florist",
+        "hunter",
+        "iceman",
+        "miner",
+        "netherian",
+        "oceanographer",
+        "woodworker"
+      ],
+      "types": [
+        "badlands"
+      ],
+      "biomeMappings": [
+        "badlands"
+      ],
+      "recipes": {
+        "morevillagers:blueprint_table": [
+          "data/morevillagers/recipe/blueprint_table.json"
+        ],
+        "morevillagers:chiller": [
+          "data/morevillagers/recipe/chiller.json"
+        ],
+        "morevillagers:decayed_workbench": [
+          "data/morevillagers/recipe/decayed_workbench.json"
+        ],
+        "morevillagers:gardening_table": [
+          "data/morevillagers/recipe/gardening_table.json"
+        ],
+        "morevillagers:hunting_post": [
+          "data/morevillagers/recipe/hunting_post.json"
+        ],
+        "morevillagers:mining_bench": [
+          "data/morevillagers/recipe/mining_bench.json"
+        ],
+        "morevillagers:oceanography_table": [
+          "data/morevillagers/recipe/oceanography_table.json"
+        ],
+        "morevillagers:purpur_altar": [
+          "data/morevillagers/recipe/purpur_altar.json"
+        ],
+        "morevillagers:woodworking_table": [
+          "data/morevillagers/recipe/woodworking_table.json"
+        ]
+      }
+    }
+  ]
+}

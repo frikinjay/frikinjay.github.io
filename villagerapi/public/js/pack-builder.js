@@ -72,6 +72,7 @@ class VillagerPackBuilder {
         this.buildStructureTags();
         this.buildTrades();
         this.buildBiomeTrades();
+        this.buildWanderingTrades();
         this.buildGifts();
         this.buildBiomeMappings();
         this.buildLootTables();
@@ -383,6 +384,21 @@ class VillagerPackBuilder {
         });
     }
 
+    buildWanderingTrades() {
+        const used = new Set();
+        (this.data.wanderingTrades || []).forEach(entry => {
+            const value = entry.wanderingJson;
+            if (!value || typeof value !== 'object' || !Object.keys(value).length) {
+                this.warnings.push('A wandering trader entry changes nothing and was not included.');
+                return;
+            }
+            let name = this.name(entry.name || 'wandering_trader') || 'wandering_trader';
+            for (let i = 2; used.has(name); i++) name = `${this.name(entry.name || 'wandering_trader') || 'wandering_trader'}_${i}`;
+            used.add(name);
+            this.json(`villagers/wandering_trader/${name}.json`, value);
+        });
+    }
+
     buildGifts() {
         const heroGifts = {};
 
@@ -409,6 +425,22 @@ class VillagerPackBuilder {
             const rows = (mapping._rows || []).filter(row => row.biome && row.villagerType);
             if (rows.length === 0) return;
 
+            if (this.options.biomeMappings === 'map') {
+                const biomes = {};
+                rows.forEach(row => {
+                    if (row.biome.startsWith('#')) {
+                        this.warnings.push(`Biome mapping "${name}": ${row.biome} was left out, because Villager API on Minecraft ${this.options.label} only maps single biomes, not biome tags.`);
+                        return;
+                    }
+                    if (row.weight && row.weight !== 1) {
+                        this.warnings.push(`Biome mapping "${name}": the weight for ${row.biome} is ignored on Minecraft ${this.options.label}.`);
+                    }
+                    biomes[this.id(row.biome, 'minecraft')] = this.id(row.villagerType);
+                });
+                if (Object.keys(biomes).length) this.json(`villagers/biome_mappings/${name}.json`, { biomes });
+                return;
+            }
+
             const entries = rows.map(row => {
                 const entry = {
                     biome: row.biome.startsWith('#') ? row.biome : this.id(row.biome, 'minecraft'),
@@ -426,6 +458,10 @@ class VillagerPackBuilder {
     buildVillageTypes() {
         const types = this.data.villageTypes || [];
         if (types.length === 0) return;
+        if (!this.options.villages) {
+            this.warnings.push(`Village types were left out: Villager API on Minecraft ${this.options.label} doesn't support them.`);
+            return;
+        }
 
         types.forEach(village => {
             const name = this.name(village.name);
@@ -465,6 +501,10 @@ class VillagerPackBuilder {
     buildVillageStructures() {
         const structures = this.data.villageStructures || [];
         if (structures.length === 0) return;
+        if (!this.options.villages) {
+            this.warnings.push(`Village houses were left out: Villager API on Minecraft ${this.options.label} doesn't support them.`);
+            return;
+        }
 
         structures.forEach(addition => {
             const village = (addition.villageType || '').trim();
