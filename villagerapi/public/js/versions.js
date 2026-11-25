@@ -91,7 +91,7 @@ const VillagerPackVersions = {
         villages: true,
         levelReplace: true,
         biomeMappings: 'list',
-        docs: MODERN_DOCS
+        docs: 'https://github.com/frikinjay/villagerapi/blob/main/DOCUMENTATION_1_21_1.md'
     },
     '1.21.1': {
         id: '1.21.1',

@@ -182,7 +182,7 @@ function animationInfo(image, animation) {
     return { width, height, columns, frames, interpolate: !!animation.interpolate, total: frames.reduce((sum, frame) => sum + frame.time, 0) };
 }
 
-function frameOf(image, info, position) {
+export function frameOf(image, info, position) {
     if (!info) return firstFrame(image);
     const index = info.frames[position % info.frames.length].index;
     const canvas = document.createElement('canvas');
@@ -193,7 +193,20 @@ function frameOf(image, info, position) {
     return canvas;
 }
 
-async function textureSource(id) {
+export function vanillaUrl(version, path) {
+    return `${CDN}${version}/assets/minecraft/${path}`;
+}
+
+export function currentVersion() {
+    return config.version;
+}
+
+export async function imageSource(url) {
+    const [image, animation] = await Promise.all([loadImage(url), loadAnimation(url)]);
+    return { url, image, info: animationInfo(image, animation) };
+}
+
+export async function textureSource(id) {
     const url = textureUrl(id);
     const [image, animation] = await Promise.all([loadImage(url), loadAnimation(url)]);
     return { url, image, info: animationInfo(image, animation) };
@@ -252,7 +265,7 @@ async function captureAnimation(sources, size, draw) {
     return { first, strip: strip.toDataURL('image/png'), frames: plan.states.length, seq: plan.seq, interpolate: plan.interpolate };
 }
 
-function tintColor(tint) {
+export function tintColor(tint) {
     if (!tint || typeof tint !== 'object') return null;
     const value = tint.value ?? tint.default;
     if (typeof value === 'number') return value & 0xffffff;
@@ -293,7 +306,7 @@ function pickModel(node) {
     }
 }
 
-async function resolveModel(modelId) {
+export async function resolveModel(modelId) {
     const result = { textures: {}, elements: null, display: {}, generated: false, entity: false };
     let current = modelId;
     let depth = 0;
@@ -323,9 +336,11 @@ async function resolveModel(modelId) {
     return result;
 }
 
-function resolveTexture(textures, reference) {
+export function resolveTexture(textures, reference) {
     let value = reference;
-    for (let i = 0; i < 12 && typeof value === 'string' && value.startsWith('#'); i++) {
+    for (let i = 0; i < 12; i++) {
+        if (value && typeof value === 'object') value = value.sprite;
+        if (typeof value !== 'string' || !value.startsWith('#')) break;
         value = textures[value.slice(1)];
     }
     return typeof value === 'string' ? value : null;

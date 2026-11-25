@@ -2,6 +2,8 @@
 
 Two Python scripts for making block-swapped copies of structure `.nbt` files, for example a badlands version of the desert village. They only need Python 3, no extra packages.
 
+The same tools also run in your browser, with a 3D preview of every structure, at [villagerapi.neoterra.dev/#tools](https://villagerapi.neoterra.dev/#tools). Both use the same `block_replacements.json` format, so mappings work in either.
+
 ## 1. Scan
 
 Copy both scripts into the folder with the structures (for example a copy of `data/minecraft/structure/village/desert` taken from the Minecraft jar) and run:
