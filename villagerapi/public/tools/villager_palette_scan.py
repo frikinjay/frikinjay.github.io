@@ -244,12 +244,14 @@ def main():
     existing = {}
     replace_final_states = True
     rename = {}
+    block_nbt = {}
     if os.path.exists(mapping_path):
         with open(mapping_path, "r", encoding="utf-8") as handle:
             previous = json.load(handle)
         existing = previous.get("blocks", {})
         replace_final_states = previous.get("replace_jigsaw_final_states", True)
         rename = previous.get("rename_files", {})
+        block_nbt = previous.get("block_nbt", {})
 
     blocks = {}
     for block in sorted(set(usage) | set(existing)):
@@ -259,6 +261,7 @@ def main():
         "replace_jigsaw_final_states": replace_final_states,
         "rename_files": rename,
         "blocks": blocks,
+        **({"block_nbt": block_nbt} if block_nbt else {}),
         "used_in_files": {block: usage.get(block, 0) for block in sorted(usage)},
     }
 

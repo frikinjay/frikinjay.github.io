@@ -1,5 +1,6 @@
-import { DIRS, VEC, FACE_SHADE, MISSING, bakeState, textureInfo, tintFor, waterQuads, stateKey } from './structure-models.js';
-import { parseState } from './structure-core.js';
+import { VEC, FACE_SHADE, MISSING, bakeState, textureInfo, tintFor, fluidTextures, quadOf, stateKey, blockExtra, cushionQuads } from './structure-models.js';
+import { parseState, plain, TAG } from './structure-core.js';
+import { entityModel, signTextQuads } from './structure-entities.js';
 
 const THREE_URL = new URL('./vendor/three.module.min.js', import.meta.url).href;
 const FOV = 40;
@@ -41,6 +42,56 @@ void main() {
     gl_FragColor = vec4(color, texel.a);
 }`;
 
+const PORTAL_VERTEX = `
+varying vec4 vProj;
+void main() {
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    vec4 mid = gl_Position * 0.5;
+    vProj = vec4(mid.x + mid.w, mid.y + mid.w, gl_Position.z, gl_Position.w);
+}`;
+
+const PORTAL_FRAGMENT = `
+uniform sampler2D sky;
+uniform sampler2D stars;
+uniform float time;
+uniform float layers;
+varying vec4 vProj;
+vec3 layerColor(int i) {
+    if (i == 0) return vec3(0.022087, 0.098399, 0.110818);
+    if (i == 1) return vec3(0.011892, 0.095924, 0.089485);
+    if (i == 2) return vec3(0.027636, 0.101689, 0.100326);
+    if (i == 3) return vec3(0.046564, 0.109883, 0.114838);
+    if (i == 4) return vec3(0.064901, 0.117696, 0.097189);
+    if (i == 5) return vec3(0.063761, 0.086895, 0.123646);
+    if (i == 6) return vec3(0.084817, 0.111994, 0.166380);
+    if (i == 7) return vec3(0.097489, 0.154120, 0.091064);
+    if (i == 8) return vec3(0.106152, 0.131144, 0.195191);
+    if (i == 9) return vec3(0.097721, 0.110188, 0.187229);
+    if (i == 10) return vec3(0.133516, 0.138278, 0.148582);
+    if (i == 11) return vec3(0.070006, 0.243332, 0.235792);
+    if (i == 12) return vec3(0.196766, 0.142899, 0.214696);
+    if (i == 13) return vec3(0.047281, 0.315338, 0.321970);
+    if (i == 14) return vec3(0.204675, 0.390010, 0.302066);
+    return vec3(0.080955, 0.314821, 0.661491);
+}
+mat4 portalLayer(float layer) {
+    mat4 translate = mat4(1.0, 0.0, 0.0, 17.0 / layer, 0.0, 1.0, 0.0, (2.0 + layer / 1.5) * (time * 1.5), 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+    float angle = radians((layer * layer * 4321.0 + layer * 9.0) * 2.0);
+    mat2 rotate = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
+    mat2 scale = mat2((4.5 - layer / 4.0) * 2.0);
+    mat4 scaleTranslate = mat4(0.5, 0.0, 0.0, 0.25, 0.0, 0.5, 0.0, 0.25, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+    return mat4(scale * rotate) * translate * scaleTranslate;
+}
+void main() {
+    vec3 color = texture2D(sky, vProj.xy / vProj.w).rgb * layerColor(0);
+    for (int i = 0; i < 16; i++) {
+        if (float(i) >= layers) break;
+        vec4 p = vProj * portalLayer(float(i + 1));
+        color += texture2D(stars, p.xy / p.w).rgb * layerColor(i);
+    }
+    gl_FragColor = vec4(color, 1.0);
+}`;
+
 function hash(x, y, z, salt) {
     let h = Math.imul(x, 3129871) ^ Math.imul(z, 116129781) ^ y ^ Math.imul(salt + 1, 0x27d4eb2d);
     h = Math.imul(h ^ (h >>> 15), 0x2c1b3c6d);
@@ -59,21 +110,48 @@ function choose(options, x, y, z, salt) {
     return options[options.length - 1];
 }
 
-const curve = level => { const f = level / 15; return f / (4 - 3 * f); };
+const lightmaps = new Map();
 
-function lightColor(sky, block, night) {
-    const s = curve(sky) * (night ? 0.18 : 1);
-    const b = curve(block);
-    let r = s * (night ? 0.75 : 1) + b;
-    let g = s * (night ? 0.8 : 1) + b * ((b * 0.6 + 0.4) * 0.6 + 0.4);
-    let bl = s + b * (b * b * 0.6 + 0.4);
-    const finish = value => {
-        let c = Math.min(1, value * 0.96 + 0.03);
-        const lifted = 1 - Math.pow(1 - c, 4);
-        c = c + (lifted - c) * 0.5;
-        return Math.min(1, Math.max(0.05, c * 0.96 + 0.75 * 0.04));
-    };
-    return [finish(r), finish(g), finish(bl)];
+function lightmap(mode) {
+    if (lightmaps.has(mode)) return lightmaps.get(mode);
+    const night = mode === 'night';
+    const skyFactor = night ? 0.24 : 1;
+    const skyColor = night ? [122 / 255, 122 / 255, 1] : [1, 1, 1];
+    const tint = [1, 216 / 255, 140 / 255];
+    const brightness = level => level / (4 - 3 * level);
+    const table = new Float32Array(16 * 16 * 3);
+    for (let sky = 0; sky < 16; sky++) {
+        for (let block = 0; block < 16; block++) {
+            const blockLevel = block / 15;
+            const blockBrightness = brightness(blockLevel) * 1.4;
+            const skyBrightness = brightness(sky / 15) * skyFactor;
+            const whiten = 0.9 * (2 * blockLevel - 1) * (2 * blockLevel - 1);
+            const color = [0, 1, 2].map(i => Math.min(1, Math.max(0, skyColor[i] * skyBrightness + (tint[i] + (1 - tint[i]) * whiten) * blockBrightness)));
+            const max = Math.max(color[0], color[1], color[2]);
+            if (max > 0) {
+                const inverse = 1 - max;
+                const scaled = 1 - inverse * inverse * inverse * inverse;
+                for (let i = 0; i < 3; i++) color[i] += (color[i] * scaled / max - color[i]) * 0.5;
+            }
+            table.set(color, (sky * 16 + block) * 3);
+        }
+    }
+    lightmaps.set(mode, table);
+    return table;
+}
+
+function lightColor(table, sky, block) {
+    const s = Math.min(15, Math.max(0, sky)), b = Math.min(15, Math.max(0, block));
+    const s0 = Math.floor(s), b0 = Math.floor(b);
+    const s1 = Math.min(15, s0 + 1), b1 = Math.min(15, b0 + 1);
+    const fs = s - s0, fb = b - b0;
+    const out = [0, 0, 0];
+    for (let i = 0; i < 3; i++) {
+        const low = table[(s0 * 16 + b0) * 3 + i] * (1 - fb) + table[(s0 * 16 + b1) * 3 + i] * fb;
+        const high = table[(s1 * 16 + b0) * 3 + i] * (1 - fb) + table[(s1 * 16 + b1) * 3 + i] * fb;
+        out[i] = low * (1 - fs) + high * fs;
+    }
+    return out;
 }
 
 class Grid {
@@ -85,8 +163,14 @@ class Grid {
         this.pz = this.sz + 2;
         const cells = (this.sx + 2) * this.py * this.pz;
         this.opaque = new Uint8Array(cells);
+        this.solid = new Uint8Array(cells);
+        this.damp = new Uint8Array(cells);
         this.shade = new Float32Array(cells).fill(1);
-        this.water = new Uint8Array(cells);
+        this.fluid = new Uint8Array(cells);
+        this.own = new Float32Array(cells);
+        this.full = new Uint8Array(cells);
+        this.self = new Uint8Array(cells);
+        this.emissive = new Uint8Array(cells);
         this.kind = new Int32Array(cells).fill(-1);
         this.sky = null;
         this.block = null;
@@ -98,58 +182,89 @@ class Grid {
     }
 }
 
-function computeLight(grid, emitters) {
-    const cells = grid.opaque.length;
+const FULL_FACE = 0xffff;
+
+function computeLight(grid, masksOf, emitters) {
+    const { py, pz } = grid;
+    const sx = grid.sx + 2;
+    const cells = grid.kind.length;
     const sky = new Uint8Array(cells);
     const block = new Uint8Array(cells);
-    const queue = new Int32Array(cells * 2);
-    const flood = (levels, seeds) => {
-        let head = 0, tail = 0;
-        for (const cell of seeds) queue[tail++] = cell;
-        while (head < tail) {
-            const cell = queue[head++];
-            const level = levels[cell];
-            if (level <= 1) continue;
-            const z = cell % grid.pz;
-            const y = Math.floor(cell / grid.pz) % grid.py;
-            const x = Math.floor(cell / (grid.pz * grid.py));
-            for (const [dx, dy, dz] of VEC) {
-                const nx = x + dx, ny = y + dy, nz = z + dz;
-                if (nx < 0 || ny < 0 || nz < 0 || nx >= grid.sx + 2 || ny >= grid.py || nz >= grid.pz) continue;
-                const next = (nx * grid.py + ny) * grid.pz + nz;
-                if (grid.opaque[next]) continue;
-                const value = level - 1 - (grid.water[next] ? 1 : 0);
-                if (value > levels[next]) {
-                    levels[next] = value;
-                    if (tail < queue.length) queue[tail++] = next;
+    const step = [-pz, pz, -1, 1, -py * pz, py * pz];
+    const mask = (cell, dir) => {
+        const masks = grid.kind[cell] >= 0 ? masksOf(grid.kind[cell]) : null;
+        return masks ? masks[dir] : 0;
+    };
+    const occludes = (from, to, dir) => {
+        const a = mask(from, dir), b = mask(to, dir ^ 1);
+        return (a || b) && ((a | b) & FULL_FACE) === FULL_FACE;
+    };
+    const flood = (levels, isSky) => {
+        const buckets = Array.from({ length: 16 }, () => []);
+        for (let cell = 0; cell < cells; cell++) if (levels[cell] > 1) buckets[levels[cell]].push(cell);
+        for (let level = 15; level >= 2; level--) {
+            const bucket = buckets[level];
+            for (let i = 0; i < bucket.length; i++) {
+                const cell = bucket[i];
+                if (levels[cell] !== level) continue;
+                const z = cell % pz, y = Math.floor(cell / pz) % py, x = Math.floor(cell / (py * pz));
+                for (let dir = 0; dir < 6; dir++) {
+                    if ((dir === 0 && y === 0) || (dir === 1 && y === py - 1) || (dir === 2 && z === 0) || (dir === 3 && z === pz - 1) || (dir === 4 && x === 0) || (dir === 5 && x === sx - 1)) continue;
+                    const next = cell + step[dir];
+                    const damp = grid.damp[next];
+                    if (damp >= 15 || occludes(cell, next, dir)) continue;
+                    const value = isSky && dir === 0 && level === 15 && damp === 0 ? 15 : level - Math.max(1, damp);
+                    if (value > levels[next]) {
+                        levels[next] = value;
+                        buckets[value].push(next);
+                    }
                 }
             }
         }
     };
-    const skySeeds = [];
-    for (let x = 0; x < grid.sx + 2; x++) {
-        for (let z = 0; z < grid.pz; z++) {
+    for (let x = 0; x < sx; x++) {
+        for (let z = 0; z < pz; z++) {
             let level = 15;
-            for (let y = grid.py - 1; y >= 0; y--) {
-                const cell = (x * grid.py + y) * grid.pz + z;
-                if (grid.opaque[cell]) level = 0;
-                else if (grid.water[cell] && level > 0) level -= 1;
-                const edge = x === 0 || z === 0 || x === grid.sx + 1 || z === grid.pz - 1 || y === grid.py - 1;
-                sky[cell] = edge && !grid.opaque[cell] ? 15 : level;
-                if (sky[cell] > 1) skySeeds.push(cell);
+            let above = -1;
+            for (let y = py - 1; y >= 0; y--) {
+                const cell = (x * py + y) * pz + z;
+                const damp = grid.damp[cell];
+                if (above >= 0) {
+                    if (damp >= 15 || occludes(above, cell, 0)) level = 0;
+                    else level = level === 15 && damp === 0 ? 15 : Math.max(0, level - Math.max(1, damp));
+                } else if (damp >= 15) level = 0;
+                sky[cell] = level;
+                above = cell;
             }
         }
     }
-    flood(sky, skySeeds);
-    const blockSeeds = [];
-    for (const [cell, level] of emitters) {
-        if (level > block[cell]) block[cell] = level;
-        blockSeeds.push(cell);
-    }
-    flood(block, blockSeeds);
+    flood(sky, true);
+    for (const [cell, level] of emitters) if (level > block[cell]) block[cell] = level;
+    flood(block, false);
     grid.sky = sky;
     grid.block = block;
 }
+
+function mergePlain(base, patch) {
+    const out = { ...base };
+    for (const [key, value] of Object.entries(patch)) {
+        out[key] = value && typeof value === 'object' && !Array.isArray(value) && base[key] && typeof base[key] === 'object' && !Array.isArray(base[key])
+            ? mergePlain(base[key], value) : value;
+    }
+    return out;
+}
+
+function fillProps(props, info) {
+    const [allowed, defaults] = info;
+    const out = {};
+    for (const [key, fallback] of Object.entries(defaults)) {
+        const value = props[key];
+        out[key] = value !== undefined && (!allowed[key] || allowed[key].includes(String(value))) ? String(value) : String(fallback);
+    }
+    return out;
+}
+
+const SPECIAL_DATA = /[:_](banner|decorated_pot)$/;
 
 async function buildMesh(view, options) {
     const [sx, sy, sz] = view.size;
@@ -162,6 +277,7 @@ async function buildMesh(view, options) {
         if (!entry) continue;
         let { name, props } = entry;
         const original = name;
+        if (name === 'minecraft:structure_block' && props.mode === 'data' && !options.showJigsaws) continue;
         let fromJigsaw = false;
         if (name === 'minecraft:jigsaw' && !options.showJigsaws && block.finalState) {
             ({ name, props } = parseState(block.finalState));
@@ -170,39 +286,92 @@ async function buildMesh(view, options) {
         const keyName = fromJigsaw ? name : original;
         const swap = options.swaps && options.swaps[name];
         if (swap && (!fromJigsaw || options.swapFinalStates)) name = swap;
-        const id = stateKey(name, props);
-        if (!unique.has(id)) unique.set(id, { name, props, index: unique.size });
+        const defaults = options.defaults && options.defaults(name);
+        if (defaults) props = fillProps(props, defaults);
+        let extra = null;
+        if (SPECIAL_DATA.test(name)) {
+            let data = block.nbt && !fromJigsaw ? plain(TAG.COMPOUND, block.nbt) : {};
+            const patch = options.blockData && !fromJigsaw && options.blockData[keyName];
+            if (patch) data = mergePlain(data, patch);
+            extra = blockExtra(name, data);
+        }
+        const id = stateKey(name, props) + (extra ? JSON.stringify(extra) : '');
+        if (!unique.has(id)) unique.set(id, { name, props, extra, index: unique.size });
         instances.push({ block: i, x: block.x, y: block.y, z: block.z, state: unique.get(id), key: options.keyOf ? options.keyOf(keyName) : -1, original: keyName, shown: name });
     }
 
-    const states = [...unique.values()];
-    const baked = await Promise.all(states.map(state => bakeState(state.name, state.props)));
-    if (options.isStale && options.isStale()) return null;
-    const water = await waterQuads();
+    const entities = [];
+    const missingParts = new Map();
+    const note = label => missingParts.set(label, (missingParts.get(label) || 0) + 1);
+    await Promise.all((view.entities || []).map(async entity => {
+        if (entity.id === 'minecraft:cushion') {
+            const data = plain(TAG.COMPOUND, entity.nbt);
+            const [ex, ey, ez] = entity.pos;
+            const x = Math.floor(ex), y = Math.floor(ey), z = Math.floor(ez);
+            const yaw = Math.round((Array.isArray(data.Rotation) ? Number(data.Rotation[0]) || 0 : 0) / 90) * 90;
+            entities.push({ x, y, z, quads: cushionQuads(String(data.color || 'white'), yaw, [(ex - x) * 16, (ey - y) * 16, (ez - z) * 16]) });
+            return;
+        }
+        const result = await entityModel(entity).catch(error => { console.warn(error); return null; });
+        if (!result) { note(entity.id.replace(/^minecraft:/, '').replace(/_/g, ' ')); return; }
+        for (const label of result.notes) note(label);
+        if (result.quads.length) entities.push({ x: result.cell[0], y: result.cell[1], z: result.cell[2], quads: result.quads });
+    }));
+    await Promise.all(instances.map(async instance => {
+        if (!/_sign$/.test(instance.shown)) return;
+        const block = view.blocks[instance.block];
+        if (!block || !block.nbt) return;
+        const quads = await signTextQuads(instance.shown, instance.state.props, block.nbt).catch(() => []);
+        if (quads.length) instance.text = quads;
+    }));
 
-    const urls = new Set();
-    for (const result of baked) for (const part of result.parts) for (const option of part) for (const quad of option.quads) urls.add(quad.texture);
-    if (baked.some(result => result.water)) for (const quad of water) urls.add(quad.texture);
-    const infos = new Map();
-    await Promise.all([...urls].map(async url => infos.set(url, (await textureInfo(url)) || (await textureInfo(MISSING)))));
+    const states = [...unique.values()];
+    const baked = await Promise.all(states.map(state => bakeState(state.name, state.props, state.extra)));
     if (options.isStale && options.isStale()) return null;
 
     const grid = new Grid([sx, sy, sz]);
     const emitters = [];
+    const fluidKinds = new Set();
     for (const instance of instances) {
         const cell = grid.at(instance.x, instance.y, instance.z);
         if (cell < 0) continue;
         const result = baked[instance.state.index];
         instance.cell = cell;
         if (result.opaque) grid.opaque[cell] = 1;
+        if (result.solid) grid.solid[cell] = 1;
+        if (result.motion) grid.full[cell] = 1;
+        grid.damp[cell] = result.dampen ?? (result.opaque ? 15 : 0);
         grid.shade[cell] = result.shade;
-        if (result.water) grid.water[cell] = 1;
+        if (result.water) grid.fluid[cell] = 1;
+        else if (result.fluid === 'lava') grid.fluid[cell] = 2;
+        grid.self[cell] = result.light;
+        if (result.emissive) grid.emissive[cell] = 1;
         grid.kind[cell] = instance.state.index;
         if (result.light > 0) emitters.push([cell, result.light]);
     }
+    for (const instance of instances) {
+        const kind = instance.cell === undefined ? 0 : grid.fluid[instance.cell];
+        if (!kind) continue;
+        const level = /^minecraft:(water|lava)$/.test(instance.state.name) ? Number(instance.state.props.level) || 0 : 0;
+        const amount = level === 0 || level >= 8 ? 8 : 8 - level;
+        instance.fluid = kind === 1 ? 'water' : 'lava';
+        grid.own[instance.cell] = amount / 9;
+        fluidKinds.add(instance.fluid);
+    }
+    const fluidSprites = new Map([...fluidKinds].map(kind => [kind, fluidTextures(kind)]));
+
+    const urls = new Set();
+    for (const result of baked) for (const part of result.parts) for (const option of part) for (const quad of option.quads) urls.add(quad.texture);
+    for (const sprites of fluidSprites.values()) for (const url of Object.values(sprites)) if (url) urls.add(url);
+    for (const entity of entities) for (const quad of entity.quads) urls.add(quad.texture);
+    for (const instance of instances) if (instance.text) for (const quad of instance.text) urls.add(quad.texture);
+    const infos = new Map();
+    await Promise.all([...urls].map(async url => infos.set(url, (await textureInfo(url)) || (await textureInfo(MISSING)))));
+    if (options.isStale && options.isStale()) return null;
+
     const lighting = options.lighting && options.lighting !== 'off';
-    if (lighting) computeLight(grid, emitters);
-    const night = options.lighting === 'night';
+    const table = lighting ? lightmap(options.lighting) : null;
+    if (lighting) computeLight(grid, kind => baked[kind].masks, emitters);
 
     const buckets = new Map();
     const bucketFor = (url, forced) => {
@@ -213,13 +382,22 @@ async function buildMesh(view, options) {
         return buckets.get(id);
     };
 
+    const OUTSIDE = [15, 0];
+    const BRIGHT = [15, 15];
     const shadeAt = (x, y, z) => { const c = grid.at(x, y, z); return c < 0 ? 1 : grid.shade[c]; };
     const permeable = (x, y, z) => { const c = grid.at(x, y, z); return c < 0 || !grid.opaque[c]; };
-    const lightAt = (x, y, z, fallback) => {
+    const coordsAt = (x, y, z) => {
         const c = grid.at(x, y, z);
-        if (c < 0) return [15, 0];
-        if (grid.opaque[c]) return fallback;
-        return [grid.sky[c], grid.block[c]];
+        if (c < 0) return OUTSIDE;
+        if (grid.emissive[c]) return BRIGHT;
+        return [grid.sky[c], Math.max(grid.block[c], grid.self[c])];
+    };
+    const blend = (a, b, c, center) => {
+        if (center[0] > 2 || center[1] > 2) {
+            const fix = n => (n[0] === 0 && n[1] === 0 ? center : n[0] === 0 ? [center[0], n[1]] : n);
+            a = fix(a); b = fix(b); c = fix(c);
+        }
+        return [(a[0] + b[0] + c[0] + center[0]) / 4, (a[1] + b[1] + c[1] + center[1]) / 4];
     };
 
     const faceSample = (x, y, z, dir, cubic, useAo) => {
@@ -228,7 +406,11 @@ async function buildMesh(view, options) {
         const [axisA, axisB] = TANGENTS[dir];
         const offset = (axis, sign) => [axis === 0 ? sign : 0, axis === 1 ? sign : 0, axis === 2 ? sign : 0];
         const center = cubic ? shadeAt(bx, by, bz) : shadeAt(x, y, z);
-        const centerLight = lighting ? lightAt(x + dx, y + dy, z + dz, lightAt(x, y, z, [0, 0])) : null;
+        let centerLight = null;
+        if (lighting) {
+            const next = grid.at(x + dx, y + dy, z + dz);
+            centerLight = cubic || !(next >= 0 && grid.solid[next]) ? coordsAt(x + dx, y + dy, z + dz) : coordsAt(x, y, z);
+        }
         const values = [];
         const lights = [];
         for (const [sa, sb] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
@@ -241,38 +423,41 @@ async function buildMesh(view, options) {
             const ox = bx + a[0] + b[0], oy = by + a[1] + b[1], oz = bz + a[2] + b[2];
             if (useAo) values.push((shadeA + shadeB + (open ? shadeAt(ox, oy, oz) : shadeA) + center) * 0.25);
             if (lighting) {
-                const la = lightAt(ax, ay, az, centerLight);
-                const lb = lightAt(cx, cy, cz, centerLight);
-                const lc = open ? lightAt(ox, oy, oz, centerLight) : la;
-                lights.push([(la[0] + lb[0] + lc[0] + centerLight[0]) / 4, (la[1] + lb[1] + lc[1] + centerLight[1]) / 4]);
+                const la = coordsAt(ax, ay, az);
+                lights.push(blend(la, coordsAt(cx, cy, cz), open ? coordsAt(ox, oy, oz) : la, centerLight));
             }
         }
         return { values, lights, axisA, axisB };
     };
 
-    const flatLight = (x, y, z, dir) => {
+    const flatLight = (instance, dir, cubic) => {
+        if (grid.emissive[instance.cell]) return BRIGHT;
         const [dx, dy, dz] = VEC[dir];
-        return lightAt(x + dx, y + dy, z + dz, lightAt(x, y, z, [0, 0]));
+        const c = cubic ? grid.at(instance.x + dx, instance.y + dy, instance.z + dz) : instance.cell;
+        const own = grid.self[instance.cell];
+        if (c < 0) return [15, own];
+        return [grid.sky[c], Math.max(grid.block[c], own)];
+    };
+
+    const isCubic = (quad, result) => {
+        const axis = quad.dir < 2 ? 1 : quad.dir < 4 ? 2 : 0;
+        const v0 = quad.p[axis], v1 = quad.p[3 + axis], v2 = quad.p[6 + axis], v3 = quad.p[9 + axis];
+        if (v0 !== v1 || v1 !== v2 || v2 !== v3) return false;
+        return (quad.dir % 2 === 1 ? v0 > 0.9999 : v0 < 0.0001) || result.shade === 0.2;
     };
 
     let quadCount = 0;
-    const emit = (quad, instance, tint, useAo, result) => {
+    const emit = (quad, instance, tint, useAo, result, fixedLight) => {
         const { x, y, z } = instance;
-        let cubic = false;
-        if (useAo || lighting) {
-            const axis = quad.dir < 2 ? 1 : quad.dir < 4 ? 2 : 0;
-            const v0 = quad.p[axis], v1 = quad.p[3 + axis], v2 = quad.p[6 + axis], v3 = quad.p[9 + axis];
-            if (v0 === v1 && v1 === v2 && v2 === v3) {
-                const positive = quad.dir % 2 === 1;
-                cubic = (positive ? v0 > 0.9999 : v0 < 0.0001) || result.shade === 0.2;
-            }
-        }
-        const sample = useAo || lighting ? faceSample(x, y, z, quad.dir, cubic, useAo) : null;
-        const flat = lighting && !sample ? flatLight(x, y, z, quad.dir) : null;
+        const cubic = (useAo || lighting) && !fixedLight ? isCubic(quad, result) : false;
+        const smoothLight = lighting && !fixedLight && useAo;
+        const sample = useAo || smoothLight ? faceSample(x, y, z, quad.dir, cubic, useAo) : null;
+        const flat = lighting && !smoothLight ? (fixedLight || flatLight(instance, quad.dir, cubic)) : null;
         const directional = quad.shade ? FACE_SHADE[quad.shadeDir] : 1;
         const tr = ((tint >> 16) & 255) / 255, tg = ((tint >> 8) & 255) / 255, tb = (tint & 255) / 255;
         const bucket = bucketFor(quad.texture, quad.layer);
         const base = bucket.pos.length / 3;
+        const emission = quad.emission || 0;
         let cx = 0, cy = 0, cz = 0;
         for (let i = 0; i < 4; i++) {
             const px = quad.p[i * 3], py = quad.p[i * 3 + 1], pz = quad.p[i * 3 + 2];
@@ -287,14 +472,13 @@ async function buildMesh(view, options) {
                 const b = Math.min(1, Math.max(0, point[sample.axisB]));
                 const w = [(1 - a) * (1 - b), a * (1 - b), a * b, (1 - a) * b];
                 if (useAo) ao = sample.values[0] * w[0] + sample.values[1] * w[1] + sample.values[2] * w[2] + sample.values[3] * w[3];
-                if (lighting) {
+                if (smoothLight) {
                     let skyLevel = 0, blockLevel = 0;
                     for (let k = 0; k < 4; k++) { skyLevel += sample.lights[k][0] * w[k]; blockLevel += sample.lights[k][1] * w[k]; }
-                    light = lightColor(skyLevel, Math.max(blockLevel, result.light), night);
+                    light = lightColor(table, Math.max(skyLevel, emission), Math.max(blockLevel, emission));
                 }
-            } else if (flat) {
-                light = lightColor(flat[0], Math.max(flat[1], result.light), night);
             }
+            if (flat) light = lightColor(table, Math.max(flat[0], emission), Math.max(flat[1], emission));
             const s = directional * ao;
             bucket.shade.push(s * tr * light[0], s * tg * light[1], s * tb * light[2]);
             bucket.key.push(instance.key);
@@ -305,6 +489,127 @@ async function buildMesh(view, options) {
         quadCount++;
     };
 
+    const fluidCode = kind => (kind === 'water' ? 1 : 2);
+    const blocksMotion = c => grid.full[c] === 1;
+    const heightAt = (x, y, z, code) => {
+        const c = grid.at(x, y, z);
+        if (c < 0) return -1;
+        if (grid.fluid[c] === code) {
+            const up = grid.at(x, y + 1, z);
+            return up >= 0 && grid.fluid[up] === code ? 1 : grid.own[c];
+        }
+        return blocksMotion(c) ? -1 : 0;
+    };
+    const weighted = (sum, height) => {
+        if (height >= 0.8) { sum[0] += height * 10; sum[1] += 10; } else if (height >= 0) { sum[0] += height; sum[1] += 1; }
+    };
+    const average = (x, y, z, code, self, a, b, cx, cz) => {
+        if (a >= 1 || b >= 1) return 1;
+        const sum = [0, 0];
+        if (a > 0 || b > 0) {
+            const corner = heightAt(x + cx, y, z + cz, code);
+            if (corner >= 1) return 1;
+            weighted(sum, corner);
+        }
+        weighted(sum, self);
+        weighted(sum, a);
+        weighted(sum, b);
+        return sum[0] / sum[1];
+    };
+    const flowOf = (x, y, z, code) => {
+        const own = grid.own[grid.at(x, y, z)];
+        let fx = 0, fz = 0;
+        for (const [dx, dz] of [[0, -1], [0, 1], [-1, 0], [1, 0]]) {
+            const n = grid.at(x + dx, y, z + dz);
+            if (n < 0 || (grid.fluid[n] && grid.fluid[n] !== code)) continue;
+            const same = grid.fluid[n] === code;
+            const neighbor = same ? grid.own[n] : 0;
+            let distance = 0;
+            if (neighbor === 0) {
+                if (!blocksMotion(n)) {
+                    const below = grid.at(x + dx, y - 1, z + dz);
+                    if (below >= 0 && grid.fluid[below] === code && grid.own[below] > 0) distance = own - (grid.own[below] - 0.8888889);
+                }
+            } else distance = own - neighbor;
+            fx += dx * distance;
+            fz += dz * distance;
+        }
+        return [fx, fz];
+    };
+    const overlayNeighbor = c => {
+        if (c < 0 || grid.kind[c] < 0) return false;
+        const name = baked[grid.kind[c]].name;
+        return /^minecraft:(.*_)?(glass|ice|slime_block|honey_block|leaves)$|_leaves$|stained_glass$/.test(name);
+    };
+    const fluidFace = (points, uv, texture, dir, instance, tint, result, light, back) => {
+        let quad = quadOf(points.map(p => p.map(v => v * 16)), uv, texture, { ao: false });
+        if (quad.dir !== dir) quad = quadOf(points.slice().reverse().map(p => p.map(v => v * 16)), uv.slice().reverse(), texture, { ao: false });
+        quad.shadeDir = dir;
+        quad.dir = dir;
+        emit(quad, instance, tint, false, result, light);
+        if (back) {
+            const reverse = quadOf(points.slice().reverse().map(p => p.map(v => v * 16)), uv.slice().reverse(), texture, { ao: false });
+            reverse.shadeDir = dir;
+            emit(reverse, instance, tint, false, result, light);
+        }
+    };
+    const emitFluid = (instance, result) => {
+        const { x, y, z } = instance;
+        const kind = instance.fluid;
+        const code = fluidCode(kind);
+        const sprites = fluidSprites.get(kind);
+        const tint = kind === 'water' ? tintFor('minecraft:water', {}, options.tints, 0) : 0xffffff;
+        const near = (dx, dy, dz) => grid.at(x + dx, y + dy, z + dz);
+        const same = c => c >= 0 && grid.fluid[c] === code;
+        const solidAt = c => c >= 0 && grid.opaque[c] === 1;
+        const up = near(0, 1, 0), down = near(0, -1, 0);
+        const self = heightAt(x, y, z, code);
+        let ne = 1, nw = 1, se = 1, sw = 1;
+        if (self < 1) {
+            const hn = heightAt(x, y, z - 1, code), hs = heightAt(x, y, z + 1, code), he = heightAt(x + 1, y, z, code), hw = heightAt(x - 1, y, z, code);
+            ne = average(x, y, z, code, self, hn, he, 1, -1);
+            nw = average(x, y, z, code, self, hn, hw, -1, -1);
+            se = average(x, y, z, code, self, hs, he, 1, 1);
+            sw = average(x, y, z, code, self, hs, hw, -1, 1);
+        }
+        let light = null, lightBelow = null;
+        if (lighting) {
+            const own = coordsAt(x, y, z), above = coordsAt(x, y + 1, z), below = coordsAt(x, y - 1, z);
+            light = [Math.max(own[0], above[0]), Math.max(own[1], above[1])];
+            lightBelow = [Math.max(own[0], below[0]), Math.max(own[1], below[1])];
+        }
+        const renderDown = !same(down) && !solidAt(down);
+        const bottom = renderDown ? 0.001 : 0;
+        if (!same(up) && !(Math.min(ne, nw, se, sw) >= 1 && solidAt(up))) {
+            const [fx, fz] = flowOf(x, y, z, code);
+            let uv, texture;
+            if (fx === 0 && fz === 0) {
+                texture = sprites.still;
+                uv = [[0, 0], [0, 1], [1, 1], [1, 0]];
+            } else {
+                texture = sprites.flow;
+                const angle = Math.atan2(fz, fx) - Math.PI / 2;
+                const sn = Math.sin(angle) * 0.25, cs = Math.cos(angle) * 0.25;
+                uv = [[0.5 + (-cs - sn), 0.5 + (-cs + sn)], [0.5 + (-cs + sn), 0.5 + (cs + sn)], [0.5 + (cs + sn), 0.5 + (cs - sn)], [0.5 + (cs - sn), 0.5 + (-cs - sn)]];
+            }
+            fluidFace([[0, nw - 0.001, 0], [0, sw - 0.001, 1], [1, se - 0.001, 1], [1, ne - 0.001, 0]], uv, texture, 1, instance, tint, result, light, !solidAt(up));
+        }
+        if (renderDown) fluidFace([[0, bottom, 0], [1, bottom, 0], [1, bottom, 1], [0, bottom, 1]], [[0, 0], [1, 0], [1, 1], [0, 1]], sprites.still, 0, instance, tint, result, lightBelow, false);
+        const sides = [
+            [2, [0, 0, -1], nw, ne, [0, 0.001], [1, 0.001]],
+            [3, [0, 0, 1], se, sw, [1, 0.999], [0, 0.999]],
+            [4, [-1, 0, 0], sw, nw, [0.001, 1], [0.001, 0]],
+            [5, [1, 0, 0], ne, se, [0.999, 0], [0.999, 1]]
+        ];
+        for (const [dir, [dx, , dz], h0, h1, [x0, z0], [x1, z1]] of sides) {
+            const n = near(dx, 0, dz);
+            if (same(n) || solidAt(n)) continue;
+            const overlay = sprites.overlay && overlayNeighbor(n);
+            const texture = overlay ? sprites.overlay : sprites.flow;
+            fluidFace([[x0, h0, z0], [x1, h1, z1], [x1, bottom, z1], [x0, bottom, z0]], [[0, (1 - h0) * 0.5], [0.5, (1 - h1) * 0.5], [0.5, 0.5], [0, 0.5]], texture, dir, instance, tint, result, light, !overlay);
+        }
+    };
+
     const problems = new Map();
     let shown = 0;
     for (const instance of instances) {
@@ -312,11 +617,11 @@ async function buildMesh(view, options) {
         const result = baked[instance.state.index];
         const { x, y, z } = instance;
         if (result.problem) problems.set(instance.shown, result.problem);
-        if (result.parts.length || result.water) shown++;
+        if (result.parts.length || instance.fluid) shown++;
         const smooth = options.smooth !== false && result.ao;
-        let tint = null;
-        result.parts.forEach((options2, partIndex) => {
-            const option = choose(options2, x, y, z, partIndex);
+        const tints = new Map();
+        result.parts.forEach((choices, partIndex) => {
+            const option = choose(choices, x, y, z, partIndex);
             for (const quad of option.quads) {
                 if (quad.cull >= 0) {
                     const [dx, dy, dz] = VEC[quad.cull];
@@ -324,22 +629,30 @@ async function buildMesh(view, options) {
                     if (next >= 0 && grid.opaque[next]) continue;
                     if (next >= 0 && result.selfCull && grid.kind[next] === instance.state.index) continue;
                 }
-                if (quad.tint >= 0 && tint === null) tint = tintFor(instance.state.name, instance.state.props, options.biome);
-                emit(quad, instance, quad.tint >= 0 ? tint : 0xffffff, smooth && quad.ao, result);
+                let color = 0xffffff;
+                if (quad.color >= 0) color = quad.color;
+                else if (quad.tint >= 0) {
+                    if (!tints.has(quad.tint)) tints.set(quad.tint, tintFor(instance.state.name, instance.state.props, options.tints, quad.tint));
+                    color = tints.get(quad.tint);
+                }
+                emit(quad, instance, color, smooth && quad.ao, result);
             }
         });
-        if (result.water) {
-            const waterTint = tintFor('minecraft:water', {}, options.biome);
-            for (const quad of water) {
-                const [dx, dy, dz] = VEC[quad.cull];
-                const next = grid.at(x + dx, y + dy, z + dz);
-                if (next >= 0 && (grid.water[next] || (grid.opaque[next] && quad.cull !== 1))) continue;
-                emit(quad, instance, waterTint, false, result);
-            }
+        if (instance.fluid) emitFluid(instance, result);
+        if (instance.text) {
+            const fixed = lighting ? coordsAt(x, y, z) : null;
+            for (const quad of instance.text) emit(quad, instance, 0xffffff, false, result, fixed);
         }
     }
 
-    return { buckets, instances, problems, quadCount, shown };
+    for (const entity of entities) {
+        const cell = grid.at(entity.x, entity.y, entity.z);
+        const instance = { block: -1, key: -1, x: entity.x, y: entity.y, z: entity.z, cell: cell < 0 ? 0 : cell };
+        const fixed = lighting ? (cell < 0 ? OUTSIDE : coordsAt(entity.x, entity.y, entity.z)) : null;
+        for (const quad of entity.quads) emit(quad, instance, quad.color >= 0 ? quad.color : 0xffffff, false, { shade: 1 }, fixed);
+    }
+
+    return { buckets, instances, problems, quadCount, shown, notDrawn: missingParts };
 }
 
 class Navigator {
@@ -564,12 +877,32 @@ export class StructureViewer {
         const id = `${layer}|${info.url}`;
         if (this.materials.has(id)) return this.materials.get(id);
         const { THREE } = this;
+        if (layer === 'portal') {
+            const repeat = source => {
+                const texture = new THREE.CanvasTexture(source.canvas);
+                texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                texture.colorSpace = THREE.NoColorSpace;
+                texture.magFilter = THREE.NearestFilter;
+                texture.minFilter = THREE.NearestFilter;
+                texture.generateMipmaps = false;
+                return texture;
+            };
+            const material = new THREE.ShaderMaterial({
+                vertexShader: PORTAL_VERTEX,
+                fragmentShader: PORTAL_FRAGMENT,
+                uniforms: { sky: { value: repeat(info.sky) }, stars: { value: repeat(info.stars) }, time: { value: 0 }, layers: { value: info.layers }, highlight: { value: -1 } },
+                side: THREE.FrontSide
+            });
+            material.userData.portal = true;
+            this.materials.set(id, material);
+            return material;
+        }
         const material = new THREE.ShaderMaterial({
             vertexShader: VERTEX,
             fragmentShader: FRAGMENT,
             uniforms: {
                 map: { value: this.texture(info) },
-                alphaCut: { value: layer === 'cutout' ? 0.1 : layer === 'translucent' ? 0.004 : -1 },
+                alphaCut: { value: layer === 'cutout' || layer.startsWith('overlay') ? 0.1 : layer === 'translucent' ? 0.004 : -1 },
                 highlight: { value: -1 }
             },
             transparent: layer === 'translucent',
@@ -601,7 +934,7 @@ export class StructureViewer {
         this.view = view;
         this.instances = result.instances;
         this.byBlock = new Map(result.instances.map(instance => [instance.block, instance]));
-        const order = { opaque: 0, cutout: 1, translucent: 2 };
+        const order = { opaque: 0, portal: 0, cutout: 1, overlay1: 1.1, overlay2: 1.2, overlay3: 1.3, translucent: 2 };
         for (const bucket of result.buckets.values()) {
             const geometry = new THREE.BufferGeometry();
             geometry.setAttribute('position', new THREE.Float32BufferAttribute(bucket.pos, 3));
@@ -623,15 +956,19 @@ export class StructureViewer {
         this.world.position.set(-sx / 2, 0, -sz / 2);
         this.helpers.position.copy(this.world.position);
         this.size = [sx, sy, sz];
+        const bounds = new THREE.Box3(new THREE.Vector3(0, 0, 0), new THREE.Vector3(sx, sy, sz));
+        for (const mesh of this.meshes) { mesh.geometry.computeBoundingBox(); bounds.union(mesh.geometry.boundingBox); }
+        this.bounds = bounds.translate(this.world.position);
         this.refreshHelpers();
         this.applyHighlight();
         if (options.frame) this.frame();
-        const used = new Set(this.meshes.map(mesh => mesh.material.uniforms.map.value));
+        const used = new Set(this.meshes.map(mesh => mesh.material.uniforms.map && mesh.material.uniforms.map.value));
         this.active = this.animated.filter(item => used.has(item.texture));
+        for (const material of new Set(this.meshes.map(mesh => mesh.material))) if (material.userData.portal) this.active.push({ portal: material });
         this.lastSort = null;
         this.updateTicker();
         this.requestRender();
-        return { problems: result.problems, quads: result.quadCount, shown: result.shown };
+        return { problems: result.problems, quads: result.quadCount, shown: result.shown, notDrawn: result.notDrawn };
     }
 
     refreshHelpers() {
@@ -673,8 +1010,9 @@ export class StructureViewer {
     frame() {
         if (!this.size || !this.THREE) return;
         const [sx, sy, sz] = this.size;
-        this.nav.target.set(0, sy / 2, 0);
-        const radius = Math.max(1, Math.hypot(sx, sy, sz) / 2);
+        const bounds = this.bounds;
+        if (bounds) bounds.getCenter(this.nav.target); else this.nav.target.set(0, sy / 2, 0);
+        const radius = Math.max(1, bounds ? bounds.getSize(new this.THREE.Vector3()).length() / 2 : Math.hypot(sx, sy, sz) / 2);
         const aspect = Math.max(1, this.canvas.clientWidth) / Math.max(1, this.canvas.clientHeight);
         const narrow = Math.atan(this.nav.slope() * Math.min(1, aspect));
         this.nav.distance = radius / Math.sin(narrow) * 1.08;
@@ -768,6 +1106,11 @@ export class StructureViewer {
             this.lastTick += steps * 50;
             let changed = false;
             for (const item of this.active) {
+                if (item.portal) {
+                    item.portal.uniforms.time.value = ((now / 50) % 24000) / 24000;
+                    changed = true;
+                    continue;
+                }
                 const { info } = item;
                 item.time += steps;
                 let frame = item.frame;

@@ -35,16 +35,25 @@
 .st-files-head input { height: 32px; font-size: 13px; }
 .st-tree { flex: 1; overflow-y: auto; padding: 6px; scrollbar-width: thin; }
 .st-files-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px; border-top: 1px solid var(--hairline); font-size: 12px; color: var(--secondary); }
-.st-folder-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 10px 6px 4px; font-size: 11px; color: var(--tertiary); }
-.st-folder-row span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-folder-row { display: grid; grid-template-columns: 12px auto minmax(0, 1fr) auto auto; align-items: center; gap: 6px; padding: 2px 6px 2px calc(6px + var(--depth, 0) * 16px); border-radius: 7px; font-size: 12px; color: var(--secondary); cursor: pointer; }
+.st-folder-row:hover { background: var(--fill); }
+.st-chevron { width: 12px; height: 12px; display: grid; place-items: center; color: var(--tertiary); transition: transform 0.15s var(--ease); }
+.st-chevron::before { content: ""; width: 5px; height: 5px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(-45deg); }
+.st-folder-row[aria-expanded="true"] .st-chevron { transform: rotate(90deg); }
+.st-folder-name { min-width: 0; padding: 5px 0; border: 0; background: none; color: inherit; font: inherit; font-weight: 600; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: rtl; cursor: pointer; }
+.st-folder-row small { font-size: 11px; color: var(--tertiary); font-variant-numeric: tabular-nums; }
 .st-folder-row .link { font-size: 11px; opacity: 0; transition: opacity 0.15s var(--ease); }
 .st-folder-row:hover .link, .st-folder-row .link:focus-visible { opacity: 1; }
-.st-file { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 2px 6px; border-radius: 7px; }
+.st-file { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 2px 6px 2px calc(24px + var(--depth, 0) * 16px); border-radius: 7px; }
 .st-file:hover { background: var(--fill); }
 .st-file.current { background: var(--accent); color: #fff; }
 .st-file.current small { color: rgba(255, 255, 255, 0.8); }
 .st-file input, .st-folder-row input { width: 14px; height: 14px; margin: 0; accent-color: var(--accent); }
-.st-file-name { min-width: 0; padding: 5px 0; border: 0; background: none; color: inherit; font: inherit; font-size: 13px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.st-file-name { min-width: 0; padding: 5px 0; border: 0; background: none; color: inherit; font: inherit; font-size: 13px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; direction: rtl; cursor: pointer; }
+.st-biome { gap: 8px; }
+.st-swatches { display: inline-flex; gap: 4px; }
+.st-swatch { position: relative; width: 22px; height: 22px; border-radius: 6px; overflow: hidden; box-shadow: 0 0 0 1px var(--hairline) inset; cursor: pointer; }
+.st-swatch input { position: absolute; inset: -8px; width: calc(100% + 16px); height: calc(100% + 16px); padding: 0; border: 0; background: none; cursor: pointer; }
 .st-file small { font-size: 11px; color: var(--tertiary); }
 
 .st-stage { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
@@ -184,7 +193,7 @@ html.st-locked, html.st-locked body { overflow: hidden; }
 .st-blocks { overflow: hidden; }
 .st-row {
     display: grid;
-    grid-template-columns: 43px minmax(0, 1fr) 16px 43px minmax(0, 1.1fr) 48px;
+    grid-template-columns: 43px minmax(0, 1fr) 16px 43px minmax(0, 1.1fr) 84px;
     align-items: center;
     gap: 10px;
     padding: 8px 14px;
@@ -207,7 +216,16 @@ html.st-locked, html.st-locked body { overflow: hidden; }
 .st-target input.invalid { border-color: var(--danger); }
 .st-warning { font-size: 11px; line-height: 1.35; color: var(--sv-warning); }
 .st-warning:empty { display: none; }
-.st-reset { font-size: 12px; justify-self: end; }
+.st-actions { display: flex; justify-content: flex-end; gap: 12px; }
+.st-actions .link { font-size: 12px; }
+.st-reset[hidden] { display: none; }
+.st-row.has-data .st-data-toggle { color: var(--accent); font-weight: 600; }
+.st-data { display: grid; gap: 3px; }
+.st-row > .st-data { grid-column: 2 / -1; }
+.st-data[hidden] { display: none; }
+.st-data textarea { width: 100%; min-height: 54px; resize: vertical; padding: 7px 10px; font: 12px/1.45 var(--mono, monospace); }
+.st-data textarea.invalid { border-color: var(--danger); }
+.sv-pick .st-data textarea { min-height: 46px; max-height: 120px; }
 .st-target-icon:empty { visibility: hidden; }
 
 .st-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; margin-top: 12px; }
@@ -243,16 +261,18 @@ html.st-locked, html.st-locked body { overflow: hidden; }
     .sv-tool svg { width: 18px; height: 18px; }
     .sv-help { top: 58px; }
     .st-file, .st-folder-row { min-height: 40px; }
+    .st-swatch { width: 32px; height: 32px; }
     .st-file input, .st-folder-row input { width: 20px; height: 20px; }
     .st-folder-row .link { opacity: 1; font-size: 12px; }
     .sv-pick-close { width: 36px; height: 36px; }
-    .st-reset { padding: 8px 0; }
+    .st-actions .link { padding: 8px 0; }
+    .st-data textarea { font-size: 16px; }
 }
 
 @media (max-width: 640px) {
     .st-row {
         grid-template-columns: 43px minmax(0, 1fr) auto;
-        grid-template-areas: "icon name reset" "ticon target target";
+        grid-template-areas: "icon name reset" "ticon target target" "data data data";
         row-gap: 6px;
     }
     .st-row > .st-icon:first-child { grid-area: icon; }
@@ -260,7 +280,8 @@ html.st-locked, html.st-locked body { overflow: hidden; }
     .st-arrow { display: none; }
     .st-target-icon { grid-area: ticon; }
     .st-target { grid-area: target; }
-    .st-reset { grid-area: reset; }
+    .st-actions { grid-area: reset; }
+    .st-row > .st-data { grid-area: data; }
     .st-filters input, .st-filters select { width: 100%; }
     .st-filters { width: 100%; }
     .st-mode { width: 100%; }

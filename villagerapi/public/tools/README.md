@@ -29,6 +29,7 @@ Open `block_replacements.json` and change the right-hand side of any block you w
 - Properties such as `facing` or `half` are kept, so swap stairs for stairs, slabs for slabs, doors for doors, and so on. Properties the new block doesn't have are ignored by Minecraft.
 - `replace_jigsaw_final_states` also swaps the block each jigsaw block turns into after generation (for example the sand under village streets). Leave it `true` unless you have a reason not to.
 - `rename_files` renames output files, for example `{"desert_": "badlands_"}`. Leave it empty `{}` when making overrides for a VillagerAPI `village_types` folder, because overrides must keep the original file names.
+- `block_nbt` sets block entity data (NBT) on every placed copy of a block, written in SNBT, for example `{"minecraft:chest": "{LootTable:\"minecraft:chests/village/village_desert_house\"}"}`. The keys are the original block IDs. Only the website applies it; the scripts keep it but ignore it.
 - `used_in_files` just shows how many files use each block. It isn't read by the apply script.
 
 Running the scan again keeps your edits and only adds blocks it hasn't seen before.
